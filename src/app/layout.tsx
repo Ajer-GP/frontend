@@ -13,11 +13,6 @@ const inter = Inter({
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap",
-});
 export const metadata: Metadata = {
   icons: { icon: "/images/logo.png" },
   title: "Ajer Website",
@@ -31,9 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang='ar'
-      className={`${inter.variable} ${ibmPlexSansArabic.variable} ${jetbrainsMono.variable} h-full antialiased`}>
-      <body className='min-h-full flex flex-col'>{children}</body>
+      lang="ar"
+      className={`${inter.variable} ${ibmPlexSansArabic.variable}  h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }

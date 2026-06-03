@@ -27,7 +27,7 @@
 
   /* font families */
   --font-primary: var(--font-inter), system-ui, sans-serif;
-  --font-arabic: var(--font-cairo), sans-serif;
+  --font-arabic: var(--font-arabic), sans-serif;
   --font-mono: var(--font-mono), monospace;
 
   /* scale */
@@ -149,7 +149,7 @@ body {
 
   /* ── Font Families ── */
   --font-family-primary: var(--font-inter), system-ui, sans-serif;
-  --font-family-arabic: var(--font-cairo), sans-serif;
+  --font-family-arabic: var(--font-arabic), sans-serif;
   --font-family-mono: var(--font-mono), monospace;
 
   /* ── Font Sizes (with built-in line-height / letter-spacing) ── */
