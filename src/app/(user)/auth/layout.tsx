@@ -8,7 +8,7 @@ export default function AuthLayout({
   return (
     <div className="flex min-h-screen" dir="rtl">
       {/* fixed photo */}
-      <div className="hidden lg:flex w-1/3 shrink-0 relative bg-brand-dark">
+      <div className="hidden lg:flex w-1/2 shrink-0 relative bg-brand-dark">
         <Image
           src="/images/auth-bg.png"
           alt="خلفية تسجيل الدخول"
@@ -19,8 +19,8 @@ export default function AuthLayout({
       </div>
 
       {/* forms */}
-      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 lg:px-16 bg-surface-primary min-h-screen overflow-y-auto">
-        <div className="w-full max-w-md">{children}</div>
+      <div className="flex flex-1 px-6 py-12 align-middle justify-center lg:px-16 bg-surface-primary min-h-screen overflow-y-auto">
+        <div className="w-full  ">{children}</div>
       </div>
     </div>
   );

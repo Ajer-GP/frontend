@@ -1,13 +1,22 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Inter, Cairo, JetBrains_Mono } from "next/font/google";
+import {
+  Inter,
+  Cairo,
+  JetBrains_Mono,
+  IBM_Plex_Sans_Arabic,
+} from "next/font/google";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
 });
-
+const ibmPlexArabic = IBM_Plex_Sans_Arabic({
+  subsets: ["arabic"],
+  weight: ["100", "200", "300", "400", "500", "600", "700"], // Choose the weights you need
+  variable: "--font-ibm-plex-arabic", // CSS variable for Tailwind
+});
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
   variable: "--font-cairo",
@@ -30,10 +39,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang='en'
-      className={`${inter.variable} ${cairo.variable} ${jetbrainsMono.variable} h-full antialiased`}>
-      <body className='min-h-full flex flex-col'>{children}</body>
+    <html lang="ar" className={` ${ibmPlexArabic.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }
