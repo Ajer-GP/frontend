@@ -119,7 +119,6 @@ body {
   letter-spacing: var(--overline-tracking);
   text-transform: var(--overline-transform);
 }
-@import "tailwindcss";
 
 @theme {
   /* ── Colors ── */
