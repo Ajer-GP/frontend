@@ -33,7 +33,7 @@ export default function forgotpassword() {
             id='email'
             name='email'
             placeholder='مثال  johndoe@example.com'
-            className='input bg-white w-full outline-none'
+            className='input bg-white w-full outline-0 border-0'
           />
         </div>
         <p className='text-gray-400 text-caption my-2'>

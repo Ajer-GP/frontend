@@ -12,7 +12,8 @@ export default function AuthLayout({
         <Image
           src='/images/auth-bg.png'
           alt='خلفية تسجيل الدخول'
-          fill
+          width={550}
+          height={500}
           className='object-cover'
           priority
         />

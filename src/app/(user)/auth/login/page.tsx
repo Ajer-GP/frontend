@@ -12,7 +12,7 @@ export default function Login() {
   const [formState, formAction] = useActionState(handleSubmit, intial_state);
   console.log(formState);
   return (
-    <div dir='rtl'>
+    <div>
       <h1 className='text-4xl text-text-primary mb-2'>مرحبا بعودتك</h1>
       <p className='text-gray-400 text-h3 my-2'>
         لا تمتلك حساب ؟
@@ -48,7 +48,7 @@ export default function Login() {
             id='email'
             name='email'
             placeholder='مثال  johndoe@example.com'
-            className='input bg-white w-full outline-none'
+            className='input bg-white w-full outline-0 border-0'
           />
         </div>
         {formState.ZodErrors && (
@@ -82,7 +82,7 @@ export default function Login() {
             id='password'
             name='password'
             placeholder='********************'
-            className='input bg-white outline-none'
+            className='input bg-white w-full outline-0 border-0'
           />
         </div>
         {formState.ZodErrors && (
