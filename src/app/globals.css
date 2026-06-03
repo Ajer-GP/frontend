@@ -1,3 +1,4 @@
+@import "tailwindcss";
 @plugin "daisyui";
 
 :root {
@@ -117,4 +118,134 @@ body {
   font-weight: var(--overline-weight);
   letter-spacing: var(--overline-tracking);
   text-transform: var(--overline-transform);
+}
+
+@theme {
+  /* ── Colors ── */
+  --color-brand-primary: #1a6b4a;
+  --color-brand-mid: #2e9e6e;
+  --color-brand-light: #e6f4ee;
+  --color-brand-dark: #0d4a32;
+
+  --color-accent-default: #e8a020;
+  --color-accent-light: #fef3dc;
+
+  --color-danger: #e24b4a;
+  --color-danger-bg: #fcebeb;
+  --color-success: #639922;
+  --color-success-bg: #eaf3de;
+  --color-warning: #ba7517;
+  --color-neutral: #888780;
+
+  --color-surface-primary: #ffffff;
+  --color-surface-secondary: #f8f7f4;
+  --color-surface-tertiary: #f1efe8;
+
+  --color-text-primary: #1c1c1a;
+  --color-text-secondary: #5f5e5a;
+  --color-text-tertiary: #888780;
+
+  --color-border-default: #d3d1c7;
+
+  /* ── Font Families ── */
+  --font-family-primary: var(--font-inter), system-ui, sans-serif;
+  --font-family-arabic: var(--font-cairo), sans-serif;
+  --font-family-mono: var(--font-mono), monospace;
+
+  /* ── Font Sizes (with built-in line-height / letter-spacing) ── */
+  --font-size-display: 28px;
+  --font-size-h1: 22px;
+  --font-size-h2: 18px;
+  --font-size-h3: 16px;
+  --font-size-body: 16px;
+  --font-size-body-sm: 14px;
+  --font-size-caption: 12px;
+  --font-size-overline: 11px;
+
+  /* ── Font Weights ── */
+  --font-weight-display: 500;
+  --font-weight-h1: 500;
+  --font-weight-h2: 500;
+  --font-weight-h3: 500;
+  --font-weight-body: 400;
+  --font-weight-body-sm: 400;
+  --font-weight-caption: 400;
+  --font-weight-overline: 500;
+
+  /* ── Line Heights ── */
+  --line-height-body: 1.65;
+  --line-height-body-sm: 1.55;
+
+  /* ── Letter Spacing ── */
+  --letter-spacing-display: -0.5px;
+  --letter-spacing-h1: -0.3px;
+  --letter-spacing-h2: -0.2px;
+  --letter-spacing-overline: 0.07em;
+
+  /* ── Spacing ── */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+}
+
+/* ── Typography utility classes ── */
+@layer utilities {
+  .text-display {
+    font-size: var(--font-size-display);
+    font-weight: var(--font-weight-display);
+    letter-spacing: var(--letter-spacing-display);
+  }
+  .text-h1 {
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-h1);
+    letter-spacing: var(--letter-spacing-h1);
+  }
+  .text-h2 {
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-h2);
+    letter-spacing: var(--letter-spacing-h2);
+  }
+  .text-h3 {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-h3);
+  }
+  .text-body {
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-body);
+    line-height: var(--line-height-body);
+  }
+  .text-body-sm {
+    font-size: var(--font-size-body-sm);
+    font-weight: var(--font-weight-body-sm);
+    line-height: var(--line-height-body-sm);
+  }
+  .text-caption {
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-caption);
+  }
+  .text-overline {
+    font-size: var(--font-size-overline);
+    font-weight: var(--font-weight-overline);
+    letter-spacing: var(--letter-spacing-overline);
+    text-transform: uppercase;
+  }
+}
+
+/* ── Base ── */
+@layer base {
+  body {
+    font-family: var(--font-family-primary);
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-primary);
+  }
+
+  :lang(ar) {
+    font-family: var(--font-family-arabic);
+  }
 }
