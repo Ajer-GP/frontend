@@ -5,9 +5,35 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import {
   forgotPasswordSchema,
+  loginSchema,
   resetPasswordSchema,
   signupSchema,
 } from "../schemas/auth.validation";
+
+export async function loginService(userData: z.infer<typeof loginSchema>) {
+  try {
+    const response = await fetch(`${process.env.API_BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...userData,
+      }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      return {
+        error:
+          data.error ||
+          data.message ||
+          "الإيميل أو الباسورد خطأ , الرجاء المحاولة مرة أخرى",
+      };
+    }
+    return data;
+  } catch (err) {
+    return err;
+  }
+}
 
 export async function registerAction(data: z.infer<typeof signupSchema>) {
   const parsed = signupSchema.safeParse(data);

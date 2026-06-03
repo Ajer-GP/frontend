@@ -1,10 +1,7 @@
 "use server";
-import { z } from "zod";
-import { loginService } from "@/Services/auth-service";
-const loginSchema = z.object({
-  email: z.string().email("البريد الإلكتروني غير صحيح").toLowerCase(),
-  password: z.string().min(8, "كلمة المرور يجب ألا تقل عن 8 أحرف"),
-});
+import { loginService } from "@/Modules/User/Features/Auth/services/actions";
+import { loginSchema } from "@/Modules/User/Features/Auth/schemas/auth.validation";
+
 export async function handleSubmit(prevState: any, formData: FormData) {
   const validatedFields = loginSchema.safeParse({
     email: String(formData.get("email") ?? ""),
