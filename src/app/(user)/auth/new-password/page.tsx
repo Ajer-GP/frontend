@@ -41,7 +41,7 @@ export default function page() {
             id='password'
             name='password'
             placeholder='********************'
-            className='input bg-white outline-none'
+            className='input bg-white w-full outline-0 border-0'
           />
         </div>
         <p className='text-gray-400 text-caption my-2'>
@@ -73,7 +73,7 @@ export default function page() {
             id='password'
             name='password'
             placeholder='********************'
-            className='input bg-white outline-none'
+            className='input bg-white w-full outline-0 border-0'
           />
         </div>
 
