@@ -50,14 +50,9 @@ export default function Reviews() {
               على أجر. التجربة كانت سلسة والتسليم في الموعد.
             </p>
             <div className='flex items-center gap-2'>
-              <div className='avatar'>
-                <div className='w-8'>
-                  <Image
-                    src='/images/cat-1.png'
-                    alt='avatar'
-                    width={50}
-                    height={50}
-                  />
+              <div className='avatar avatar-placeholder'>
+                <div className='bg-brand-primary text-neutral-content w-10 rounded-full'>
+                  <span>B</span>
                 </div>
               </div>
               <p className='font-black text-sm'>بسنت خالد</p>
@@ -84,14 +79,9 @@ export default function Reviews() {
               تجربة سهلة جدًا، وجدت المنتج الذي أحتاجه خلال دقائق.
             </p>
             <div className='flex items-center gap-2'>
-              <div className='avatar'>
-                <div className='w-8'>
-                  <Image
-                    src='/images/cat-1.png'
-                    alt='avatar'
-                    width={50}
-                    height={50}
-                  />
+              <div className='avatar avatar-placeholder'>
+                <div className='bg-brand-primary text-neutral-content w-10 rounded-full'>
+                  <span>R</span>
                 </div>
               </div>
               <p className='font-black text-sm'> رؤى فودة</p>
@@ -119,14 +109,9 @@ export default function Reviews() {
               منتظم.
             </p>
             <div className='flex items-center gap-2'>
-              <div className='avatar'>
-                <div className='w-8'>
-                  <Image
-                    src='/images/cat-1.png'
-                    alt='avatar'
-                    width={50}
-                    height={50}
-                  />
+              <div className='avatar avatar-placeholder'>
+                <div className='bg-brand-primary text-neutral-content w-10 rounded-full'>
+                  <span>kh</span>
                 </div>
               </div>
               <p className='font-black text-sm'> خالد محمود</p>
