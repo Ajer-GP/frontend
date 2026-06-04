@@ -1,6 +1,6 @@
 "use server";
-import { loginService } from "@/Modules/User/Features/Auth/services/actions";
-import { loginSchema } from "@/Modules/User/Features/Auth/schemas/auth.validation";
+import { loginService } from "@/modules/user/features/auth/services/actions";
+import { loginSchema } from "@/modules/user/features/auth/schemas/auth.validation";
 
 export async function handleSubmit(prevState: any, formData: FormData) {
   const validatedFields = loginSchema.safeParse({

@@ -2,21 +2,23 @@
 
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { resendOtpAction, verifyOtpAction } from "../services/actions";
 
 type OtpState = "idle" | "failed" | "success";
 type Props = {
   email: string;
-  type?: string;
+  otpType?: string;
 };
-export default function OtpVerification({ email, type }: Props) {
+export default function OtpVerification({ email, otpType }: Props) {
+  const router = useRouter();
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
   const [otpState, setOtpState] = useState<OtpState>("idle");
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
-  const [timeLeft, setTimeLeft] = useState(300); // 5:00
+  const [timeLeft, setTimeLeft] = useState(300);
   const [attempts, setAttempts] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -27,6 +29,13 @@ export default function OtpVerification({ email, type }: Props) {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
+
+  // Redirect to forgot-password when timer expires (reset-password flow only)
+  useEffect(() => {
+    if (timeLeft === 0 && otpType === "reset-password") {
+      router.push("/auth/forgot-password");
+    }
+  }, [timeLeft, otpType, router]);
 
   function startTimer() {
     setTimeLeft(300);
@@ -86,13 +95,22 @@ export default function OtpVerification({ email, type }: Props) {
 
     const result = await verifyOtpAction(code);
 
-    if (result?.success === false) {
+    if (!result || result.success === false) {
       setAttempts((a) => a + 1);
       setOtpState("failed");
-      setServerError(result.error);
+      setServerError(result?.error ?? "حدث خطأ غير متوقع");
       setIsSubmitting(false);
+      return;
     }
-    // On success → server redirects automatically, no need to handle here
+
+    // ── success ──────────────────────────────────────────────────────
+    if (result.otpType === "register") {
+      // show success screen — button inside handles navigation
+      setOtpState("success");
+    } else {
+      // reset-password: go to reset page immediately
+      router.push("/auth/new-password");
+    }
   };
 
   const handleRetry = () => {
@@ -121,7 +139,7 @@ export default function OtpVerification({ email, type }: Props) {
 
   const isFilled = otp.every((d) => d !== "");
 
-  // ─── Success Screen ───────────────────────────────────────────────
+  // ─── Success Screen (register only) ──────────────────────────────
   if (otpState === "success") {
     return (
       <div className="flex-1 flex flex-col justify-center px-8 py-10 gap-5">
@@ -145,7 +163,10 @@ export default function OtpVerification({ email, type }: Props) {
             مجتمع الإيجار الأذكى في مصر.
           </p>
         </div>
-        <button className="w-full py-3 rounded-xl font-semibold text-[24px] bg-brand-primary hover:bg-brand-dark text-white shadow-md shadow-green-100 transition-all">
+        <button
+          onClick={() => router.push("/auth/login")}
+          className="w-full py-3 rounded-xl font-semibold text-[24px] bg-brand-primary hover:bg-brand-dark text-white shadow-md shadow-green-100 transition-all"
+        >
           ابدأ رحلتك الآن
         </button>
       </div>

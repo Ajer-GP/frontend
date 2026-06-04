@@ -6,13 +6,14 @@ import { cookies } from "next/headers";
 import {
   forgotPasswordSchema,
   loginSchema,
+  resetPasswordFormSchema,
   resetPasswordSchema,
   signupSchema,
 } from "../schemas/auth.validation";
 
 export async function loginService(userData: z.infer<typeof loginSchema>) {
   try {
-    const response = await fetch(`${process.env.API_BASE_URL}/api/auth/login`, {
+    const response = await fetch(`${process.env.API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -42,7 +43,7 @@ export async function registerAction(data: z.infer<typeof signupSchema>) {
   }
 
   try {
-    const res = await fetch(`${process.env.API_BASE_URL}/api/auth/signup`, {
+    const res = await fetch(`${process.env.API_BASE_URL}/auth/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -91,10 +92,7 @@ export async function forgotPassword(
   const parsed = forgotPasswordSchema.safeParse(data);
 
   if (!parsed.success) {
-    return {
-      success: false,
-      error: "البريد الإلكتروني غير صحيح",
-    };
+    return { success: false, error: "البريد الإلكتروني غير صحيح" };
   }
 
   try {
@@ -102,26 +100,22 @@ export async function forgotPassword(
       `${process.env.API_BASE_URL}/auth/forget-password`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: parsed.data.email,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: parsed.data.email }),
       },
     );
 
     const result = await res.json();
+    console.log(result);
 
     if (!res.ok) {
       return {
         success: false,
-        error: result?.message || "حدث خطأ",
+        error: result?.message || "حدث خطأ، تحقق من البريد الإلكتروني",
       };
     }
 
     const { cookies } = await import("next/headers");
-
     (await cookies()).set("pending_email", parsed.data.email, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -135,82 +129,82 @@ export async function forgotPassword(
       path: "/",
     });
   } catch {
-    return {
-      success: false,
-      error: "تعذر الاتصال بالخادم",
-    };
+    return { success: false, error: "تعذر الاتصال بالخادم" };
   }
 
-  redirect("/auth/forgot-password/verify-email");
+  redirect("/auth/register/verify-email");
 }
 
-export async function resetPassword(data: z.infer<typeof resetPasswordSchema>) {
-  const parsed = resetPasswordSchema.safeParse(data);
-
+export async function resetPassword(
+  data: z.infer<typeof resetPasswordFormSchema>,
+) {
+  const parsed = resetPasswordFormSchema.safeParse(data);
   if (!parsed.success) {
-    return {
-      success: false,
-      error: "بيانات غير صحيحة",
-    };
+    return { success: false, error: "بيانات غير صحيحة" };
   }
 
   const cookieStore = await cookies();
   const email = cookieStore.get("pending_email")?.value;
 
   if (!email) {
-    return {
-      success: false,
-      error: "انتهت الجلسة، أعد طلب رمز التحقق",
-    };
+    return { success: false, error: "انتهت الجلسة، أعد طلب رمز التحقق" };
   }
 
   try {
     const res = await fetch(`${process.env.API_BASE_URL}/auth/reset-password`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email,
-        otp_code: parsed.data.otp_code,
-        new_password: parsed.data.new_password,
+        email, // ← from cookie
+        new_password: parsed.data.new_password, // ← from form
       }),
     });
 
     const result = await res.json();
 
     if (!res.ok) {
+      // 400 usually means the OTP/session expired → tell the client to restart
+      if (res.status === 400) {
+        return {
+          success: false,
+          expired: true,
+          error: result?.message || "انتهت صلاحية الجلسة، أعد طلب رمز التحقق",
+        };
+      }
       return {
         success: false,
         error: result?.message || "فشل تغيير كلمة المرور",
       };
     }
 
+    // clean up cookies
     cookieStore.delete("pending_email");
   } catch {
-    return {
-      success: false,
-      error: "تعذر الاتصال بالخادم",
-    };
+    return { success: false, error: "تعذر الاتصال بالخادم" };
   }
 
-  redirect("/auth/login");
+  return { success: true };
 }
 
 export async function resendOtpAction() {
   const cookieStore = await cookies();
   const email = cookieStore.get("pending_email")?.value;
+  const otpType = cookieStore.get("otp_type")?.value;
 
   if (!email) {
     return { success: false, error: "انتهت الجلسة، يرجى التسجيل مجدداً" };
   }
 
+  // reset-password flow resends via forget-password endpoint
+  const endpoint =
+    otpType === "reset-password"
+      ? `${process.env.API_BASE_URL}/auth/forget-password`
+      : `${process.env.API_BASE_URL}/auth/resend-otp`;
+
   try {
-    const res = await fetch(`${process.env.API_BASE_URL}/api/auth/resend-otp`, {
+    const res = await fetch(endpoint, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     });
 
@@ -227,20 +221,81 @@ export async function resendOtpAction() {
     return { success: false, error: "تعذر الاتصال بالخادم، حاول مجدداً" };
   }
 }
+// export async function verifyOtpAction(otp: string) {
+//   const cookieStore = await cookies();
+//   const email = cookieStore.get("pending_email")?.value;
+
+//   if (!email) {
+//     return { success: false, error: "انتهت الجلسة، يرجى التسجيل مجدداً" };
+//   }
+
+//   try {
+//     const res = await fetch(`${process.env.API_BASE_URL}/auth/verify-otp`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({ email, otp }),
+//     });
+
+//     if (!res.ok) {
+//       const err = await res.json();
+//       return {
+//         success: false,
+//         error: err?.message || "رمز التحقق غير صحيح أو منتهي الصلاحية",
+//       };
+//     }
+
+//     // Clean up the cookie after successful verification
+//     cookieStore.delete("pending_email");
+//   } catch {
+//     return { success: false, error: "تعذر الاتصال بالخادم، حاول مجدداً" };
+//   }
+
+//   redirect("/auth/login");
+// }
 export async function verifyOtpAction(otp: string) {
   const cookieStore = await cookies();
   const email = cookieStore.get("pending_email")?.value;
+  const otpType = cookieStore.get("otp_type")?.value;
 
   if (!email) {
     return { success: false, error: "انتهت الجلسة، يرجى التسجيل مجدداً" };
   }
 
+  // ── reset-password: verify OTP with the dedicated API endpoint
+  if (otpType === "reset-password") {
+    try {
+      const res = await fetch(
+        `${process.env.API_BASE_URL}/auth/verify-resetpassword-otp`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, otp_code: otp }),
+        },
+      );
+
+      if (!res.ok) {
+        const err = await res.json();
+        return {
+          success: false,
+          error: err?.message || "رمز التحقق غير صحيح أو منتهي الصلاحية",
+        };
+      }
+    } catch {
+      return { success: false, error: "تعذر الاتصال بالخادم، حاول مجدداً" };
+    }
+
+    // OTP verified — keep pending_email for the reset-password step, drop otp_type
+    cookieStore.delete("otp_type");
+    return { success: true, otpType: "reset-password" }; // client → router.push("/auth/new-password")
+  }
+
+  // ── register: verify OTP with the API
   try {
-    const res = await fetch(`${process.env.API_BASE_URL}/api/auth/verify-otp`, {
+    const res = await fetch(`${process.env.API_BASE_URL}/auth/verify-otp`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, otp }),
     });
 
@@ -252,11 +307,12 @@ export async function verifyOtpAction(otp: string) {
       };
     }
 
-    // Clean up the cookie after successful verification
-    cookieStore.delete("pending_email");
+    // Keep pending_email alive — deleting it here would cause the server component
+    // to redirect to forgot-password while the success screen is still mounted.
+    // The cookie expires naturally (maxAge 10 min) or is cleaned up on next login.
+    cookieStore.delete("otp_type");
+    return { success: true, otpType: "register" }; // client → setOtpState("success")
   } catch {
     return { success: false, error: "تعذر الاتصال بالخادم، حاول مجدداً" };
   }
-
-  redirect("/auth/login");
 }

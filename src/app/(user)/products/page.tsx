@@ -1,0 +1,25 @@
+import ProductsClient from "@/modules/user/features/products/components/ProductsClient";
+import { getProductsAction } from "@/modules/user/features/products/services/products.actions";
+import { GetProductsParams } from "@/modules/user/features/products/types/products.typs";
+
+interface PageProps {
+  searchParams: Promise<Record<string, string | undefined>>;
+}
+
+export default async function ProductsPage({ searchParams }: PageProps) {
+  const sp = await searchParams;
+
+  const params: GetProductsParams = {
+    page: sp.page ? Number(sp.page) : 1,
+    limit: sp.limit ? Number(sp.limit) : 12,
+    period: (sp.period as GetProductsParams["period"]) ?? undefined,
+    minPrice: sp.minPrice ? Number(sp.minPrice) : undefined,
+    maxPrice: sp.maxPrice ? Number(sp.maxPrice) : undefined,
+    condition: sp.condition as GetProductsParams["condition"],
+    category: sp.category,
+  };
+
+  const result = await getProductsAction(params);
+
+  return <ProductsClient initialResult={result} initialParams={params} />;
+}

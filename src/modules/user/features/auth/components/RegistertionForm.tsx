@@ -57,9 +57,9 @@ export default function RegistrationForm() {
             الاسم الكامل
           </label>
           <label
-            className={`input input-bordered outline-0 flex items-center gap-2 w-full ${
+            className={`input input-bordered outline-0 bg-white  border border-gray-300 rounded-xl  flex items-center gap-2 w-full ${
               errors.fullName ? "input-error" : ""
-            }`}
+            }  hover:border-black `}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -67,7 +67,7 @@ export default function RegistrationForm() {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-4 h-4 text-text-tertiary shrink-0"
+              className=" size-5 shrink-0"
             >
               <path
                 strokeLinecap="round"
@@ -79,7 +79,7 @@ export default function RegistrationForm() {
               id="fullName"
               type="text"
               placeholder="مثال: أحمد محمد"
-              className="grow bg-transparent text-right outline-none"
+              className="grow bg-white  text-right outline-none"
               autoComplete="name"
               {...register("fullName")}
             />
@@ -100,7 +100,7 @@ export default function RegistrationForm() {
             البريد الإلكتروني
           </label>
           <label
-            className={`input input-bordered outline-0 flex items-center gap-2 w-full ${
+            className={`input input-bordered  hover:border-black  border border-gray-300 rounded-xl bg-white  outline-0 flex items-center gap-2 w-full ${
               errors.email ? "input-error" : ""
             }`}
           >
@@ -110,7 +110,7 @@ export default function RegistrationForm() {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-4 h-4 text-text-tertiary shrink-0"
+              className=" size-5 shrink-0"
             >
               <path
                 strokeLinecap="round"
@@ -122,7 +122,7 @@ export default function RegistrationForm() {
               id="email"
               type="email"
               placeholder="example@gmail.com"
-              className="grow bg-transparent text-right outline-none"
+              className="grow bg-white text-right outline-none"
               autoComplete="email"
               dir="ltr"
               {...register("email")}
@@ -144,7 +144,7 @@ export default function RegistrationForm() {
             رقم الهاتف
           </label>
           <label
-            className={`input input-bordered outline-0 flex items-center gap-2 w-full ${
+            className={`input input-bordered hover:border-black  border border-gray-300 rounded-xl bg-white  outline-0 flex items-center gap-2 w-full ${
               errors.phoneNumber ? "input-error" : ""
             }`}
           >
@@ -154,7 +154,7 @@ export default function RegistrationForm() {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-4 h-4 text-text-tertiary shrink-0"
+              className=" size-5 shrink-0"
             >
               <path
                 strokeLinecap="round"
@@ -169,7 +169,7 @@ export default function RegistrationForm() {
               id="phoneNumber"
               type="tel"
               placeholder="01X XXXX XXXX"
-              className="grow bg-transparent text-right outline-none"
+              className="grow bg-white text-right outline-none"
               autoComplete="tel"
               dir="ltr"
               {...register("phoneNumber")}
@@ -191,7 +191,7 @@ export default function RegistrationForm() {
             كلمة السر
           </label>
           <label
-            className={`input input-bordered outline-0 flex items-center gap-2 w-full ${
+            className={`input input-bordered hover:border-black  border border-gray-300 rounded-xl bg-white  outline-0 flex items-center gap-2 w-full ${
               errors.password ? "input-error" : ""
             }`}
           >
@@ -201,7 +201,7 @@ export default function RegistrationForm() {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-4 h-4 text-text-tertiary shrink-0"
+              className=" size-5 shrink-0"
             >
               <path
                 strokeLinecap="round"
@@ -213,7 +213,7 @@ export default function RegistrationForm() {
               id="password"
               type={showPassword ? "text" : "password"}
               placeholder="كلمة السر"
-              className="grow bg-transparent text-right outline-none"
+              className="grow bg-white text-right outline-none"
               autoComplete="new-password"
               {...register("password")}
             />
@@ -280,7 +280,7 @@ export default function RegistrationForm() {
           <input
             id="terms"
             type="checkbox"
-            className="checkbox checkbox-sm border-border-default checked:border-brand-primary [--chkbg:theme(colors.brand-primary)]"
+            className="checkbox checkbox-sm border-border-default text-black checked:border-brand-primary [--chkbg:theme(colors.brand-primary)]"
             checked={termsAccepted}
             onChange={(e) => setTermsAccepted(e.target.checked)}
           />
