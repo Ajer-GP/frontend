@@ -26,10 +26,9 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="ar"
-      className={`${inter.variable} ${ibmPlexSansArabic.variable}  h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+      lang='ar'
+      className={`${ibmPlexSansArabic.variable}  h-full antialiased`}>
+      <body className='min-h-full flex flex-col'>{children}</body>
     </html>
   );
 }

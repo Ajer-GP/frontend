@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import OtpVerification from "@/modules/user/features/auth/components/Otpverification";
+import OtpVerification from "@/Modules/User/Features/Auth/components/Otpverification";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

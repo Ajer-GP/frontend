@@ -1,32 +1,25 @@
-import Image from "next/image";
-import Link from "next/link";
+import Best_products from "./_components/Landing/Best-products";
+import Categories from "./_components/Landing/Categories";
+import Common_questions from "./_components/Landing/Common-questions";
+import Footer from "./_components/Landing/Footer";
+import Hero from "./_components/Landing/Hero";
+import How_it_works from "./_components/Landing/How-it-works";
+import Navbar from "./_components/Landing/Navbar";
+import Reviews from "./_components/Landing/Reviews";
+import Why_us from "./_components/Landing/why-us";
 
 export default function Home() {
   return (
-    <div className='flex items-center justify-center bg-zinc-50 font-sans '>
-      <main className='flex w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white sm:items-start'>
-        <div
-          className='flex min-h-screen items-center justify-center bg-surface-secondary'
-          dir='rtl'>
-          <div className='flex flex-col items-center gap-4'>
-            <Link
-              href='/auth/login'
-              className='w-48 rounded-lg bg-brand-primary px-6 py-3 text-center text-body text-white hover:bg-brand-dark transition-colors'>
-              تسجيل الدخول
-            </Link>
-            <Link
-              href='/auth/register'
-              className='w-48 rounded-lg border border-brand-primary px-6 py-3 text-center text-body text-brand-primary hover:bg-brand-light transition-colors'>
-              إنشاء حساب
-            </Link>
-            <Link
-              href='/auth/forgot-password'
-              className='w-48 rounded-lg border border-brand-primary px-6 py-3 text-center text-body text-brand-primary hover:bg-brand-light transition-colors'>
-              نسيت كلمة المرور
-            </Link>
-          </div>
-        </div>
-      </main>
-    </div>
+    <main dir='rtl'>
+      <Navbar />
+      <Hero />
+      <Categories />
+      <How_it_works />
+      <Best_products />
+      <Why_us />
+      <Reviews />
+      <Common_questions />
+      <Footer />{" "}
+    </main>
   );
 }
