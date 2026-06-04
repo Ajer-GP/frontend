@@ -4,16 +4,19 @@ import OtpVerification from "@/modules/user/features/auth/components/Otpverifica
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "إنشاء حساب جديد | أجر",
-  description: "أنشئ حسابك على منصة أجر وابدأ في إدارة أعمالك بكفاءة",
+  title: "التحقق من البريد الإلكتروني | أجر",
+  description: "أدخل رمز التحقق المرسل إلى بريدك الإلكتروني",
 };
 
-export default async function VerifyEmailPage() {
+export default async function ForgotPasswordVerifyPage() {
   const cookieStore = await cookies();
   const email = cookieStore.get("pending_email")?.value;
   const otpType = cookieStore.get("otp_type")?.value;
 
-  if (!email) redirect("/auth/register"); // no cookie = kick back
+  if (!email) {
+    // Send back to the correct starting point based on what flow was intended
+    redirect(otpType === "reset-password" ? "/auth/forgot-password" : "/auth/register");
+  }
 
   return (
     <div dir="rtl" className="pb-13">

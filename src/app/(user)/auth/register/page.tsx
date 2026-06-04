@@ -9,17 +9,18 @@ export const metadata: Metadata = {
 
 export default function RegisterPage() {
   return (
-    <div dir='rtl' className=' pb-13'>
+    <div dir="rtl" className=" pb-13">
       {/* العنوان */}
-      <div className='mb-8 '>
-        <h1 className='text-4xl font-medium text-text-primary mb-2'>
+      <div className="mb-8 ">
+        <h1 className="text-4xl font-medium text-text-primary mb-2">
           إنشاء حساب جديد
         </h1>
-        <p className='font-xl font-normal text-text-secondary'>
+        <p className=" font-normal text-gray-400 text-h3 my-2">
           هل تمتلك حساباً بالفعل؟{" "}
           <Link
-            href='/auth/login'
-            className='text-brand-primary font-medium underline'>
+            href="/auth/login"
+            className="text-brand-primary font-medium underline "
+          >
             سجل الدخول
           </Link>
         </p>

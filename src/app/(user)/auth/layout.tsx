@@ -21,7 +21,7 @@ export default function AuthLayout({
       </div>
 
       {/* Form panel */}
-      <div className="relative z-10 flex flex-1 flex-col justify-center min-h-screen overflow-y-auto bg-surface-primary/95 backdrop-blur-sm lg:bg-surface-primary lg:backdrop-blur-none">
+      <div className="relative z-10 flex flex-1 justify-center min-h-screen overflow-y-auto bg-surface-primary/95 backdrop-blur-sm lg:bg-surface-primary lg:backdrop-blur-none">
         <div className="w-full max-w-xl mx-auto px-5 py-10 sm:px-8 sm:py-14 lg:px-12 xl:px-16">
           {children}
         </div>
