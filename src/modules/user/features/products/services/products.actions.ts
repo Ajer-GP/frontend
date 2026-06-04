@@ -36,14 +36,13 @@ export async function getProductsAction(
     const res = await fetch(`${process.env.API_BASE_URL}/products${qs}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      // cache for 60 s — remove or set to 0 if you need always-fresh data
       next: { revalidate: 60 },
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       return {
         success: false,
-        error: err?.message || "فشل تحميل المنتجات",
+        error: err?.message || " .فشل تحميل المنتجات",
       };
     }
 
