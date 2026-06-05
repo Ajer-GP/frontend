@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function Best_products() {
   return (
     <div className='flex flex-col justify-center items-center px-4 sm:px-6 md:px-14 mb-10'>
-      <div className='badge badge-md mt-5 mb-1 p-4 font-black rounded-3xl bg-brand-light text-brand-primary'>
+      <div className='badge badge-md mt-5 mb-1 p-4 font-black rounded-3xl bg-brand-light border-brand-light text-brand-primary'>
         منتجات مختارة لك{" "}
       </div>
       <h1 className='text-2xl sm:text-3xl font-black my-1 text-center'>
@@ -11,9 +11,8 @@ export default function Best_products() {
         <strong className='text-brand-primary'>اختيارها </strong> بناءً علي
         &nbsp;
         <strong className='text-brand-primary'>اهتماماتك </strong>{" "}
-        <strong className='text-brand-primary'>يقول </strong>
       </h1>
-      <div className='card bg-base-100 w-96 shadow-sm'>
+      <div className='card bg-white w-96 shadow-sm my-2'>
         <figure>
           <div className='relative'>
             <Image
@@ -22,7 +21,7 @@ export default function Best_products() {
               width={200}
               height={200}
             />
-            <span className='absolute top-4 left-2 badge badge-sm text-accent-default bg-[#FDF6E9] font-black'>
+            <span className='absolute top-4 left-2 badge badge-sm text-accent-default bg-[#FDF6E9]  border-[#FDF6E9] font-black'>
               جديد
             </span>
           </div>
@@ -31,7 +30,7 @@ export default function Best_products() {
           <p className='text-gray-400'>الكترونيات</p>
           <div className='flex justify-between'>
             <h2 className='card-title'>كاميرا سوني Alpha 7 III</h2>
-            <div className='badge bg-[#FDF6E9] font-black'>
+            <div className='badge bg-[#FDF6E9] border-[#FDF6E9] font-black text-black'>
               4.7
               <svg
                 xmlns='http://www.w3.org/2000/svg'
@@ -53,7 +52,7 @@ export default function Best_products() {
             /يوم
           </h2>
           <div className='card-actions '>
-            <button className='btn bg-white w-full border border-brand-primary rounded-xl text-brand-primary'>
+            <button className='btn bg-white w-full  border-brand-primary rounded-xl text-brand-primary shadow-none'>
               اعرف المزيد
             </button>
           </div>

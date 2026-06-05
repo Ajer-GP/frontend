@@ -15,7 +15,7 @@ export default function Hero() {
         من ممتلكاتك، واستمتع بتجربة آمنة وسهلة من البداية للنهاية
       </p>
 
-      <label className='input my-5 w-full max-w-2xl sm:max-w-3xl rounded-xl shadow-sm py-6 flex items-center gap-2'>
+      <label className='input bg-white my-5 w-full max-w-2xl sm:max-w-3xl rounded-xl shadow-sm py-6 flex items-center gap-2'>
         <Image
           src='/search-normal.svg'
           alt='search icon'
@@ -26,7 +26,7 @@ export default function Hero() {
           type='search'
           required
           placeholder='ماذا تريد أن تستأجر اليوم؟'
-          className='py-4 flex-1 min-w-0'
+          className='bg-white py-4 flex-1 min-w-0'
         />
         <button className='btn bg-brand-primary text-white rounded-xl px-4 my-2 whitespace-nowrap'>
           ابحث
