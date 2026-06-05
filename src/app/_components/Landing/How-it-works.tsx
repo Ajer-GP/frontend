@@ -3,7 +3,7 @@ import React from "react";
 export default function How_it_works() {
   return (
     <div className='bg-brand-dark flex flex-col justify-center items-center px-4 sm:px-8 md:px-16 py-10'>
-      <div className='badge badge-md mt-5 p-4 font-black rounded-3xl bg-brand-light text-brand-primary'>
+      <div className='badge badge-md mt-5 p-4 font-black rounded-3xl bg-brand-light border-brand-light text-brand-primary'>
         كيف يعمل أجر؟
       </div>
       <h1 className='text-2xl sm:text-3xl font-black my-2 text-white text-center'>

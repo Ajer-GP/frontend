@@ -12,10 +12,10 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const [loginState, loginAction] = useState(true);
+  const [loginState, setLogin] = useState(false);
   return (
     <>
-      <div className='navbar bg-base-100 shadow-sm sticky top-0 z-50'>
+      <div className='navbar bg-white shadow-sm sticky top-0 z-50'>
         {/* Logo */}
         <div className='navbar-start'>
           <Link href='/'>
@@ -81,12 +81,14 @@ export default function Navbar() {
           </div>
         ) : (
           <div className='navbar-end gap-2 hidden lg:flex mx-7'>
-            <Link href='/auth/login' className='btn rounded-2xl bg-white'>
+            <Link
+              href='/auth/login'
+              className='btn rounded-2xl bg-white text-brand-primary border-brand-primary'>
               تسجيل الدخول
             </Link>
             <Link
               href='/auth/register'
-              className='btn rounded-2xl bg-brand-dark text-white'>
+              className='btn rounded-2xl bg-brand-dark text-white border-0'>
               ابدأ الآن
             </Link>
           </div>
@@ -111,10 +113,12 @@ export default function Navbar() {
             </label>
             <ul
               tabIndex={0}
-              className='menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-64'>
+              className='menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-white rounded-box w-64'>
               {navLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className='font-black'>
+                  <Link
+                    href={link.href}
+                    className='px-4 font-black hover:text-brand-primary hover:underline underline-offset-6'>
                     {link.label}
                   </Link>
                 </li>
@@ -161,7 +165,7 @@ export default function Navbar() {
                   <li className='mt-2'>
                     <Link
                       href='/auth/login'
-                      className='btn btn-sm rounded-2xl bg-white my-1'>
+                      className='btn btn-sm rounded-2xl bg-white my-1 border-brand-primary text-brand-primary'>
                       تسجيل الدخول
                     </Link>
                   </li>

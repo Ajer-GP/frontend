@@ -19,7 +19,7 @@ const StarIcon = () => (
 export default function Reviews() {
   return (
     <div className='flex flex-col justify-center items-center px-4 sm:px-6 md:px-14 mb-10'>
-      <div className='badge badge-md mt-5 mb-1 p-4 font-black rounded-3xl bg-brand-light text-brand-primary'>
+      <div className='badge badge-md mt-5 mb-1 p-4 font-black rounded-3xl bg-brand-light border-brand-light text-brand-primary'>
         آراء عملاؤنا{" "}
       </div>
       <h1 className='text-2xl sm:text-3xl font-black my-1 text-center'>

@@ -3,7 +3,7 @@ import React from "react";
 export default function Common_questions() {
   return (
     <div className='flex flex-col gap-3 items-center my-10 px-4 sm:px-8 md:px-16'>
-      <div className='badge badge-md mt-5 p-4 font-black rounded-3xl bg-brand-light text-brand-primary'>
+      <div className='badge badge-md mt-5 p-4 font-black rounded-3xl bg-brand-light border-brand-light text-brand-primary'>
         الأسئلة الشائعة
       </div>
       <h1 className='mb-4 mt-2 font-black text-2xl sm:text-3xl md:text-4xl text-center'>
@@ -11,7 +11,7 @@ export default function Common_questions() {
       </h1>
 
       <div className='flex flex-col gap-3 w-full max-w-7xl'>
-        <div className='collapse collapse-arrow border border-base-300 bg-gray-100 has-checked:bg-brand-light has-checked:border has-checked:border-brand-primary'>
+        <div className='collapse collapse-arrow border border-gray-300 bg-gray-100 has-checked:bg-brand-light has-checked:border has-checked:border-brand-primary'>
           <input type='checkbox' />
           <div className='collapse-title font-semibold'>
             1. كيف يمكنني استئجار منتج؟
@@ -22,7 +22,7 @@ export default function Common_questions() {
           </div>
         </div>
 
-        <div className='collapse collapse-arrow border border-base-300 bg-gray-100 has-checked:bg-brand-light has-checked:border has-checked:border-brand-primary'>
+        <div className='collapse collapse-arrow border border-gray-300 bg-gray-100 has-checked:bg-brand-light has-checked:border has-checked:border-brand-primary'>
           <input type='checkbox' />
           <div className='collapse-title font-semibold'>
             2. كيف تتم عملية استلام وإرجاع المنتج؟
@@ -33,7 +33,7 @@ export default function Common_questions() {
           </div>
         </div>
 
-        <div className='collapse collapse-arrow border border-base-300 bg-gray-100 has-checked:bg-brand-light has-checked:border has-checked:border-brand-primary'>
+        <div className='collapse collapse-arrow border border-gray-300 bg-gray-100 has-checked:bg-brand-light has-checked:border has-checked:border-brand-primary'>
           <input type='checkbox' />
           <div className='collapse-title font-semibold'>
             3. كيف أربح من منتجاتي؟
@@ -44,7 +44,7 @@ export default function Common_questions() {
           </div>
         </div>
 
-        <div className='collapse collapse-arrow border border-base-300 bg-gray-100 has-checked:bg-brand-light has-checked:border has-checked:border-brand-primary'>
+        <div className='collapse collapse-arrow border border-gray-300 bg-gray-100 has-checked:bg-brand-light has-checked:border has-checked:border-brand-primary'>
           <input type='checkbox' />
           <div className='collapse-title font-semibold'>
             4. ماذا أفعل إذا واجهت مشكلة أثناء الإيجار؟
