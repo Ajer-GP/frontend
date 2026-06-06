@@ -5,7 +5,6 @@ import { loginService } from "../services/actions";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-
   const [formState, formAction] = useActionState(loginService, {});
 
   return (
