@@ -28,6 +28,7 @@ export async function loginService(prevState: any, formData: FormData) {
   });
 
   const data = await res.json();
+  console.log("Backend login response:", data);
 
   if (!res.ok) return { message: data.message || "فشل تسجيل الدخول" };
 
@@ -40,12 +41,38 @@ export async function loginService(prevState: any, formData: FormData) {
     path: "/",
   });
 
-  cookieStore.set("refresh_token", data.refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 15,
-    path: "/",
-  });
+  // Fetch refresh token from the refresh-token endpoint
+  let refreshToken = null;
+  try {
+    const refreshRes = await fetch(
+      `${process.env.API_BASE_URL}/auth/refresh-token`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${data.accessToken}`,
+        },
+        body: JSON.stringify({ email: parsed.data.email }),
+      },
+    );
+
+    if (refreshRes.ok) {
+      const refreshData = await refreshRes.json();
+      refreshToken = refreshData.refreshToken;
+      console.log("Got refresh token from endpoint:", refreshToken);
+    }
+  } catch (error) {
+    console.error("Failed to fetch refresh token:", error);
+  }
+
+  if (refreshToken) {
+    cookieStore.set("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 15,
+      path: "/",
+    });
+  }
 
   cookieStore.set("user", JSON.stringify(data.user), {
     secure: process.env.NODE_ENV === "production",

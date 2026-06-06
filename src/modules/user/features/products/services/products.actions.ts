@@ -47,7 +47,6 @@ export async function getProductsAction(
     }
 
     const data: ProductsResponse = await res.json();
-    console.log(data);
 
     return { success: true, data };
   } catch {

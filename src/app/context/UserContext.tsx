@@ -3,30 +3,40 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 const UserContext = createContext(null);
 
-const hasAuthCookies = () => {
-  const cookies = document.cookie.split(";").map((c) => c.trim());
-  const hasAccess = cookies.some((c) => c.startsWith("access_token="));
-  const hasRefresh = cookies.some((c) => c.startsWith("refresh_token="));
-  return hasAccess || hasRefresh;
-};
-
 export function UserProvider({ children, initialUser = null }) {
   const [user, setUser] = useState(initialUser);
-  const [isLoading, setIsLoading] = useState(initialUser === null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchUser = async () => {
     setIsLoading(true);
     try {
-      const isAuthenticated = hasAuthCookies();
-      setUser(isAuthenticated ? { authenticated: true } : null);
+      const res = await fetch("/api/me", {
+        cache: "no-store",
+        credentials: "same-origin",
+      });
+      if (!res.ok) {
+        setUser(null);
+        return;
+      }
+
+      const data = await res.json();
+      setUser(data?.user ?? null);
+    } catch {
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
+    if (initialUser) {
+      setUser(initialUser);
+      setIsLoading(false);
+      return;
+    }
+
     fetchUser();
-  }, []);
+  }, [initialUser]);
 
   return (
     <UserContext.Provider value={{ user, isLoading, fetchUser, setUser }}>
@@ -35,4 +45,10 @@ export function UserProvider({ children, initialUser = null }) {
   );
 }
 
-export const useUser = () => useContext(UserContext);
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUser must be used within UserProvider");
+  }
+  return context;
+};
