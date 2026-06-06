@@ -4,6 +4,7 @@ import How_it_works from "@/app/_components/ProductDetails/How-it-works";
 import Owner from "@/app/_components/ProductDetails/Owner";
 import Product from "@/app/_components/ProductDetails/Product";
 import ReturnRefundPolicy from "@/app/_components/ProductDetails/ReturnRefundPolicy";
+import UsersReviews from "@/app/_components/ProductDetails/UsersReviews";
 import { getProductByIdAction } from "@/Modules/User/Features/products/services/products.actions";
 
 export default async function page({
@@ -109,6 +110,7 @@ export default async function page({
       <Owner data={data} />
       <How_it_works />
       <ReturnRefundPolicy />
+      <UsersReviews data={data} />
       <Footer />
     </div>
   );
