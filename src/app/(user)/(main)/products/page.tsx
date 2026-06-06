@@ -1,3 +1,5 @@
+import Footer from "@/app/_components/Landing/Footer";
+import Navbar from "@/app/_components/Landing/Navbar";
 import ProductsClient from "@/modules/user/features/products/components/ProductsClient";
 import { getProductsAction } from "@/modules/user/features/products/services/products.actions";
 import { GetProductsParams } from "@/modules/user/features/products/types/products.typs";
@@ -21,5 +23,9 @@ export default async function ProductsPage({ searchParams }: PageProps) {
 
   const result = await getProductsAction(params);
 
-  return <ProductsClient initialResult={result} initialParams={params} />;
+  return (
+    <>
+      <ProductsClient initialResult={result} initialParams={params} />;
+    </>
+  );
 }

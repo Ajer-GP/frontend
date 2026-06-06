@@ -34,12 +34,14 @@ export interface Product {
 }
 
 export interface ProductsResponse {
-  products: Product[];
-  pagination: {
-    total: number;
-    page: number;
-    pages: number;
-    limit: number;
+  result: {
+    products: Product[];
+    pagination: {
+      total: number;
+      page: number;
+      pages: number;
+      limit: number;
+    };
   };
 }
 

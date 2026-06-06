@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import OtpVerification from "@/Modules/User/Features/Auth/components/Otpverification";
 import type { Metadata } from "next";
+import OtpVerification from "@/modules/user/features/auth/components/Otpverification";
 
 export const metadata: Metadata = {
   title: "التحقق من البريد الإلكتروني | أجر",
@@ -15,7 +15,9 @@ export default async function ForgotPasswordVerifyPage() {
 
   if (!email) {
     // Send back to the correct starting point based on what flow was intended
-    redirect(otpType === "reset-password" ? "/auth/forgot-password" : "/auth/register");
+    redirect(
+      otpType === "reset-password" ? "/auth/forgot-password" : "/auth/register",
+    );
   }
 
   return (

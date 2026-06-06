@@ -192,6 +192,10 @@ body {
   --spacing-8: 32px;
   --spacing-10: 40px;
   --spacing-12: 48px;
+
+  --background-image-grid:
+    linear-gradient(var(--color-border-default) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-border-default) 1px, transparent 1px);
 }
 
 /* ── Typography utility classes ── */

@@ -1,0 +1,22 @@
+// app/(main)/layout.tsx
+
+import Footer from "@/app/_components/Landing/Footer";
+import Navbar from "@/app/_components/Landing/Navbar";
+
+export default function MainLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <>
+      <nav>
+        <Navbar />
+      </nav>
+      <main>{children}</main>
+      <footer>
+        <Footer />
+      </footer>
+    </>
+  );
+}
