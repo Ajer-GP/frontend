@@ -1,5 +1,6 @@
 import Footer from "@/app/_components/Landing/Footer";
 import Navbar from "@/app/_components/Landing/Navbar";
+import Details from "@/app/_components/ProductDetails/Details";
 import How_it_works from "@/app/_components/ProductDetails/How-it-works";
 import Owner from "@/app/_components/ProductDetails/Owner";
 import Product from "@/app/_components/ProductDetails/Product";
@@ -107,6 +108,7 @@ export default async function page({
           </div>
         </div>
       </div>
+      <Details data={data} />
       <Owner data={data} />
       <How_it_works />
       <ReturnRefundPolicy />

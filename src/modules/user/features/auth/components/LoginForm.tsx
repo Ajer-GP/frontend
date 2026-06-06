@@ -1,17 +1,12 @@
 "use client";
-import React, { useState } from "react";
-import { useActionState } from "react";
-import { handleSubmit } from "@/app/actions/auth";
+import { useState, useActionState } from "react";
 import Link from "next/link";
+import { loginService } from "../services/actions";
 
-const intial_state = {
-  data: null,
-  ZodErrors: null,
-  message: null,
-};
 export default function LoginForm() {
-  const [formState, formAction] = useActionState(handleSubmit, intial_state);
   const [showPassword, setShowPassword] = useState(false);
+
+  const [formState, formAction] = useActionState(loginService, {});
 
   return (
     <>
@@ -45,7 +40,7 @@ export default function LoginForm() {
             className='input bg-white w-full outline-0 border-0'
           />
         </div>
-        {formState.ZodErrors && (
+        {formState?.ZodErrors && (
           <p className='label text-caption  mx-2 text-danger'>
             {formState.ZodErrors?.email?.[0]}{" "}
           </p>
@@ -139,9 +134,14 @@ export default function LoginForm() {
           />
           <p> تذكرني علي هذا الجهاز</p>
         </div>
-        {formState?.message?.message && (
+        {formState?.message && (
           <p className='label text-caption mx-2 text-danger '>
-            {formState.message?.message}
+            {formState.message}
+          </p>
+        )}
+        {formState?.data?.user && (
+          <p className='label text-caption mx-2 text-green-600'>
+            تم تسجيل الدخول بنجاح
           </p>
         )}
         <button className='btn w-full bg-brand-primary hover:bg-brand-dark text-white border-none rounded-xl text-body font-medium mt-1'>

@@ -1,8 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
-
+import { useUser } from "@/app/context/UserContext";
 const navLinks = [
   { href: "/", label: "الرئيسية" },
   { href: "/products", label: "الفئات" },
@@ -12,7 +11,10 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const [loginState, setLogin] = useState(false);
+  const { user, isLoading } = useUser();
+
+  const isAuthenticated = Boolean(user);
+  console.log(user);
   return (
     <>
       <div className='navbar bg-white shadow-sm sticky top-0 z-50'>
@@ -42,7 +44,7 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Buttons */}
-        {loginState ? (
+        {isAuthenticated ? (
           <div className='navbar-end gap-2 hidden lg:flex mx-7'>
             <Link href='/notifications'>
               <span className='flex items-center justify-center size-12 bg-brand-light text-brand-primary rounded-full'>
@@ -123,7 +125,7 @@ export default function Navbar() {
                   </Link>
                 </li>
               ))}
-              {loginState ? (
+              {isAuthenticated ? (
                 <span className='flex my-3'>
                   <Link href='/notifications'>
                     <span className='flex items-center justify-center size-12 bg-brand-light text-brand-primary rounded-full mx-1'>
