@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Inter, IBM_Plex_Sans_Arabic, JetBrains_Mono } from "next/font/google";
-
+import { UserProvider } from "./context/UserContext";
 const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic"],
   weight: ["400", "500", "600"],
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   description: "help people to rent tools",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -28,7 +28,9 @@ export default function RootLayout({
     <html
       lang='ar'
       className={`${ibmPlexSansArabic.variable}  h-full antialiased`}>
-      <body className='min-h-full flex flex-col'>{children}</body>
+      <body className='min-h-full flex flex-col'>
+        <UserProvider>{children}</UserProvider>
+      </body>
     </html>
   );
 }

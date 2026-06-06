@@ -11,31 +11,57 @@ import {
   signupSchema,
 } from "../schemas/auth.validation";
 
-export async function loginService(userData: z.infer<typeof loginSchema>) {
-  try {
-    const response = await fetch(`${process.env.API_BASE_URL}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...userData,
-      }),
-    });
+export async function loginService(prevState: any, formData: FormData) {
+  const parsed = loginSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
 
-    const data = await response.json();
-    if (!response.ok) {
-      return {
-        error:
-          data.error ||
-          data.message ||
-          "الإيميل أو الباسورد خطأ , الرجاء المحاولة مرة أخرى",
-      };
-    }
-    return data;
-  } catch (err) {
-    return err;
+  if (!parsed.success) {
+    return { ZodErrors: parsed.error.flatten().fieldErrors };
   }
-}
 
+  const res = await fetch(`${process.env.API_BASE_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(parsed.data),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) return { message: data.message || "فشل تسجيل الدخول" };
+
+  const cookieStore = await cookies();
+
+  cookieStore.set("access_token", data.accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 15,
+    path: "/",
+  });
+
+  cookieStore.set("refresh_token", data.refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 15,
+    path: "/",
+  });
+
+  cookieStore.set("user", JSON.stringify(data.user), {
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 7,
+    path: "/",
+  });
+
+  redirect("/");
+}
+export async function logoutAction() {
+  const cookieStore = await cookies();
+  cookieStore.delete("access_token");
+  cookieStore.delete("refresh_token");
+  cookieStore.delete("user");
+  redirect("/login");
+}
 export async function registerAction(data: z.infer<typeof signupSchema>) {
   const parsed = signupSchema.safeParse(data);
   if (!parsed.success) {
