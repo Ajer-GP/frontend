@@ -3,7 +3,16 @@ import React from "react";
 
 export default function Hero() {
   return (
-    <div className="flex flex-col justify-center items-center px-4 sm:px-8 md:px-16">
+    <div className="relative flex flex-col justify-center items-center px-4 sm:px-8 md:px-16">
+      {/* Background Image */}
+      <Image
+        src="/images/hero-bg.png"
+        alt="background"
+        fill
+        className="object-cover -z-10"
+        priority
+      />
+
       <h1 className="my-10 font-black text-3xl sm:text-4xl md:text-5xl text-center">
         <strong className="text-brand-primary">استأجر</strong> ما تحتـاجه{" "}
         <strong className="text-brand-primary">و اربــح </strong> مما تملكه
@@ -15,7 +24,7 @@ export default function Hero() {
         من ممتلكاتك، واستمتع بتجربة آمنة وسهلة من البداية للنهاية
       </p>
 
-      <label className="input my-5 w-full max-w-2xl sm:max-w-3xl rounded-xl shadow-sm py-6 flex items-center gap-2">
+      <label className="input bg-white my-5 w-full max-w-2xl sm:max-w-3xl rounded-xl shadow-sm py-6 flex items-center gap-2">
         <Image
           src="/search-normal.svg"
           alt="search icon"
@@ -26,7 +35,7 @@ export default function Hero() {
           type="search"
           required
           placeholder="ماذا تريد أن تستأجر اليوم؟"
-          className="py-4 flex-1 min-w-0"
+          className="bg-white py-4 flex-1 min-w-0"
         />
         <button className="btn bg-brand-primary text-white rounded-xl px-4 my-2 whitespace-nowrap">
           ابحث

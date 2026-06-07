@@ -19,7 +19,7 @@ const StarIcon = () => (
 export default function Reviews() {
   return (
     <div className='flex flex-col justify-center items-center px-4 sm:px-6 md:px-14 mb-10'>
-      <div className='badge badge-md mt-5 mb-1 p-4 font-black rounded-3xl bg-brand-light text-brand-primary'>
+      <div className='badge badge-md mt-5 mb-1 p-4 font-black rounded-3xl bg-brand-light border-brand-light text-brand-primary'>
         آراء عملاؤنا{" "}
       </div>
       <h1 className='text-2xl sm:text-3xl font-black my-1 text-center'>
@@ -50,14 +50,9 @@ export default function Reviews() {
               على أجر. التجربة كانت سلسة والتسليم في الموعد.
             </p>
             <div className='flex items-center gap-2'>
-              <div className='avatar'>
-                <div className='w-8'>
-                  <Image
-                    src='/images/cat-1.png'
-                    alt='avatar'
-                    width={50}
-                    height={50}
-                  />
+              <div className='avatar avatar-placeholder'>
+                <div className='bg-brand-primary text-neutral-content w-10 rounded-full'>
+                  <span>B</span>
                 </div>
               </div>
               <p className='font-black text-sm'>بسنت خالد</p>
@@ -84,14 +79,9 @@ export default function Reviews() {
               تجربة سهلة جدًا، وجدت المنتج الذي أحتاجه خلال دقائق.
             </p>
             <div className='flex items-center gap-2'>
-              <div className='avatar'>
-                <div className='w-8'>
-                  <Image
-                    src='/images/cat-1.png'
-                    alt='avatar'
-                    width={50}
-                    height={50}
-                  />
+              <div className='avatar avatar-placeholder'>
+                <div className='bg-brand-primary text-neutral-content w-10 rounded-full'>
+                  <span>R</span>
                 </div>
               </div>
               <p className='font-black text-sm'> رؤى فودة</p>
@@ -119,14 +109,9 @@ export default function Reviews() {
               منتظم.
             </p>
             <div className='flex items-center gap-2'>
-              <div className='avatar'>
-                <div className='w-8'>
-                  <Image
-                    src='/images/cat-1.png'
-                    alt='avatar'
-                    width={50}
-                    height={50}
-                  />
+              <div className='avatar avatar-placeholder'>
+                <div className='bg-brand-primary text-neutral-content w-10 rounded-full'>
+                  <span>kh</span>
                 </div>
               </div>
               <p className='font-black text-sm'> خالد محمود</p>

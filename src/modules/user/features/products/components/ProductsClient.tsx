@@ -176,8 +176,8 @@ export default function ProductsClient({
   const totalPages = result.success ? result.data.result.pagination.pages : 0;
   const currentPage = result.success ? result.data.result.pagination.page : 1;
 
-  console.log(products, "ioihoih");
-  console.log(result, "uuuuuuuuu");
+  // console.log(products, "ioihoih");
+  // console.log(result, "uuuuuuuuu");
 
   const hasError = !result.success;
   const errorMsg = !result.success ? result.error : "";
