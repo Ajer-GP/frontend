@@ -25,7 +25,7 @@ export default function RegistrationForm() {
 
   const onSubmit = async (data: SignupFormData) => {
     if (!termsAccepted) return;
-    console.log(data);
+    // console.log(data);
     //  call server action.:
     const res = await registerAction(data);
     if (res?.success === false) {

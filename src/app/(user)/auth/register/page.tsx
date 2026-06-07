@@ -1,5 +1,5 @@
-import RegistertionForm from "@/Modules/User/Features/Auth/components/RegistertionForm";
 import type { Metadata } from "next";
+import RegistertionForm from "@/modules/user/features/auth/components/RegistertionForm";
 import Link from "next/link";
 
 export const metadata: Metadata = {

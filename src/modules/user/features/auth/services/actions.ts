@@ -74,11 +74,11 @@ export async function loginService(prevState: any, formData: FormData) {
     });
   }
 
-  cookieStore.set("user", JSON.stringify(data.user), {
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 7,
-    path: "/",
-  });
+cookieStore.set("user", encodeURIComponent(JSON.stringify(data.user)), {
+  secure: process.env.NODE_ENV === "production",
+  maxAge: 60 * 60 * 24 * 7,
+  path: "/",
+});
 
   redirect("/");
 }
@@ -159,7 +159,7 @@ export async function forgotPassword(
     );
 
     const result = await res.json();
-    console.log(result);
+    // console.log(result);
 
     if (!res.ok) {
       return {

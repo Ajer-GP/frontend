@@ -20,49 +20,39 @@ export async function GET(request: Request) {
     const refreshToken = cookies["refresh_token"];
     const userCookie = cookies["user"];
 
-    if (!userCookie) {
+    if (!accessToken && !refreshToken) return NextResponse.json({ user: null });
+
+    // Access token still valid → return user directly
+    if (accessToken)
+      return NextResponse.json({ user: user ? JSON.parse(user) : null });
+
+    // Access token expired → use refresh token
+    const refreshRes = await fetch(
+      `${process.env.API_BASE_URL}/refresh-token`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+      },
+    );
+    console.log(refreshRes);
+    if (!refreshRes.ok) {
+      // Refresh token expired → clear cookies → force re-login
+      cookieStore.delete("access_token");
+      cookieStore.delete("refresh_token");
+      cookieStore.delete("user");
       return NextResponse.json({ user: null });
     }
 
-    let user = null;
-    try {
-      user = JSON.parse(userCookie);
-    } catch {
-      user = null;
-    }
+    const data = await refreshRes.json();
 
-    if (!accessToken) {
-      if (!refreshToken) {
-        return NextResponse.json({ user: null });
-      }
-
-      const refreshRes = await fetch(
-        `${process.env.API_BASE_URL}/refresh-token`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refreshToken }),
-        },
-      );
-
-      if (!refreshRes.ok) {
-        const response = NextResponse.json({ user: null });
-        response.cookies.delete("access_token");
-        response.cookies.delete("refresh_token");
-        response.cookies.delete("user");
-        return response;
-      }
-
-      const data = await refreshRes.json();
-      const response = NextResponse.json({ user });
-      response.cookies.set("access_token", data.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 60 * 15,
-        path: "/",
-      });
-      return response;
-    }
+    // Save new access token
+    cookieStore.set("access_token", data.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 15,
+      path: "/",
+    });
 
     return NextResponse.json({ user });
   } catch {

@@ -176,8 +176,8 @@ export default function ProductsClient({
   const totalPages = result.success ? result.data.result.pagination.pages : 0;
   const currentPage = result.success ? result.data.result.pagination.page : 1;
 
-  console.log(products, "ioihoih");
-  console.log(result, "uuuuuuuuu");
+  // console.log(products, "ioihoih");
+  // console.log(result, "uuuuuuuuu");
 
   const hasError = !result.success;
   const errorMsg = !result.success ? result.error : "";
@@ -353,93 +353,75 @@ export default function ProductsClient({
 
   return (
     <div dir="rtl" className="min-h-screen bg-surface-primary">
-      {/* Breadcrumb */}
-      <div className="border-b border-border-default bg-surface-secondary">
-        <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center gap-1.5 text-caption text-text-tertiary">
-          <Link href="/" className="hover:text-brand-primary transition-colors">
-            الرئيسية
-          </Link>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="size-3 rotate-180"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m8.25 4.5 7.5 7.5-7.5 7.5"
-            />
-          </svg>
-          <a
-            href="/products"
-            className="hover:text-brand-primary transition-colors"
-          >
-            الفئات
-          </a>
-          {activeCategory && (
-            <>
+      <div
+        style={{
+          backgroundImage: `
+          linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px)
+        `,
+          backgroundSize: "80px 80px",
+        }}
+      >
+        {/* Breadcrumb */}
+
+        <div className="breadcrumbs text-sm max-w-7xl mx-auto px-4 py-2.5 text-[#676767]">
+          <ul>
+            <li>
+              <Link href="/" className="font-medium text-[20px]">
+                الرئيسية
+              </Link>
+            </li>
+            <li>
+              <Link href="/categories" className="font-medium text-[20px]">
+                الفئات
+              </Link>
+            </li>
+            {activeCategory && (
+              <li className="text-[#2E9E6E] font-medium text-[20px]">
+                {CATEGORIES.find((c) => c.value === activeCategory)?.label}
+              </li>
+            )}
+          </ul>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          {/* Page header */}
+          <div className="mb-6">
+            {/* AI recommendation banner */}
+            <div className="inline-flex items-center gap-1.5 bg-[#E8F0ED] text-[#2E9E6E] text-caption font-normal px-3 py-1.5 rounded-full mb-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth={2}
+                strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-3 rotate-180"
+                className="size-3.5"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                  d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"
                 />
               </svg>
-              <span className="text-brand-primary">
-                {CATEGORIES.find((c) => c.value === activeCategory)?.label}
-              </span>
-            </>
-          )}
+              توصيات ذكية بالذكاء الاصطناعي
+            </div>
+
+            <h1 className="text-[48px] font-medium text-text-primary mb-1">
+              {activeCategory
+                ? (CATEGORIES.find((c) => c.value === activeCategory)?.label ??
+                  "المنتجات")
+                : "جميع المنتجات"}
+            </h1>
+            <p className="text-[20px] text-text-secondary">
+              استأجر كاميرات احترافية، وأجهزة لابتوب، ومعدات متنوعة من ملاك
+              موثوقين في جميع أنحاء مصر بالساعة أو باليوم أو بالأسبوع.
+            </p>
+            <p className="text-[#515151] font-semibold text-[20px] mt-1">
+              {total?.toLocaleString()} منتج متوفر
+            </p>
+          </div>
         </div>
       </div>
-
       <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Page header */}
-        <div className="mb-6">
-          {/* AI recommendation banner */}
-          <div className="inline-flex items-center gap-1.5 bg-accent-light text-accent-default text-caption font-medium px-3 py-1.5 rounded-full mb-3">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-3.5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"
-              />
-            </svg>
-            توصيات ذكية بالذكاء الاصطناعي
-          </div>
-
-          <h1 className="text-display font-medium text-text-primary mb-1">
-            {activeCategory
-              ? (CATEGORIES.find((c) => c.value === activeCategory)?.label ??
-                "المنتجات")
-              : "جميع المنتجات"}
-          </h1>
-          <p className="text-body-sm text-text-secondary">
-            استأجر كاميرات احترافية، وأجهزة لابتوب، ومعدات متنوعة من ملاك
-            موثوقين في جميع أنحاء مصر بالساعة أو باليوم أو بالأسبوع.
-          </p>
-          <p className="text-caption text-text-tertiary mt-1">
-            {total?.toLocaleString()} منتج متوفر
-          </p>
-        </div>
-
         <div className="flex gap-6">
           {/* ── Filter sidebar — desktop ──────────────────────────────────────── */}
           <div className="hidden lg:block w-64 shrink-0">

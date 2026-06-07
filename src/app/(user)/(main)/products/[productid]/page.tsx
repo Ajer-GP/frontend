@@ -16,6 +16,7 @@ export default async function page({
   const { productid } = await params;
   const result = await getProductByIdAction(productid);
   const data = result.data.product;
+  // console.log(data);
   return (
     <div dir='rtl' className=''>
       <Navbar />

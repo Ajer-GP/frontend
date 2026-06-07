@@ -5,6 +5,7 @@ import Link from "next/link";
 export default async function Best_products() {
   const result = await getProductsAction();
   const data = result.data.result.products;
+  // console.log(data);
   return (
     <div className='flex flex-col justify-center items-center px-4 sm:px-6 md:px-14 mb-10'>
       <div className='badge badge-md mt-5 mb-1 p-4 font-black rounded-3xl bg-brand-light border-brand-light text-brand-primary'>
