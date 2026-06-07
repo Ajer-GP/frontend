@@ -3,6 +3,8 @@
 import Footer from "@/app/_components/Landing/Footer";
 import Navbar from "@/app/_components/Landing/Navbar";
 import { UserProvider } from "@/app/_context/UserContext";
+import { cookies } from "next/headers";
+
 async function getUserFromCookies() {
   try {
     const cookieStore = await cookies();
@@ -15,13 +17,16 @@ async function getUserFromCookies() {
     return null;
   }
 }
-export default function MainLayout({
+
+export default async function MainLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialUser = await getUserFromCookies();
+
   return (
-    <UserProvider initialUser={getUserFromCookies()}>
+    <UserProvider initialUser={initialUser}>
       <nav>
         <Navbar />
       </nav>

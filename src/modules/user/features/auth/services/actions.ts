@@ -33,35 +33,25 @@ export async function loginService(prevState: any, formData: FormData) {
   if (!res.ok) return { message: data.message || "فشل تسجيل الدخول" };
 
   const cookieStore = await cookies();
+  const remember = formData.get("remember");
+  const sessionMaxAge = 60 * 15; // 15 minutes
+  const rememberMaxAge = 60 * 60 * 24 * 15; // 15 days
 
   cookieStore.set("access_token", data.accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 15,
+    maxAge: sessionMaxAge,
     path: "/",
   });
-  // If backend returned a refresh token in the login response, store it.
-  // Do NOT attempt to call the refresh endpoint here — that endpoint
-  // issues new access tokens when an access token expires (see /api/me).
-  if (data.refreshToken) {
-    cookieStore.set("refresh_token", data.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 15,
-      path: "/",
-    });
-  }
 
   cookieStore.set("user", JSON.stringify(data.user), {
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: remember ? rememberMaxAge : sessionMaxAge,
     path: "/",
   });
 
-  // If the user selected "remember me", request a refresh token and store it
-  try {
-    const remember = formData.get("remember");
-    if (remember) {
+  if (remember) {
+    try {
       const refreshRes = await fetch(
         `${process.env.API_BASE_URL}/auth/refresh-token`,
         {
@@ -72,20 +62,18 @@ export async function loginService(prevState: any, formData: FormData) {
       );
       if (refreshRes.ok) {
         const refreshData = await refreshRes.json();
-        // Backend returns accessToken, but we'll store it as refresh_token
         if (refreshData?.accessToken) {
           cookieStore.set("refresh_token", refreshData.accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            maxAge: 60 * 60 * 24 * 15,
+            maxAge: rememberMaxAge,
             path: "/",
           });
-          console.log("Stored refresh token from /auth/refresh-token endpoint");
         }
       }
+    } catch (err) {
+      console.error("Remember-me refresh call failed:", err);
     }
-  } catch (err) {
-    console.error("Remember-me refresh call failed:", err);
   }
 
   redirect("/");

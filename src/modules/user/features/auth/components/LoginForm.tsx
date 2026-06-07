@@ -129,6 +129,8 @@ export default function LoginForm() {
         <div className='flex gap-2'>
           <input
             type='checkbox'
+            name='remember'
+            value='on'
             className='checkbox border-border-default checked:border-brand-primary text-white checked:bg-brand-primary'
           />
           <p> تذكرني علي هذا الجهاز</p>
