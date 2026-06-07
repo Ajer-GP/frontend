@@ -29,12 +29,8 @@ export function UserProvider({ children, initialUser = null }) {
   };
 
   useEffect(() => {
-    if (initialUser) {
-      setUser(initialUser);
-      setIsLoading(false);
-      return;
-    }
-
+    // Always verify auth state with server, even if initialUser exists
+    // This ensures tokens haven't been deleted/expired elsewhere
     fetchUser();
   }, [initialUser]);
 

@@ -40,33 +40,11 @@ export async function loginService(prevState: any, formData: FormData) {
     maxAge: 60 * 15,
     path: "/",
   });
-
-  // Fetch refresh token from the refresh-token endpoint
-  let refreshToken = null;
-  try {
-    const refreshRes = await fetch(
-      `${process.env.API_BASE_URL}/auth/refresh-token`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${data.accessToken}`,
-        },
-        body: JSON.stringify({ email: parsed.data.email }),
-      },
-    );
-
-    if (refreshRes.ok) {
-      const refreshData = await refreshRes.json();
-      refreshToken = refreshData.refreshToken;
-      console.log("Got refresh token from endpoint:", refreshToken);
-    }
-  } catch (error) {
-    console.error("Failed to fetch refresh token:", error);
-  }
-
-  if (refreshToken) {
-    cookieStore.set("refresh_token", refreshToken, {
+  // If backend returned a refresh token in the login response, store it.
+  // Do NOT attempt to call the refresh endpoint here — that endpoint
+  // issues new access tokens when an access token expires (see /api/me).
+  if (data.refreshToken) {
+    cookieStore.set("refresh_token", data.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 15,
@@ -74,11 +52,41 @@ export async function loginService(prevState: any, formData: FormData) {
     });
   }
 
-cookieStore.set("user", encodeURIComponent(JSON.stringify(data.user)), {
-  secure: process.env.NODE_ENV === "production",
-  maxAge: 60 * 60 * 24 * 7,
-  path: "/",
-});
+  cookieStore.set("user", JSON.stringify(data.user), {
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 7,
+    path: "/",
+  });
+
+  // If the user selected "remember me", request a refresh token and store it
+  try {
+    const remember = formData.get("remember");
+    if (remember) {
+      const refreshRes = await fetch(
+        `${process.env.API_BASE_URL}/auth/refresh-token`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: parsed.data.email }),
+        },
+      );
+      if (refreshRes.ok) {
+        const refreshData = await refreshRes.json();
+        // Backend returns accessToken, but we'll store it as refresh_token
+        if (refreshData?.accessToken) {
+          cookieStore.set("refresh_token", refreshData.accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 60 * 60 * 24 * 15,
+            path: "/",
+          });
+          console.log("Stored refresh token from /auth/refresh-token endpoint");
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Remember-me refresh call failed:", err);
+  }
 
   redirect("/");
 }
