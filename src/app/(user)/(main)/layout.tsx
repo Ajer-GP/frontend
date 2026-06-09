@@ -8,6 +8,8 @@ export default async function MainLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getUserFromCookies();
+
   return (
     <>
       <nav>

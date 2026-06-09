@@ -1,7 +1,8 @@
+import { Product } from "@/modules/user/features/products/types/products.typs";
 import React from "react";
 
-export default function Details(data) {
-  const product = data.data;
+export default function Details({ data }: { data: Product }) {
+  const product = data;
   return (
     <div className='mx-10'>
       <h1 className='text-2xl font-black my-4'> تفاصيل المنتج</h1>

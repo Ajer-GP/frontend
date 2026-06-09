@@ -166,12 +166,12 @@ export default function ProductCard({ product, period = "day" }: Props) {
           >
             اعرف المزيد
           </Link>
-          <Link
+          {/* <Link
             href={`/products/${product._id}/rent`}
             className="flex-1 text-center py-2 rounded-xl text-body-sm font-medium bg-brand-primary text-white hover:bg-brand-dark transition-colors"
           >
             أجر الآن
-          </Link>
+          </Link> */}
         </div>
       </div>
     </div>

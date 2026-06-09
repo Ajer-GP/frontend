@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default async function Owner(data) {
+export default async function Owner(data: any) {
   const owner = data.data.owner;
   return (
     <div className='my-10 mx-10'>
