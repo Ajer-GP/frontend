@@ -1,15 +1,29 @@
 "use client";
-import { useState, useActionState } from "react";
+import { useState, useActionState, useEffect } from "react";
 import Link from "next/link";
 import { loginService } from "../services/actions";
+import { useAuth } from "@/app/_context/AuthContext";
+import { useRouter } from "next/navigation";
+const initialState = { ZodErrors: null, message: null };
 
 export default function LoginForm() {
+  const router = useRouter();
+  const { refreshUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [formState, formAction] = useActionState(loginService, {});
+  const [formState, action, isPending] = useActionState(
+    loginService,
+    initialState,
+  );
+
+  useEffect(() => {
+    if (formState && (formState as any).success) {
+      refreshUser().then(() => router.push("/"));
+    }
+  }, [formState, refreshUser, router]);
 
   return (
     <>
-      <form action={formAction} className='flex flex-col gap-4'>
+      <form action={action} className='flex flex-col gap-4'>
         <label
           htmlFor='email'
           className='label text-body-sm  mt-4 mx-2 text-black '>
@@ -39,7 +53,7 @@ export default function LoginForm() {
             className='input bg-white w-full outline-0 border-0'
           />
         </div>
-        {formState?.ZodErrors && (
+        {formState?.ZodErrors?.email && (
           <p className='label text-caption  mx-2 text-danger'>
             {formState.ZodErrors?.email?.[0]}{" "}
           </p>
@@ -115,7 +129,7 @@ export default function LoginForm() {
             )}
           </button>
         </div>
-        {formState.ZodErrors && (
+        {formState?.ZodErrors?.password && (
           <p className='label text-caption mx-2 text-danger '>
             {formState.ZodErrors?.password?.[0]}
           </p>
@@ -126,28 +140,18 @@ export default function LoginForm() {
           {" "}
           نسيت كلمة السر ؟
         </Link>
-        <div className='flex gap-2'>
-          <input
-            type='checkbox'
-            name='remember'
-            value='on'
-            className='checkbox border-border-default checked:border-brand-primary text-white checked:bg-brand-primary'
-          />
-          <p> تذكرني علي هذا الجهاز</p>
-        </div>
+
         {formState?.message && (
           <p className='label text-caption mx-2 text-danger '>
             {formState.message}
           </p>
         )}
-        {formState?.data?.user && (
-          <p className='label text-caption mx-2 text-green-600'>
-            تم تسجيل الدخول بنجاح
-          </p>
-        )}
-        <button className='btn w-full bg-brand-primary hover:bg-brand-dark text-white border-none rounded-xl text-body font-medium mt-1'>
-          {" "}
-          سجل الدخول
+
+        <button
+          type='submit'
+          disabled={isPending}
+          className='btn w-full bg-brand-primary hover:bg-brand-dark text-white border-none rounded-xl text-body font-medium mt-1 disabled:opacity-60'>
+          {isPending ? "جاري تسجيل الدخول..." : "سجل الدخول"}
         </button>
       </form>
       <div className='mt-6 w-80 mx-auto'>
