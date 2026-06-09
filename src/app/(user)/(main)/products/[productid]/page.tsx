@@ -6,7 +6,7 @@ import Owner from "@/app/_components/ProductDetails/Owner";
 import Product from "@/app/_components/ProductDetails/Product";
 import ReturnRefundPolicy from "@/app/_components/ProductDetails/ReturnRefundPolicy";
 import UsersReviews from "@/app/_components/ProductDetails/UsersReviews";
-import { getProductByIdAction } from "@/Modules/User/Features/products/services/products.actions";
+import { getProductByIdAction } from "@/modules/user/features/products/services/products.actions";
 
 export default async function page({
   params,
@@ -15,11 +15,18 @@ export default async function page({
 }) {
   const { productid } = await params;
   const result = await getProductByIdAction(productid);
-  const data = result.data.product;
+  if (!result.success)
+    return <div>حدث خطأ في تحميل المنتج , {result.error}</div>;
+  const res = result.data;
+  const data = res.product;
+
+  console.log(data, "ppp");
+
+  // const result = await getProductByIdAction(productid);
+  // const data = result.data.product;
   // console.log(data);
   return (
     <div dir="rtl" className="">
-      <Navbar />
       <Product data={data} />
       <div className="flex flex-col gap-4 my-8 mx-4 sm:mx-8 lg:mx-10">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black">
@@ -114,7 +121,6 @@ export default async function page({
       <How_it_works />
       <ReturnRefundPolicy />
       <UsersReviews data={data} />
-      <Footer />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import {
   ActionResult,
   GetProductsParams,
   Product,
+  ProductResponse,
   ProductsResponse,
 } from "../types/products.typs";
 
@@ -59,7 +60,7 @@ export async function getProductsAction(
 
 export async function getProductByIdAction(
   id: string,
-): Promise<ActionResult<Product>> {
+): Promise<ActionResult<ProductResponse>> {
   if (!id) {
     return { success: false, error: "معرّف المنتج مطلوب" };
   }
@@ -82,7 +83,9 @@ export async function getProductByIdAction(
       };
     }
 
-    const data: Product = await res.json();
+    const data: ProductResponse = await res.json();
+    console.log(data, "AAAAAAAAAAAAAAAA");
+
     return { success: true, data };
   } catch {
     return { success: false, error: "تعذر الاتصال بالخادم، حاول مجدداً" };

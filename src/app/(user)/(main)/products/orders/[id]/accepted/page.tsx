@@ -1,0 +1,157 @@
+"use client";
+import { useState, useEffect } from "react";
+import OrderStepper from "@/app/_components/orders/OrderStepper";
+import OrderSummaryCard from "@/app/_components/orders/OrderSummaryCard";
+import PaymentPage from "@/app/_components/orders/Payment";
+import Image from "next/image";
+
+type PaymentTab = "card" | "instapay" | "discount";
+
+export default function AcceptedPage() {
+  const [tab, setTab] = useState<PaymentTab>("card");
+  const [seconds, setSeconds] = useState(3 * 60 * 60); // 3 hours
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSeconds((s) => (s > 0 ? s - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
+  const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+  const s = String(seconds % 60).padStart(2, "0");
+
+  return (
+    <div dir="rtl" className=" max-w-6xl mx-auto p-4 space-y-4">
+      {/* Header */}
+      <div className="text-center py-6 space-y-2">
+        <div className="w-32 h-32 rounded-full bg-brand-light flex items-center justify-center mx-auto">
+          <Image
+            width={80}
+            height={80}
+            src="/images/tick-circle.png"
+            alt="Checkmark"
+            className="text-brand-primary text-2xl"
+          />
+        </div>
+        <h1 className="text-h1">تم قبول طلب إيجارك</h1>
+        <p className="text-body-sm text-text-secondary">
+          تم قبول طلبك من المالك أكمل عملية دفع العربون بالأسفل لضمان إكمال طلبك
+        </p>
+        <button className="border border-[#BA801A] text-[#BA801A] bg-[#FDF6E9] text-body-sm px-4 py-1.5 rounded-full">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-4 w-4 h-4 inline-block ml-1"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+            />
+          </svg>
+          بانتظار دفع عربون الحجز
+        </button>
+      </div>
+
+      {/* Stepper */}
+      <div className="border border-border-default rounded-xl p-4">
+        <p className="text-caption text-text-secondary mb-3">متابعة الطلب</p>
+        <OrderStepper currentStep={3} />
+      </div>
+
+      {/* Countdown */}
+      <div className="bg-[#FFFDFA] border-[#E8A020] border-1 rounded-xl p-4 flex gap-3">
+        <span className="text-warning text-2xl mt-0.5">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+            />
+          </svg>
+        </span>
+        <div className="flex justify-between align-middle w-full">
+          <div>
+            <p className="text[24px] font-medium text-[#000]">
+              يجب اتمام عملية الدفع خلال 3 ساعات
+            </p>
+            <p className="text-[16px] text-[#676767] mt-1">
+              سيتم إلغاء حجزك تلقائيًا إذا لم يتم إتمام الدفع قبل الموعد
+              النهائي.{" "}
+            </p>
+            <p className="text-caption text-[#676767] mt-1">
+              ينتهي في 5 يونيو 2026، الساعة 8:16 مساءً.{" "}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            {[h, m, s].map((val, i) => (
+              <>
+                <div
+                  key={i}
+                  className="bg-white border border-[#676767] w-14 h-13 text-center flex justify-center items-center rounded-[20px] px-3 py-1 text-lg font-semibold"
+                >
+                  {val}
+                </div>
+                {i < 2 && <span className="text-black font-bold">:</span>}
+              </>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Summary + Deposit */}
+      <div className="grid grid-cols-2 gap-3">
+        <OrderSummaryCard
+          product={{
+            name: "كاميرا سوني ألفا A7 IV بدون مرآة (Mirrorless)",
+            category: "كاميرا",
+            image: "/images/camera.jpg",
+            ownerName: "بسنت خالد",
+            ownerAvatar: "/images/owner.jpg",
+          }}
+          dates={{
+            start: "02/05/2026",
+            end: "05/05/2026",
+            days: 3,
+            dailyRate: 100,
+          }}
+          pricing={null} // hide pricing here, show in deposit card
+        />
+        <div className="border border-border-default rounded-xl p-4">
+          <p className="text-caption text-text-secondary mb-3">
+            تفاصيل تكلفة العربون
+          </p>
+          <div className="space-y-2 text-body-sm">
+            <div className="flex justify-between">
+              <span>300</span>
+              <span className="text-text-secondary">تكلفة العربون</span>
+            </div>
+            <div className="flex justify-between">
+              <span>100</span>
+              <span className="text-text-secondary">سعر التوصيل</span>
+            </div>
+          </div>
+          <div className="flex justify-between font-medium text-brand-primary border-t border-border-default pt-2 mt-2">
+            <span>ج.م 400</span>
+            <span>الإجمالي</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Payment */}
+      <PaymentPage />
+    </div>
+  );
+}

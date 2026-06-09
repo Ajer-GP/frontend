@@ -1,9 +1,28 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  Dispatch,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+type UserContextType = {
+  user: any;
+  isLoading: boolean;
+  fetchUser: () => Promise<void>;
+  setUser: Dispatch<any>;
+};
 
-const UserContext = createContext(null);
+const UserContext = createContext<UserContextType | null>(null);
+// const UserContext = createContext(null);
 
-export function UserProvider({ children, initialUser = null }) {
+export function UserProvider({
+  children,
+  initialUser = null,
+}: {
+  children: React.ReactNode;
+  initialUser?: any;
+}) {
   const [user, setUser] = useState(initialUser);
   const [isLoading, setIsLoading] = useState(false);
 

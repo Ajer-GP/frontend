@@ -15,23 +15,38 @@ export type ProductCategory =
   | "party tools"
   | "other";
 
-export interface Product {
+export type Product = {
   _id: string;
   title: string;
   description: string;
+  name: string;
+  category: string;
+  condition: "excellent" | "good" | "fair" | "poor";
+  pricePerHour: number;
   pricePerDay: number;
-  pricePerWeek?: number;
-  insuranceAmount?: number;
-  condition: ProductCondition;
-  category: ProductCategory;
+  pricePerWeek: number;
+  insuranceAmount: number;
   coverImage: {
     url: string;
     publicId: string;
   };
   rating: number | null;
-  createdAt?: string;
-  updatedAt?: string;
-}
+  usingCondition?: string;
+  handlingNotes?: string;
+  images?: { url: string; publicId: string }[];
+};
+
+export type Pagination = {
+  total: number;
+  page: number;
+  pages: number;
+  limit: number;
+};
+
+// export type ProductsResponse = {
+//   products: Product[];
+//   pagination: Pagination;
+// };
 
 export interface ProductsResponse {
   result: {
@@ -58,3 +73,8 @@ export interface GetProductsParams {
 export type ActionResult<T> =
   | { success: true; data: T }
   | { success: false; error: string };
+
+export type ProductResponse = {
+  status: string;
+  product: Product;
+};
