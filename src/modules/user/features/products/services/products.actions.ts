@@ -21,6 +21,7 @@ function buildQuery(params: GetProductsParams): string {
     query.set("maxPrice", String(params.maxPrice));
   if (params.condition) query.set("condition", params.condition);
   if (params.category) query.set("category", params.category);
+  if (params.search) query.set("search", params.search);
 
   return query.toString() ? `?${query.toString()}` : "";
 }
@@ -68,6 +69,44 @@ export async function getProductByIdAction(
     const res = await fetch(`${process.env.API_BASE_URL}/products/${id}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return {
+        success: false,
+        error:
+          res.status === 404
+            ? "المنتج غير موجود"
+            : err?.message || "فشل تحميل المنتج",
+      };
+    }
+
+    const data: Product = await res.json();
+    return { success: true, data };
+  } catch {
+    return { success: false, error: "تعذر الاتصال بالخادم، حاول مجدداً" };
+  }
+}
+
+export async function rentRequest(productId, startDate, endDate, totalAmount) {
+  if (!productId) {
+    return { success: false, error: "معرّف المنتج مطلوب" };
+  }
+
+  try {
+    const res = await fetch(`${process.env.API_BASE_URL}/requests`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        productId: productId,
+        startDate: startDate,
+        endDate: endDate,
+        totalAmount: totalAmount,
+      }),
       next: { revalidate: 60 },
     });
 

@@ -19,6 +19,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
     maxPrice: sp.maxPrice ? Number(sp.maxPrice) : undefined,
     condition: sp.condition as GetProductsParams["condition"],
     category: sp.category,
+    search: sp.search,
   };
 
   const result = await getProductsAction(params);

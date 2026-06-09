@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import "./globals.css";
-import { Inter, IBM_Plex_Sans_Arabic, JetBrains_Mono } from "next/font/google";
-import { UserProvider } from "./_context/UserContext";
+import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
+import { AuthProvider } from "./_context/AuthContext";
 
 const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic"],
   weight: ["400", "500", "600"],
   variable: "--font-arabic",
 });
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -21,33 +21,16 @@ export const metadata: Metadata = {
   description: "help people to rent tools",
 };
 
-async function getUserFromCookies() {
-  try {
-    const cookieStore = await cookies();
-    const userCookie = cookieStore.get("user");
-    if (userCookie?.value) {
-      return JSON.parse(userCookie.value);
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const initialUser = await getUserFromCookies();
-
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang='ar'
       dir='rtl'
-      className={`${ibmPlexSansArabic.variable}  h-full antialiased`}>
+      className={`${ibmPlexSansArabic.variable} ${inter.variable} h-full antialiased`}>
       <body className='min-h-full flex flex-col'>
-        <UserProvider initialUser={initialUser}>{children}</UserProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

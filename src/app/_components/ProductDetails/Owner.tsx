@@ -10,13 +10,21 @@ export default async function Owner(data) {
       <div className='flex flex-col gap-4 px-4 py-4 border border-gray-400 bg-gray-50 rounded-2xl'>
         {/* Top row */}
         <div className='flex gap-3 items-center'>
-          <Image
-            src={owner.profileImage.url}
-            alt='user image'
-            width={80}
-            height={80}
-            className='rounded-full object-cover'
-          />
+          {owner.profileImage ? (
+            <Image
+              src={owner.profileImage?.url}
+              alt='user image'
+              width={80}
+              height={80}
+              className='rounded-full object-cover'
+            />
+          ) : (
+            <div className='avatar avatar-placeholder'>
+              <div className='bg-brand-primary text-neutral-content w-24 rounded-full'>
+                <span className='text-3xl'>{owner.fullName[0]}</span>
+              </div>
+            </div>
+          )}
           <div className='flex flex-col gap-2'>
             {/* Name + badge */}
             <div className='flex items-center gap-2'>

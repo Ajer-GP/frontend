@@ -20,7 +20,7 @@ export default function UsersReviews(data) {
   return (
     <div className='flex flex-col px-4 sm:px-6 md:px-14 mb-10'>
       <h1 className='font-black text-2xl'>التقييمات</h1>
-      {owner.reviews.length > 0 ? (
+      {owner.reviews?.length > 0 ? (
         <div className='flex flex-wrap gap-2 mt-5 mb-3'>
           {owner.reviews?.map((rev) => (
             <div
