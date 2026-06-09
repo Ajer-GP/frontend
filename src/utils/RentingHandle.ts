@@ -29,6 +29,8 @@ export function calculateRentalFee(totalHours, product) {
   const insurance = product.insuranceAmount ?? 0;
 
   const total = rentalFee + insurance + deliveryFee + commission + deposit;
+  const totalAmount = rentalFee + insurance + deliveryFee + commission;
+
   return {
     breakdown: { weeks, days, hours, weeksCost, daysCost, hoursCost },
     fees: {
@@ -38,6 +40,7 @@ export function calculateRentalFee(totalHours, product) {
       deposit,
       insurance,
       total,
+      totalAmount,
     },
   };
 }

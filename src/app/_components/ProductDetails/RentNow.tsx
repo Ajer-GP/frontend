@@ -1,7 +1,8 @@
 "use client";
 import React, { useMemo, useState } from "react";
 import { calculateRentalFee, MIN_HOURS_FROM_NOW } from "@/utils/RentingHandle";
-import path from "path";
+import { CreateRentRequest } from "@/Modules/User/Features/Rent/services/Rent.actions";
+import { redirect } from "next/navigation";
 export default function RentNow(data) {
   const product = data.data;
   const day = new Date().toISOString().split("T")[0];
@@ -11,7 +12,8 @@ export default function RentNow(data) {
   const [startDate, setstartDate] = useState("");
   const [returnVal, setReturnVal] = useState("am");
   const [startVal, setStartVal] = useState("am");
-  const [errors, setErrors] = useState("");
+  const [rentError, setRentError] = useState("");
+  const [rentSuccess, setRentSuccess] = useState("");
   const handleReturnHourChange = (e) => {
     setReturnHour(e.target.value);
   };
@@ -40,6 +42,7 @@ export default function RentNow(data) {
     if (period === "am" && h === 12) h = 0;
 
     const [year, month, day] = date.split("-").map(Number);
+
     return new Date(year, month - 1, day, h, 0, 0);
   };
 
@@ -57,6 +60,18 @@ export default function RentNow(data) {
         totalfee: null,
         error: `يجب أن يبدأ الإيجار بعد ${MIN_HOURS_FROM_NOW} ساعة على الأقل`,
       };
+    } else if (
+      start &&
+      end &&
+      start?.toISOString().split("T")[0] === end?.toISOString().split("T")[0] &&
+      Number(returnHour) - Number(startHour) <= 3
+    ) {
+      return {
+        days: 0,
+        hours: 0,
+        totalfee: null,
+        error: "يجب أن تكون مدة الإيجار 4 ساعات على الأقل",
+      };
     } else if (!start || !end) return { days: 0, hours: 0 };
     else if (end <= start) {
       return {
@@ -72,6 +87,7 @@ export default function RentNow(data) {
     const totalfee = calculateRentalFee(totalHours, product);
     const days = Math.floor(totalHours / 24);
     const hours = totalHours % 24; // remaining hours after full days
+
     return {
       days,
       hours,
@@ -87,7 +103,35 @@ export default function RentNow(data) {
     returnVal,
     product,
   ]);
-  const rentFunction = () => {};
+
+  const createRequest = async () => {
+    const productId = product._id;
+    const rentStart = buildDateTime(startDate, startHour, startVal);
+    const rentEnd = buildDateTime(returnDate, returnHour, returnVal);
+    if (!rentStart || !rentEnd || !rental.totalfee) {
+      console.log("select date and time ");
+      return;
+    }
+    setRentError("");
+    setRentSuccess("");
+    const res = await CreateRentRequest(
+      productId,
+      rentStart?.toISOString(),
+      rentEnd?.toISOString(),
+      rental.totalfee?.fees.totalAmount,
+    );
+    if (res.status === 400) {
+      setRentError(JSON.parse(res.error).error.message);
+    } else if (!res.success) {
+      setRentError(res.error);
+    } else {
+      setRentError("");
+      setRentSuccess("تم إرسال طلب الإيجار بنجاح! جاري معالجة طلبك...");
+      setTimeout(() => setRentSuccess(""), 5000);
+      redirect(`/orders/${res.rentalRequest.rentalRequest._id}/request/sent`);
+    }
+  };
+
   return (
     <div className='flex flex-col gap-4 my-8 mx-4 sm:mx-8 lg:mx-10'>
       <h1 className='text-2xl sm:text-3xl lg:text-4xl font-black'>
@@ -252,7 +296,7 @@ export default function RentNow(data) {
                 <span>{rental.totalfee?.fees?.deliveryFee ?? 0}</span>
               </div>
               <div className='flex justify-between text-sm sm:text-base'>
-                <span className='text-gray-400'>نسبة المنصة (2%)</span>
+                <span className='text-gray-400'>نسبة المنصة (5%)</span>
                 <span>{rental.totalfee?.fees.commission ?? 0}</span>
               </div>
               <div className='flex justify-between text-sm sm:text-base'>
@@ -262,16 +306,23 @@ export default function RentNow(data) {
               <div className='flex justify-between bg-gray-100 rounded-3xl px-4 py-2 mt-1'>
                 <span className='text-brand-primary font-medium'>الاجمالي</span>
                 <span className='text-brand-primary font-black'>
-                  {rental.totalfee?.fees.total ?? 0}
+                  {rental.totalfee?.fees.totalAmount ?? 0}
                 </span>
               </div>
             </div>
 
             <button
-              disabled={!product.isValid}
+              onClick={createRequest}
+              disabled={!product.isActive}
               className='btn bg-brand-primary rounded-3xl text-white w-full mt-auto'>
               أجر الآن
             </button>
+            {rentSuccess && (
+              <span className='text-success my-2 font-medium'>
+                {rentSuccess}
+              </span>
+            )}
+            {rentError && <span className='text-danger my-2'>{rentError}</span>}
           </div>
         </div>
       </div>

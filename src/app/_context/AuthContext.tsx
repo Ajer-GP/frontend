@@ -78,9 +78,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Check auth on every mount (page load / tab refocus)
+  // Check auth on mount
   useEffect(() => {
     refreshUser();
+  }, [refreshUser]);
+
+  // Silently refresh the access_token every 14 minutes (token TTL is 15 min)
+  // This calls /api/me which detects the expired access_token, uses the
+  // refresh_token to get a new one from the backend, and sets it as a cookie
+  useEffect(() => {
+    const FOURTEEN_MINUTES = 14 * 60 * 1000;
+    const interval = setInterval(() => {
+      refreshUser();
+    }, FOURTEEN_MINUTES);
+    return () => clearInterval(interval);
   }, [refreshUser]);
 
   const logout = useCallback(async () => {
