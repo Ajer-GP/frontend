@@ -222,8 +222,8 @@ export default function ProductsClient({
             <div
               className='absolute h-2 bg-brand-primary rounded-full'
               style={{
-                left: `${(priceRange[0] / 5000) * 100}%`,
-                right: `${100 - (priceRange[1] / 5000) * 100}%`,
+                right: `${(priceRange[0] / 5000) * 100}%`,
+                left: `${100 - (priceRange[1] / 5000) * 100}%`,
               }}
             />
             <input

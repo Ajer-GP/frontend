@@ -1,28 +1,27 @@
 import React from "react";
 import Image from "next/image";
-
-export default async function Product(data) {
-  const ProductInfo = data.data;
+import type { Product } from "@/modules/user/features/products/types/products.typs";
+export default async function Product({ data }: { data: Product }) {
+  const ProductInfo = data;
   return (
-    <div className='flex flex-col md:flex-row my-6 mx-4 md:my-10 md:mx-10 gap-6'>
-      {/* Images Section */}
-      <div className='flex flex-col w-full md:w-auto md:flex-shrink-0'>
+    <div className='flex my-10 mx-10'>
+      <div className='flex flex-col'>
         <Image
           src={ProductInfo.coverImage.url}
           alt='product image'
-          width={400}
-          height={400}
-          className='border border-gray-500 rounded-2xl w-full md:w-100 object-cover'
+          width={100}
+          height={100}
+          className='border border-gray-500 rounded-2xl w-100'
         />
-        <div className='flex gap-2 md:gap-4 my-3 overflow-x-auto pb-1'>
-          {ProductInfo.images.map((img, i: number) => (
+        <div className=' flex gap-4 my-3 '>
+          {ProductInfo.images?.map((img, i: number) => (
             <Image
               key={i}
               src={img.url}
               alt='product image'
               width={100}
               height={100}
-              className='border border-gray-500 rounded-2xl w-20 md:w-31 flex-shrink-0 object-cover'
+              className='border border-gray-500 rounded-2xl w-20 md:w-31 shrink-0 object-cover'
             />
           ))}
         </div>

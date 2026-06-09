@@ -1,11 +1,14 @@
 import React from "react";
 import Image from "next/image";
-import { getProductsAction } from "@/Modules/User/Features/products/services/products.actions";
 import Link from "next/link";
+import { getProductsAction } from "@/modules/user/features/products/services/products.actions";
 export default async function Best_products() {
-  const result = await getProductsAction();
-  const data = result.data.result.products;
+  // const result = await getProductsAction();
+  // const data = result.data.result.products;
   // console.log(data);
+  const result = await getProductsAction();
+  if (!result.success) return <div>حدث خطأ في تحميل المنتجات</div>;
+  const data = result.data.result.products;
   return (
     <div className='flex flex-col justify-center items-center px-4 sm:px-6 md:px-14 mb-10'>
       <div className='badge badge-md mt-5 mb-1 p-4 font-black rounded-3xl bg-brand-light border-brand-light text-brand-primary'>
