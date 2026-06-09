@@ -68,6 +68,7 @@ export interface GetProductsParams {
   maxPrice?: number;
   condition?: ProductCondition;
   category?: string;
+  search?: string;
 }
 
 export type ActionResult<T> =

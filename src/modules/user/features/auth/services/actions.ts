@@ -28,39 +28,53 @@ export async function loginService(prevState: any, formData: FormData) {
   });
 
   const data = await res.json();
+  console.log("Backend login response:", data);
 
   if (!res.ok) return { message: data.message || "فشل تسجيل الدخول" };
 
   const cookieStore = await cookies();
+  const isProduction = process.env.NODE_ENV === "production";
+  const ACCESS_TTL = 60 * 15; // 15 minutes
 
+  // access_token: 15 min TTL, httpOnly — /api/me silently refreshes it mid-session
   cookieStore.set("access_token", data.accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 15,
+    secure: isProduction,
+    sameSite: "lax",
     path: "/",
+    maxAge: ACCESS_TTL,
   });
 
-  cookieStore.set("refresh_token", data.refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 15,
+  // refresh_token: 15-day persistent cookie, httpOnly
+  // used mid-session to silently renew the access_token every 15 min
+  if (data.refreshToken) {
+    cookieStore.set("refresh_token", data.refreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 15, // 15 days
+    });
+  }
+
+  // user cookie: same 15-day lifetime as refresh_token
+  // /api/me reads this to return the user profile after a silent refresh
+  cookieStore.set("user", JSON.stringify(data.user), {
+    httpOnly: false,
+    secure: isProduction,
+    sameSite: "lax",
     path: "/",
+    maxAge: 60 * 60 * 24 * 15, // 15 days
   });
 
-cookieStore.set("user", encodeURIComponent(JSON.stringify(data.user)), {
-  secure: process.env.NODE_ENV === "production",
-  maxAge: 60 * 60 * 24 * 7,
-  path: "/",
-});
-
-  redirect("/");
+  return { success: true };
 }
 export async function logoutAction() {
   const cookieStore = await cookies();
   cookieStore.delete("access_token");
   cookieStore.delete("refresh_token");
   cookieStore.delete("user");
-  redirect("/login");
+  redirect("/auth/login");
 }
 export async function registerAction(data: z.infer<typeof signupSchema>) {
   const parsed = signupSchema.safeParse(data);

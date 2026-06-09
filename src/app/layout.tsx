@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import "./globals.css";
-import { Inter, IBM_Plex_Sans_Arabic, JetBrains_Mono } from "next/font/google";
+import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
+import { AuthProvider } from "./_context/AuthContext";
 
 const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic"],
   weight: ["400", "500", "600"],
   variable: "--font-arabic",
 });
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -20,18 +21,17 @@ export const metadata: Metadata = {
   description: "help people to rent tools",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      dir="rtl"
-      lang="ar"
-      className={`${ibmPlexSansArabic.variable}  h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+      lang='ar'
+      dir='rtl'
+      className={`${ibmPlexSansArabic.variable} ${inter.variable} h-full antialiased`}>
+      <body className='min-h-full flex flex-col'>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }
