@@ -57,40 +57,6 @@ export default function AddProductForm() {
         </p>
       </div>
 
-      {/* Stepper */}
-      <div className="flex items-center gap-0 mb-8">
-        {STEPS.map((label, i) => {
-          const num = i + 1;
-          const done = num < currentStep;
-          const active = num === currentStep;
-          return (
-            <div key={i} className="flex items-center flex-1 last:flex-none">
-              <div className="flex flex-col items-center gap-1">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-colors
-                    ${done ? "bg-brand-primary border-brand-primary text-white" : ""}
-                    ${active ? "border-brand-primary text-brand-primary bg-white" : ""}
-                    ${!done && !active ? "border-border-default text-text-tertiary bg-white" : ""}
-                  `}
-                >
-                  {done ? "✓" : num}
-                </div>
-                <span
-                  className={`text-caption ${active ? "text-brand-primary font-medium" : "text-text-tertiary"}`}
-                >
-                  {label}
-                </span>
-              </div>
-              {i < STEPS.length - 1 && (
-                <div
-                  className={`flex-1 h-px mx-2 mb-4 ${done ? "bg-brand-primary" : "bg-border-default"}`}
-                />
-              )}
-            </div>
-          );
-        })}
-      </div>
-
       {/* Steps */}
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         {currentStep === 1 && <Step1Basics onNext={next} />}
