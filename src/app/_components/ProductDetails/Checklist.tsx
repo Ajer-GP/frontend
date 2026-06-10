@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Checklist(data) {
+export default function Checklist(data: any) {
   const product = data.data;
   return (
     <div className='my-5 mx-4 md:mx-10'>
@@ -12,7 +12,7 @@ export default function Checklist(data) {
       </p>
       <div className='border border-gray-300 my-3 px-2 py-2 rounded-2xl'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-1'>
-          {product.checklist.map((check, i) => (
+          {product.checklist.map((check: any, i: number) => (
             <div
               key={i}
               className='flex gap-1 border border-brand-primary bg-white px-2 py-1 mx-3 my-2 rounded-xl text-brand-primary'>
