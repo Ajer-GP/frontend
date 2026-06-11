@@ -16,6 +16,10 @@ export default async function page({
 }) {
   const { productid } = await params;
   const result = await getProductByIdAction(productid);
+
+  if (!result.success)
+    return <div>حدث خطأ في تحميل المنتج , {result.error}</div>;
+
   const data = result.data.product;
 
   // if (!result.success)
@@ -26,16 +30,16 @@ export default async function page({
   // console.log(data, "ppp");
 
   return (
-    <div dir='rtl' className=''>
-      <div className='breadcrumbs text-sm max-w-7xl mx-8 my-4 px-4 py-2.5 text-[#676767]'>
+    <div dir="rtl" className="">
+      <div className="breadcrumbs text-sm max-w-7xl mx-8 my-4 px-4 py-2.5 text-[#676767]">
         <ul>
-          <li className='font-medium text-[20px]'>
-            <Link href='/'>الرئيسية</Link>
+          <li className="font-medium text-[20px]">
+            <Link href="/">الرئيسية</Link>
           </li>
-          <li className='font-medium text-[20px]'>
-            <Link href='/products'>الفئات</Link>
+          <li className="font-medium text-[20px]">
+            <Link href="/products">الفئات</Link>
           </li>
-          <li className='font-medium text-[20px]'>{data.name}</li>
+          <li className="font-medium text-[20px]">{data.name}</li>
         </ul>
       </div>
       <Product data={data} />
