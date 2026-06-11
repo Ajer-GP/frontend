@@ -10,8 +10,11 @@ import { addProduct } from "@/app/_actions/addProduct.action";
 import { FullFormData, fullSchema } from "@/app/_schemas/addProduct.schema";
 // server action
 
-const STEPS = ["الأساسيات", "التسعير", "مراجعة"];
-
+const STEPS = [
+  { number: 1, title: "الأساسيات" },
+  { number: 2, title: "التسعير" },
+  { number: 3, title: "مراجعة" },
+];
 export default function AddProductForm() {
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -48,21 +51,61 @@ export default function AddProductForm() {
     <FormProvider {...methods}>
       {/* Header */}
       <div className="mb-8">
-        <p className="text-caption text-brand-primary font-medium mb-1">
+        <p className="text-caption text-brand-primary font-medium mb-1 bg-brand-light w-50 rounded-3xl px-4 py-2">
           أعرض منتجك في أقل من 5 دقائق
         </p>
-        <h1 className="text-h1 mb-1">اعرض منتجك للإيجار</h1>
+        <h1 className="text-4xl font-black my-3">اعرض منتجك للإيجار</h1>
         <p className="text-body-sm text-text-secondary">
           حول ممتلكاتك غير المستخدمة إلى مصدر دخل إضافي
         </p>
       </div>
 
       {/* Steps */}
-      <form onSubmit={methods.handleSubmit(onSubmit)}>
-        {currentStep === 1 && <Step1Basics onNext={next} />}
-        {currentStep === 2 && <Step2Pricing onNext={next} onBack={back} />}
-        {currentStep === 3 && <Step3Review onBack={back} />}
-      </form>
+      <div className="flex items-start justify-center">
+        {STEPS.map((step, index) => {
+          const isLast = index === STEPS.length - 1;
+          const isActive = currentStep === step.number;
+          const isDone = currentStep > step.number;
+
+          return (
+            <div key={step.number} className="flex items-start">
+              {/* Circle + label */}
+              <div className="flex flex-col items-center gap-2">
+                <span
+                  className={`flex items-center justify-center size-10 rounded-full border font-medium text-sm
+              ${
+                isActive || isDone
+                  ? "border-brand-primary bg-brand-light text-brand-primary"
+                  : "border-gray-300 bg-white text-gray-400"
+              }`}>
+                  {step.number}
+                </span>
+                <p
+                  className={`text-xs font-medium
+            ${isActive || isDone ? "text-brand-primary" : "text-gray-400"}`}>
+                  {step.title}
+                </p>
+              </div>
+
+              {/* Connector line — hidden after last step */}
+              {!isLast && (
+                <div
+                  className={`h-px w-60 mt-6 mx-1
+            ${isDone ? "bg-brand-primary" : "bg-gray-200"}`}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div>
+        <form onSubmit={methods.handleSubmit(onSubmit)}>
+          {/* name of each tab group should be unique */}
+          {currentStep === 1 && <Step1Basics onNext={next} />}{" "}
+          {currentStep === 2 && <Step2Pricing onNext={next} onBack={back} />}{" "}
+          {currentStep === 3 && <Step3Review onBack={back} />}{" "}
+        </form>
+      </div>
     </FormProvider>
   );
 }

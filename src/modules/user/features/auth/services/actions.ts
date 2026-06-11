@@ -1,5 +1,4 @@
 "use server";
-
 import { z } from "zod";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
@@ -28,37 +27,38 @@ export async function loginService(prevState: any, formData: FormData) {
   });
 
   const data = await res.json();
-  console.log("Backend login response:", data);
 
   if (!res.ok) return { message: data.message || "فشل تسجيل الدخول" };
 
   const cookieStore = await cookies();
   const isProduction = process.env.NODE_ENV === "production";
-  const ACCESS_TTL = 60 * 15; // 15 minutes
 
-  // access_token: 15 min TTL, httpOnly — /api/me silently refreshes it mid-session
+  // 1. Set access token — 15 min
   cookieStore.set("access_token", data.accessToken, {
     httpOnly: true,
     secure: isProduction,
     sameSite: "lax",
     path: "/",
-    maxAge: ACCESS_TTL,
+    maxAge: 60 * 15,
   });
 
-  // refresh_token: 15-day persistent cookie, httpOnly
-  // used mid-session to silently renew the access_token every 15 min
-  if (data.refreshToken) {
-    cookieStore.set("refresh_token", data.refreshToken, {
+  // 2. Extract refresh token from Set-Cookie header (backend sets it as httpOnly)
+  //    Fall back to response body if backend also sends it there
+  const setCookieHeader = res.headers.get("set-cookie");
+  const refreshToken =
+    setCookieHeader?.match(/refresh_token=([^;]+)/)?.[1] ?? data.refreshToken;
+
+  if (refreshToken) {
+    cookieStore.set("refresh_token", refreshToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: "lax",
+      sameSite: isProduction ? "none" : "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 15, // 15 days
     });
   }
 
-  // user cookie: same 15-day lifetime as refresh_token
-  // /api/me reads this to return the user profile after a silent refresh
+  // 3. User profile cookie — readable by JS for UI (not httpOnly)
   cookieStore.set("user", JSON.stringify(data.user), {
     httpOnly: false,
     secure: isProduction,
@@ -72,11 +72,13 @@ export async function loginService(prevState: any, formData: FormData) {
 export async function logoutAction() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value;
-
+  const refreshToken = cookieStore.get("refresh_token")?.value;
   try {
     const res = await fetch(`${process.env.API_BASE_URL}/auth/logout`, {
       method: "POST",
+      credentials: "include",
       headers: {
+        Cookie: `refresh_token=${refreshToken}`,
         Authorization: `Bearer ${accessToken}`,
       },
     });
@@ -87,6 +89,7 @@ export async function logoutAction() {
 
   cookieStore.delete("access_token");
   cookieStore.delete("refresh_token");
+
   cookieStore.delete("user");
 
   redirect("/auth/login");
