@@ -33,16 +33,14 @@ export async function GET() {
     }
 
     // access_token expired — try to silently refresh with refresh_token
-    if (refreshToken) {
+    if (!accessToken) {
       const refreshRes = await fetch(
         `${process.env.API_BASE_URL}/auth/refresh-token`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${refreshToken}`,
           },
-          body: JSON.stringify({ refreshToken }),
         },
       );
 

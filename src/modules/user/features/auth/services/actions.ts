@@ -71,9 +71,24 @@ export async function loginService(prevState: any, formData: FormData) {
 }
 export async function logoutAction() {
   const cookieStore = await cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
+
+  try {
+    const res = await fetch(`${process.env.API_BASE_URL}/auth/logout`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    console.log(res);
+  } catch (err) {
+    console.error("Logout API call failed:", err);
+  }
+
   cookieStore.delete("access_token");
   cookieStore.delete("refresh_token");
   cookieStore.delete("user");
+
   redirect("/auth/login");
 }
 export async function registerAction(data: z.infer<typeof signupSchema>) {

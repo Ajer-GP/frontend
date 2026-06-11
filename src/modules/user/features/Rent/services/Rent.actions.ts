@@ -57,7 +57,10 @@ export async function CreateRentRequest(
     }
 
     const rentalRequest = await res.json();
-    console.log("CreateRentRequest -> success", rentalRequest);
+    console.log(
+      "CreateRentRequest -> success",
+      rentalRequest.rentalRequest.rentalRequest,
+    );
     return { success: true, rentalRequest };
   } catch {
     return { success: false, error: "تعذر الاتصال بالخادم، حاول مجدداً" };

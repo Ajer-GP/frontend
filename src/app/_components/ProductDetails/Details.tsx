@@ -74,7 +74,7 @@ export default function Details({ data }: { data: Product }) {
           aria-label='مواصفات'
         />
         <div className='tab-content border-gray-300 bg-gray-50 p-10 rounded-2xl'>
-          {product.specs.map((spec, i) => (
+          {product.specs?.map((spec, i) => (
             <div key={i} className='flex justify-between my-1'>
               <p className='text-gray-500'>{spec.label}</p>
               <p className='font-black'>{spec.value}</p>
@@ -90,7 +90,7 @@ export default function Details({ data }: { data: Product }) {
         />
         <div className=' tab-content border-gray-300 bg-gray-50 p-10 rounded-2xl'>
           <div className='flex flex-wrap'>
-            {product.accessories.map((acc, i) => (
+            {product.accessories?.map((acc, i) => (
               <div
                 key={i}
                 className='flex gap-1 border border-brand-primary bg-white px-2 py-1 mx-3  my-1 rounded-xl text-brand-primary'>

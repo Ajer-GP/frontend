@@ -109,7 +109,9 @@ export default function RentNow(data) {
     const rentStart = buildDateTime(startDate, startHour, startVal);
     const rentEnd = buildDateTime(returnDate, returnHour, returnVal);
     if (!rentStart || !rentEnd || !rental.totalfee) {
-      console.log("select date and time ");
+      setRentError(
+        "لإتمام عملية الإيجار، يُرجى تحديد التاريخ والوقت المناسبَين لك",
+      );
       return;
     }
     setRentError("");
@@ -128,7 +130,9 @@ export default function RentNow(data) {
       setRentError("");
       setRentSuccess("تم إرسال طلب الإيجار بنجاح! جاري معالجة طلبك...");
       setTimeout(() => setRentSuccess(""), 5000);
-      redirect(`/orders/${res.rentalRequest.rentalRequest._id}/request/sent`);
+      redirect(
+        `/products/orders/${res.rentalRequest.rentalRequest.rentalRequest._id}/request-sent`,
+      );
     }
   };
 
