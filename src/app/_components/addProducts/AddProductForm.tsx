@@ -20,7 +20,7 @@ export default function AddProductForm() {
 
   const methods = useForm<FullFormData>({
     resolver: zodResolver(fullSchema),
-    mode: "onTouched",
+    mode: "onChange",
     defaultValues: {
       title: "",
       description: "",
@@ -50,14 +50,33 @@ export default function AddProductForm() {
   return (
     <FormProvider {...methods}>
       {/* Header */}
-      <div className="mb-8">
-        <p className="text-caption text-brand-primary font-medium mb-1 bg-brand-light w-50 rounded-3xl px-4 py-2">
-          أعرض منتجك في أقل من 5 دقائق
-        </p>
-        <h1 className="text-4xl font-black my-3">اعرض منتجك للإيجار</h1>
-        <p className="text-body-sm text-text-secondary">
-          حول ممتلكاتك غير المستخدمة إلى مصدر دخل إضافي
-        </p>
+
+      <div
+        style={{
+          backgroundImage: `
+          linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px)
+        `,
+          backgroundSize: "80px 80px",
+        }}>
+        {/* Breadcrumb */}
+
+        <div className="breadcrumbs text-sm max-w-7xl mx-auto px-4 py-2.5 text-[#676767]"></div>
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          {/* Page header */}
+          <div className="mb-6">
+            {/* AI recommendation banner */}
+            <div className="inline-flex items-center gap-1.5 bg-[#E8F0ED] text-[#2E9E6E] text-caption font-normal px-3 py-1.5 rounded-full mb-3">
+              <p className="text-caption text-brand-primary font-medium mb-1 bg-brand-light w-50 rounded-3xl px-4 ">
+                أعرض منتجك في أقل من 5 دقائق
+              </p>
+            </div>
+            <h1 className="text-4xl font-black my-3">اعرض منتجك للإيجار</h1>
+            <p className="text-body-sm text-text-secondary">
+              حول ممتلكاتك غير المستخدمة إلى مصدر دخل إضافي
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Steps */}

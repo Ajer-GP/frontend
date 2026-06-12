@@ -8,14 +8,13 @@ function clearAuthCookies(response: NextResponse) {
   return response;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("access_token")?.value;
     const refreshToken = cookieStore.get("refresh_token")?.value;
     const userRaw = cookieStore.get("user")?.value;
 
-    // No user cookie at all — definitely not signed in
     if (!userRaw) {
       return NextResponse.json({ user: null });
     }
@@ -27,46 +26,35 @@ export async function GET() {
       return clearAuthCookies(NextResponse.json({ user: null }));
     }
 
-    // access_token still valid — user is signed in
     if (accessToken) {
       return NextResponse.json({ user });
     }
 
-    // access_token expired — try to silently refresh with refresh_token
+    // access_token expired — delegate to the dedicated refresh route
     if (refreshToken) {
-      const refreshRes = await fetch(
-        `${process.env.API_BASE_URL}/auth/refresh-token`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${refreshToken}`,
-          },
-          body: JSON.stringify({ refreshToken }),
+      const origin = new URL(request.url).origin;
+      const refreshRes = await fetch(`${origin}/api/auth/refresh`, {
+        method: "POST",
+        headers: {
+          // Forward the cookies so the refresh route can read refresh_token
+          Cookie: request.headers.get("cookie") ?? "",
         },
-      );
+      });
 
       if (!refreshRes.ok) {
         return clearAuthCookies(NextResponse.json({ user: null }));
       }
 
-      const data = await refreshRes.json();
-      if (!data?.accessToken) {
-        return clearAuthCookies(NextResponse.json({ user: null }));
-      }
-
-      // Issue a fresh access_token cookie and return the user
+      // Proxy the Set-Cookie headers from the refresh route (new access_token, rotated refresh_token)
       const response = NextResponse.json({ user });
-      response.cookies.set("access_token", data.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 60 * 15, // 15 minutes
-        path: "/",
+      refreshRes.headers.forEach((value, key) => {
+        if (key.toLowerCase() === "set-cookie") {
+          response.headers.append("set-cookie", value);
+        }
       });
       return response;
     }
 
-    // No tokens at all — clear stale user cookie
     return clearAuthCookies(NextResponse.json({ user: null }));
   } catch {
     return NextResponse.json({ user: null });

@@ -2,7 +2,6 @@
 import { useAuth } from "@/app/_context/AuthContext";
 import Image from "next/image";
 import Link from "next/link";
-import { useAutoRefresh } from "@/app/_hooks/useAuthRefresh";
 
 const navLinks = [
   { href: "/", label: "الرئيسية" },
@@ -14,7 +13,6 @@ const navLinks = [
 
 export default function Navbar() {
   const { user, logout, isLoading } = useAuth();
-  useAutoRefresh();
   return (
     <div className="navbar bg-white shadow-sm sticky top-0 z-50">
       {/* Logo */}

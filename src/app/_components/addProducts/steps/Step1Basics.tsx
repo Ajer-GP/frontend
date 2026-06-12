@@ -8,7 +8,6 @@ import {
   FullFormData,
 } from "@/app/_schemas/addProduct.schema";
 import { useState } from "react";
-import { title } from "process";
 
 const MAIN_CATEGORIES = [
   { id: "electronics", label: "الكترونيات", icon: "/images/cat-1.png" },
@@ -54,7 +53,8 @@ export default function Step1Basics({ onNext }: Props) {
     remove: removeAcc,
   } = useFieldArray({ control, name: "accessories" });
 
-  const mainCat = watch("mainCategory");
+  const [mainCat, setMainCat] = useState("");
+  const [selectedSub, setSelectedSub] = useState("");
   const selectedTips = watch("handlingTips") ?? [];
   const condition = watch("condition");
 
@@ -135,6 +135,8 @@ export default function Step1Basics({ onNext }: Props) {
                 key={cat.id}
                 type="button"
                 onClick={() => {
+                  setMainCat(cat.id);
+                  setSelectedSub("");
                   setValue("mainCategory", cat.id);
                   setValue("subCategory", "");
                 }}
@@ -167,10 +169,13 @@ export default function Step1Basics({ onNext }: Props) {
                 <button
                   key={sub}
                   type="button"
-                  onClick={() => setValue("subCategory", sub)}
+                  onClick={() => {
+                    setSelectedSub(sub);
+                    setValue("subCategory", sub);
+                  }}
                   className={`border rounded-full px-4 py-1.5 text-body-sm transition-colors
                   ${
-                    watch("subCategory") === sub
+                    selectedSub === sub
                       ? "border-brand-primary bg-brand-light text-brand-primary"
                       : "border-border-default text-text-secondary"
                   }`}>
