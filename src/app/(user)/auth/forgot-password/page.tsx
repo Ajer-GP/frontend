@@ -4,8 +4,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { forgotPasswordSchema } from "@/modules/user/features/auth/schemas/auth.validation";
-import { forgotPassword } from "@/modules/user/features/auth/services/actions";
+import { forgotPasswordSchema } from "@/Modules/User/Features/Auth/schemas/auth.validation";
+import { forgotPassword } from "@/Modules/User/Features/Auth/services/actions";
 
 type FormData = z.infer<typeof forgotPasswordSchema>;
 
@@ -36,23 +36,20 @@ export default function ForgotPassword() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <label
           htmlFor="email"
-          className=" label text-body-sm my-2 mx-2 text-black"
-        >
+          className=" label text-body-sm my-2 mx-2 text-black">
           البريد الالكتروني
         </label>
         <div
           className={`flex items-center gap-2 border rounded-xl px-3 py-1 hover:border-black ${
             errors.email ? "border-red-400" : "border-gray-300"
-          }`}
-        >
+          }`}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-6"
-          >
+            className="size-6">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -83,8 +80,7 @@ export default function ForgotPassword() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="btn w-full bg-brand-primary h-10 hover:bg-brand-dark text-white border-none rounded-xl text-body font-medium mt-1 disabled:opacity-60"
-        >
+          className="btn w-full bg-brand-primary h-10 hover:bg-brand-dark text-white border-none rounded-xl text-body font-medium mt-1 disabled:opacity-60">
           {isSubmitting ? (
             <span className="loading loading-spinner loading-sm" />
           ) : (

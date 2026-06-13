@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import OtpVerification from "@/modules/user/features/auth/components/Otpverification";
+import OtpVerification from "@/Modules/User/Features/Auth/components/Otpverification";
 
 export const metadata: Metadata = {
   title: "التحقق من البريد الإلكتروني | أجر",

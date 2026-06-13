@@ -1,7 +1,7 @@
 "use client";
 import React, { useMemo, useState } from "react";
 import { calculateRentalFee, MIN_HOURS_FROM_NOW } from "@/utils/RentingHandle";
-import { CreateRentRequest } from "@/modules/user/features/Rent/services/Rent.actions";
+import { CreateRentRequest } from "@/Modules/User/Features/Rent/services/Rent.actions";
 import { redirect } from "next/navigation";
 export default function RentNow(data) {
   const product = data.data;

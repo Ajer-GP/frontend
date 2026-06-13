@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import RegistertionForm from "@/modules/user/features/auth/components/RegistertionForm";
+import RegistertionForm from "@/Modules/User/Features/Auth/components/RegistertionForm";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -19,8 +19,7 @@ export default function RegisterPage() {
           هل تمتلك حساباً بالفعل؟{" "}
           <Link
             href="/auth/login"
-            className="text-brand-primary font-medium underline "
-          >
+            className="text-brand-primary font-medium underline ">
             سجل الدخول
           </Link>
         </p>

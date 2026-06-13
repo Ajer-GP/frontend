@@ -4,8 +4,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
-import { resetPasswordFormSchema } from "@/modules/user/features/auth/schemas/auth.validation";
-import { resetPassword } from "@/modules/user/features/auth/services/actions";
+import { resetPasswordFormSchema } from "@/Modules/User/Features/Auth/schemas/auth.validation";
+import { resetPassword } from "@/Modules/User/Features/Auth/services/actions";
 import { useRouter } from "next/navigation";
 
 type FormData = z.infer<typeof resetPasswordFormSchema>;
@@ -49,8 +49,7 @@ export default function ResetPasswordPage() {
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className="size-5"
-      >
+        className="size-5">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -69,8 +68,7 @@ export default function ResetPasswordPage() {
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className="size-5"
-      >
+        className="size-5">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -95,15 +93,13 @@ export default function ResetPasswordPage() {
         {errors.root && (
           <div
             role="alert"
-            className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700"
-          >
+            className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="w-4 h-4 shrink-0 mt-0.5"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+              stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -119,23 +115,20 @@ export default function ResetPasswordPage() {
         <div className="flex flex-col gap-1">
           <label
             htmlFor="new_password"
-            className="label text-body-sm mt-2 mx-2 text-black"
-          >
+            className="label text-body-sm mt-2 mx-2 text-black">
             كلمة السر الجديدة
           </label>
           <div
             className={`flex items-center gap-2 border rounded-xl px-3 py-1 hover:border-black ${
               errors.new_password ? "border-red-400" : "border-gray-300"
-            }`}
-          >
+            }`}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-6 text-gray-400 shrink-0"
-            >
+              className="size-6 text-gray-400 shrink-0">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -153,8 +146,7 @@ export default function ResetPasswordPage() {
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               className="text-gray-400 hover:text-gray-600"
-              tabIndex={-1}
-            >
+              tabIndex={-1}>
               <EyeIcon open={showPassword} />
             </button>
           </div>
@@ -172,8 +164,7 @@ export default function ResetPasswordPage() {
         <div className="flex flex-col gap-1">
           <label
             htmlFor="confirm_password"
-            className="label text-body-sm mt-2 mx-2 text-black"
-          >
+            className="label text-body-sm mt-2 mx-2 text-black">
             تأكيد كلمة السر
           </label>
           <div
@@ -183,16 +174,14 @@ export default function ResetPasswordPage() {
                 watch("new_password")
                 ? "border-red-400"
                 : "border-gray-300"
-            }`}
-          >
+            }`}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-6 text-gray-400 shrink-0"
-            >
+              className="size-6 text-gray-400 shrink-0">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -210,8 +199,7 @@ export default function ResetPasswordPage() {
               type="button"
               onClick={() => setShowConfirm((v) => !v)}
               className="text-gray-400 hover:text-gray-600"
-              tabIndex={-1}
-            >
+              tabIndex={-1}>
               <EyeIcon open={showConfirm} />
             </button>
           </div>
@@ -227,8 +215,7 @@ export default function ResetPasswordPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="btn w-full bg-brand-primary hover:bg-brand-dark text-white border-none rounded-xl text-body font-medium mt-1 disabled:opacity-60"
-        >
+          className="btn w-full bg-brand-primary hover:bg-brand-dark text-white border-none rounded-xl text-body font-medium mt-1 disabled:opacity-60">
           {isSubmitting ? (
             <span className="loading loading-spinner loading-sm" />
           ) : (

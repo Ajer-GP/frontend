@@ -1,5 +1,4 @@
-import OrdersClient from "@/modules/user/features/Rent/components/OrdersClient";
-import { cookies } from "next/headers";
+import OrdersClient from "@/Modules/User/Features/Rent/components/OrdersClient";
 import { redirect } from "next/navigation";
 
 export default async function OrdersPage() {

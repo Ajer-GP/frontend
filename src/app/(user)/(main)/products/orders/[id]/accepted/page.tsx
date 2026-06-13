@@ -1,4 +1,4 @@
-import AcceptedClient from "@/modules/user/features/Rent/components/AcceptedClient";
+import AcceptedClient from "@/Modules/User/Features/Rent/components/AcceptedClient";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
