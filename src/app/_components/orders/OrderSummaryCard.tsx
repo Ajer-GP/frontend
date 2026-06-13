@@ -75,7 +75,7 @@ export default function OrderSummaryCard({ product, dates, pricing }: Props) {
         </div>
         <div>
           <p className="text-text-tertiary text-caption">الحساب اليومي</p>
-          <p className="font-medium">{dates.dailyRate}</p>
+          <p className="font-medium">{dates.dailyRate.toFixed(2)} ج.م</p>
         </div>
       </div>
 

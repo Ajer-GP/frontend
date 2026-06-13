@@ -1,5 +1,6 @@
 "use server";
 import { cookies } from "next/headers";
+import { GetRentalResult } from "../types";
 
 export async function CreateRentRequest(
   productId,
@@ -64,5 +65,35 @@ export async function CreateRentRequest(
     return { success: true, rentalRequest };
   } catch {
     return { success: false, error: "تعذر الاتصال بالخادم، حاول مجدداً" };
+  }
+}
+
+export async function getOrderByIdAction(id: string): Promise<GetRentalResult> {
+  if (!id) return { success: false, error: "معرّف الطلب مطلوب" };
+
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("access_token")?.value;
+
+    const res = await fetch(`${process.env.API_BASE_URL}/requests/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      return {
+        success: false,
+        error: res.status === 404 ? "الطلب غير موجود" : "فشل تحميل الطلب",
+        status: res.status,
+      };
+    }
+
+    const data = await res.json();
+    return { success: true, rental: data.rental };
+  } catch {
+    return { success: false, error: "تعذر الاتصال بالخادم" };
   }
 }
