@@ -54,6 +54,11 @@ export default function Step1Basics({ onNext }: Props) {
     remove: removeAcc,
   } = useFieldArray({ control, name: "accessories" });
 
+  const { fields: noteFields, append: appendNote } = useFieldArray({
+    control,
+    name: "notes",
+  });
+
   const [mainCat, setMainCat] = useState("");
   const [selectedTips, setSelectedTips] = useState<string[]>([]);
   const [condition, setCondition] = useState("");
@@ -343,16 +348,25 @@ export default function Step1Basics({ onNext }: Props) {
                 className="text-body-sm font-medium my-2">
                 أضف ملاحظة (اختياري){" "}
               </label>
-              <input
-                type="text"
-                id="condition"
-                name="condition"
-                className="border border-border-default rounded-lg px-3 py-2 my-1 text-body-sm text-right outline-none focus:border-brand-primary"
-              />
+              {noteFields.map((field, i) => (
+                <input
+                  key={field.id}
+                  {...register(`notes.${i}.text`)}
+                  placeholder="أضف ملاحظة"
+                  className="w-full border border-border-default rounded-lg px-3 py-2 text-body-sm text-right outline-none focus:border-brand-primary mb-2"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      appendNote({ text: "" });
+                    }
+                  }}
+                />
+              ))}
             </div>
             <div>
               <button
                 type="button"
+                onClick={() => appendNote({ text: "" })}
                 className="text-body-sm text-white bg-brand-primary px-3 py-2 my-1 w-20 rounded-xl text-center font-medium flex items-center gap-1 ">
                 + أضف
               </button>
