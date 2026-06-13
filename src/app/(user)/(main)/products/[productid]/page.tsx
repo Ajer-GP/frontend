@@ -5,7 +5,7 @@ import Owner from "@/app/_components/ProductDetails/Owner";
 import Product from "@/app/_components/ProductDetails/Product";
 import ReturnRefundPolicy from "@/app/_components/ProductDetails/ReturnRefundPolicy";
 import UsersReviews from "@/app/_components/ProductDetails/UsersReviews";
-import { getProductByIdAction } from "@/Modules/User/Features/products/services/products.actions";
+import { getProductByIdAction } from "@/modules/user/features/products/services/products.actions";
 import RentNow from "@/app/_components/ProductDetails/RentNow";
 import Checklist from "@/app/_components/ProductDetails/Checklist";
 import Link from "next/link";
