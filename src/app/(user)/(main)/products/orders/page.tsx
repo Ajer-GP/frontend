@@ -22,5 +22,7 @@ export default async function OrdersPage() {
   });
   const data = res.ok ? await res.json() : { rentals: [] };
 
-  return <OrdersClient initialOrders={data.rentals} currentUserId={user.id} />;
+  return (
+    <OrdersClient initialOrders={data.rentals} currentUserId={user?._id} />
+  );
 }
