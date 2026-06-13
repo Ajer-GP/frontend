@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useTransition } from "react";
+import { useState, useRef, useTransition, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -9,6 +9,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { payDepositInstapay } from "@/app/_actions/payDeposit.action";
 import { createStripeIntent } from "@/app/_actions/createStripeIntent.action";
+import Image from "next/image";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY!);
 
@@ -24,6 +25,25 @@ export default function PaymentSection({
   const [tab, setTab] = useState<Tab>("card");
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loadingStripe, setLoadingStripe] = useState(false);
+
+  // ← جيبي الـ secret أول ما الـ component يتحمل
+  useEffect(() => {
+    setLoadingStripe(true);
+    createStripeIntent(orderId)
+      .then((secret) => {
+        console.log("clientSecret:", secret); // ← شوفي إيه اللي بيرجع
+        setClientSecret(secret);
+        setLoadingStripe(false);                                                                                                                                                                 
+      })
+      .catch((err) => {
+        console.error("stripe error:", err); // ← لو في error
+        setLoadingStripe(false);
+      });
+  }, [orderId]);
+
+  // const handleTabChange = async (t: Tab) => {
+  //   setTab(t);
+  // };
 
   const handleTabChange = async (t: Tab) => {
     setTab(t);
@@ -72,6 +92,7 @@ export default function PaymentSection({
               stripe={stripePromise}
               options={{ clientSecret, locale: "ar" }}
             >
+              degrg
               <StripeForm amount={amount} />
             </Elements>
           )}
@@ -144,7 +165,9 @@ function InstapayForm({
         className="border-2 border-dashed border-border-default rounded-xl p-8 flex flex-col items-center gap-3 cursor-pointer hover:border-brand-primary transition-colors"
       >
         {preview ? (
-          <img
+          <Image
+            width={160}
+            height={160}
             src={preview}
             alt="صورة التحويل"
             className="max-h-40 rounded-lg object-contain"
