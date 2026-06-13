@@ -33,7 +33,7 @@ export default function PaymentSection({
       .then((secret) => {
         console.log("clientSecret:", secret); // ← شوفي إيه اللي بيرجع
         setClientSecret(secret);
-        setLoadingStripe(false);                                                                                                                                                                 
+        setLoadingStripe(false);
       })
       .catch((err) => {
         console.error("stripe error:", err); // ← لو في error
@@ -49,7 +49,10 @@ export default function PaymentSection({
     setTab(t);
     if (t === "card" && !clientSecret) {
       setLoadingStripe(true);
+
       const secret = await createStripeIntent(orderId);
+      console.log("clientSecret:", secret);
+      console.log("orderId:", orderId);
       setClientSecret(secret);
       setLoadingStripe(false);
     }
@@ -93,7 +96,7 @@ export default function PaymentSection({
               options={{ clientSecret, locale: "ar" }}
             >
               degrg
-              <StripeForm amount={amount} />
+              <StripeForm amount={amount} orderId={orderId} />
             </Elements>
           )}
         </>
@@ -209,7 +212,8 @@ function InstapayForm({
     </div>
   );
 }
-function StripeForm({ amount }: { amount: number }) {
+// غيري الـ function signature
+function StripeForm({ amount, orderId }: { amount: number; orderId: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const [isPending, startTransition] = useTransition();
@@ -223,7 +227,7 @@ function StripeForm({ amount }: { amount: number }) {
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/orders/confirmed`,
+          return_url: `${window.location.origin}/products/orders/${orderId}/confirmed`,
         },
       });
       if (error) setError(error.message ?? "فشل الدفع");

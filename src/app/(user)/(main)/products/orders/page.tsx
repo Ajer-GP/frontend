@@ -5,7 +5,10 @@ import { redirect } from "next/navigation";
 export default async function OrdersPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value;
-  const user = cookieStore.get("user")?.value;
+  const userCookie = cookieStore.get("user")?.value;
+  console.log(userCookie);
+
+  const user = userCookie ? JSON.parse(decodeURIComponent(userCookie)) : null;
   if (!token) redirect("/auth/login");
 
   // جيبي اليوزر الحالي
@@ -22,5 +25,7 @@ export default async function OrdersPage() {
   });
   const data = res.ok ? await res.json() : { rentals: [] };
 
-  return <OrdersClient initialOrders={data.rentals} currentUserId={user.id} />;
+  return (
+    <OrdersClient initialOrders={data.rentals} currentUserId={user?._id} />
+  );
 }

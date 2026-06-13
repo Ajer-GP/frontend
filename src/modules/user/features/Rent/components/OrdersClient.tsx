@@ -8,7 +8,7 @@ import { Rental } from "../types";
 
 interface Props {
   initialOrders: Rental[];
-  currentUserId: string; // عشان نعرف renter ولا owner
+  currentUserId: string | null; // عشان نعرف renter ولا owner
 }
 
 const TABS = [

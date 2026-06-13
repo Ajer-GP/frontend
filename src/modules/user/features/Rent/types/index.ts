@@ -4,6 +4,7 @@ export interface Rental {
   ownerId: string;
   status:
     | "pending"
+    | "waiting_for_deposit"
     | "accepted"
     | "confirmed"
     | "active"

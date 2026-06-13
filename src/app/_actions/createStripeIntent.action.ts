@@ -17,5 +17,6 @@ export async function createStripeIntent(orderId: string) {
   );
 
   const data = await res.json();
-  return data.clientSecret as string; // الـ backend يرجع clientSecret
+  console.log(data, "data from createStripeIntent.action.ts");
+  return data.data.clientSecret as string; // الـ backend يرجع clientSecret
 }
