@@ -1,7 +1,7 @@
 import Footer from "@/app/_components/Landing/Footer";
 import Navbar from "@/app/_components/Landing/Navbar";
-import ProductsClient from "@/modules/user/features/products/components/ProductsClient";
-import { getProductsAction } from "@/modules/user/features/products/services/products.actions";
+import ProductsClient from "@/Modules/User/Features/products/components/ProductsClient";
+import { getProductsAction } from "@/Modules/User/Features/products/services/products.actions";
 import { GetProductsParams } from "@/modules/user/features/products/types/products.typs";
 
 interface PageProps {

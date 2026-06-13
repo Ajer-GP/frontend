@@ -80,7 +80,7 @@ export default function AddProductForm() {
       </div>
 
       {/* Steps */}
-      <div className="flex items-start justify-center">
+      <div className="flex items-start justify-center my-3">
         {STEPS.map((step, index) => {
           const isLast = index === STEPS.length - 1;
           const isActive = currentStep === step.number;
@@ -109,7 +109,7 @@ export default function AddProductForm() {
               {/* Connector line — hidden after last step */}
               {!isLast && (
                 <div
-                  className={`h-px w-60 mt-6 mx-1
+                  className={`h-px w-100 mt-6 mx-1
             ${isDone ? "bg-brand-primary" : "bg-gray-200"}`}
                 />
               )}
@@ -117,7 +117,7 @@ export default function AddProductForm() {
           );
         })}
       </div>
-      <div>
+      <div className="max-w-4xl mx-20">
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           {/* name of each tab group should be unique */}
           {currentStep === 1 && <Step1Basics onNext={next} />}{" "}

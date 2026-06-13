@@ -3,10 +3,10 @@ import { cookies } from "next/headers";
 import { GetRentalResult } from "../types";
 
 export async function CreateRentRequest(
-  productId,
-  startDate,
-  endDate,
-  totalAmount,
+  productId: string,
+  startDate: string,
+  endDate: string,
+  totalAmount: number,
 ) {
   if (!productId) {
     return { success: false, error: "معرّف المنتج مطلوب" };
@@ -52,7 +52,7 @@ export async function CreateRentRequest(
       } catch {}
       return {
         success: false,
-        error: parsed?.message || err || "unknown error",
+        error: (parsed as any)?.message || err || "unknown error",
         status: res.status,
       };
     }

@@ -1,6 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import { cookies } from "next/headers";
-import { getOrderByIdAction } from "@/modules/user/features/Rent/services/Rent.actions";
+import { getOrderByIdAction } from "@/Modules/User/Features/Rent/services/Rent.actions";
 interface Props {
   params: Promise<{ id: string }>;
 }

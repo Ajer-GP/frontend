@@ -15,25 +15,50 @@ export type ProductCategory =
   | "party tools"
   | "other";
 
+export type ProductImage = {
+  url: string;
+  publicId: string;
+};
+
+export type Owner = {
+  _id: string;
+  fullName: string;
+  isVerified: boolean;
+  isActive: boolean;
+  rating: number | null;
+};
+
+export type Spec = {
+  title: string;
+  value: string;
+};
+
 export type Product = {
   _id: string;
   title: string;
-  description: string;
   name: string;
+  description: string;
   category: string;
-  condition: "excellent" | "good" | "fair" | "poor";
+  condition: "new" | "like_new" | "good" | "fair" | "poor";
+  specs: Spec[];
+  accessories: string[];
+  checklist: string[];
+  handlingNotes: string;
+  usage: string;
+  coverImage: ProductImage;
+  images: ProductImage[];
   pricePerHour: number;
   pricePerDay: number;
   pricePerWeek: number;
   insuranceAmount: number;
-  coverImage: {
-    url: string;
-    publicId: string;
-  };
+  location: string;
+  owner: Owner;
   rating: number | null;
-  usingCondition?: string;
-  handlingNotes?: string;
-  images?: { url: string; publicId: string }[];
+  successfulRentals: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 };
 
 export type Pagination = {
