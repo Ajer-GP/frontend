@@ -6,7 +6,7 @@ import {
   useReducer,
   useCallback,
 } from "react";
-import { logoutAction } from "@/modules/user/features/Auth/services/actions";
+import { logoutAction } from "@/modules/user/features/auth/services/actions";
 
 interface User {
   id: string;
