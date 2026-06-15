@@ -1,30 +1,50 @@
-"use client";
-import { useState, useEffect } from "react";
+import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
 import OrderStepper from "@/app/_components/orders/OrderStepper";
 import OrderSummaryCard from "@/app/_components/orders/OrderSummaryCard";
-import PaymentPage from "@/app/_components/orders/Payment";
 import Image from "next/image";
 import Link from "next/link";
+import { getAndGuardRental } from "@/modules/user/lib/getAndGuardRental";
 
-type PaymentTab = "card" | "instapay" | "discount";
+interface Props {
+  params: Promise<{ id: string }>;
+}
 
-export default function AcceptedPage() {
-  const [tab, setTab] = useState<PaymentTab>("card");
-  const [seconds, setSeconds] = useState(3 * 60 * 60); // 3 hours
+export default async function RequestSentPage({ params }: Props) {
+  const { id } = await params;
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSeconds((s) => (s > 0 ? s - 1 : 0));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const rental = await getAndGuardRental(id, "pending");
+  const start = new Date(rental.startDate);
+  const end = new Date(rental.endDate);
+  const days = Math.ceil(
+    (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
+  );
 
-  const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
-  const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
-  const s = String(seconds % 60).padStart(2, "0");
+  const product = {
+    name: rental.product.title,
+    category: "",
+    image: rental.product.coverImage.url,
+    ownerName: rental.owner.fullName,
+    ownerAvatar: rental.owner.profileImage.url,
+  };
+
+  const dates = {
+    start: start.toLocaleDateString("ar-EG"),
+    end: end.toLocaleDateString("ar-EG"),
+    days,
+    dailyRate: rental.rentalFee / (days || 1),
+  };
+
+  const pricing = {
+    rentalPrice: rental.rentalFee,
+    insurance: rental.insuranceAmount,
+    delivery: rental.deliveryFee,
+    platformFee: rental.commissionFee,
+    total: rental.totalAmount,
+  };
 
   return (
-    <div dir="rtl" className=" max-w-6xl mx-auto p-4 space-y-4">
+    <div dir="rtl" className="max-w-6xl mx-auto p-4 space-y-4">
       {/* Header */}
       <div className="text-center py-6 space-y-2">
         <div className="w-32 h-32 rounded-full bg-brand-light flex items-center justify-center mx-auto">
@@ -32,8 +52,7 @@ export default function AcceptedPage() {
             width={80}
             height={80}
             src="/images/tick-circle.png"
-            alt="Checkmark"
-            className="text-brand-primary text-2xl"
+            alt="تم الإرسال"
           />
         </div>
         <h1 className="text-h1">تم ارسال طلب ايجار بنجاح</h1>
@@ -48,7 +67,7 @@ export default function AcceptedPage() {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-4 w-4 h-4 inline-block ml-1"
+            className="size-4 inline-block ml-1"
           >
             <path
               strokeLinecap="round"
@@ -68,29 +87,7 @@ export default function AcceptedPage() {
 
       {/* Two columns */}
       <div className="grid grid-cols-2 gap-3">
-        {/* Order Summary */}
-        <OrderSummaryCard
-          product={{
-            name: "كاميرا سوني ألفا A7 IV بدون مرآة (Mirrorless)",
-            category: "كاميرا",
-            image: "/images/camera.jpg",
-            ownerName: "بسنت خالد",
-            ownerAvatar: "/images/owner.jpg",
-          }}
-          dates={{
-            start: "02/05/2026",
-            end: "05/05/2026",
-            days: 3,
-            dailyRate: 100,
-          }}
-          pricing={{
-            rentalPrice: 300,
-            insurance: 2000,
-            delivery: 100,
-            platformFee: 20,
-            total: 3000,
-          }}
-        />
+        <OrderSummaryCard product={product} dates={dates} pricing={pricing} />
 
         {/* Info + Actions */}
         <div className="border border-border-default rounded-xl p-4 space-y-4">
@@ -127,7 +124,7 @@ export default function AcceptedPage() {
                 استكشف منتجات أخرى
               </button>
             </Link>
-            <Link href="/orders">
+            <Link href="/products/orders">
               <button className="w-full border border-border-default text-text-secondary rounded-lg py-2.5 text-body-sm">
                 شاهد طلبات إيجارك
               </button>

@@ -4,6 +4,7 @@ import OrderStepper from "@/app/_components/orders/OrderStepper";
 import OrderSummaryCard from "@/app/_components/orders/OrderSummaryCard";
 import HowItWorks from "@/app/_components/ProductDetails/How-it-works";
 import Image from "next/image";
+import { getAndGuardRental } from "@/modules/user/lib/getAndGuardRental";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -11,21 +12,7 @@ interface Props {
 
 export default async function ConfirmedPage({ params }: Props) {
   const { id } = await params;
-
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
-
-  const res = await fetch(`${process.env.API_BASE_URL}/requests/${id}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    cache: "no-store",
-  });
-
-  if (!res.ok) notFound();
-
-  const { rental } = await res.json();
+  const rental = await getAndGuardRental(id, "confirmed");
 
   // ── map إلى الشكل اللي OrderSummaryCard بتتوقعه
   const product = {
