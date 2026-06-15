@@ -7,6 +7,7 @@ const navLinks = [
   { href: "/", label: "الرئيسية" },
   { href: "/products", label: "الفئات" },
   { href: "/products/add", label: "اعرض منتجك للايجار" },
+  { href: "/products/orders", label: "طلبات الايجار" },
   { href: "/how-it-works", label: "كيف يعمل أجر؟" },
   { href: "/privacy", label: "سياسة الخصوصية والأمان" },
 ];
@@ -34,7 +35,8 @@ export default function Navbar() {
           <Link
             key={link.href}
             href={link.href}
-            className="px-4 font-black hover:text-brand-primary hover:underline underline-offset-6">
+            className="px-4 font-black hover:text-brand-primary hover:underline underline-offset-6"
+          >
             {link.label}
           </Link>
         ))}
@@ -54,7 +56,8 @@ export default function Navbar() {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-8">
+                  className="size-8"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -71,7 +74,8 @@ export default function Navbar() {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-8">
+                  className="size-8"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -82,14 +86,16 @@ export default function Navbar() {
             </Link>
             <button
               onClick={logout}
-              className="btn bg-brand-light text-brand-primary rounded-full h-12">
+              className="btn bg-brand-light text-brand-primary rounded-full h-12"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-6">
+                className="size-6"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -102,12 +108,14 @@ export default function Navbar() {
           <>
             <Link
               href="/auth/login"
-              className="btn rounded-2xl bg-white text-brand-primary border-brand-primary">
+              className="btn rounded-2xl bg-white text-brand-primary border-brand-primary"
+            >
               تسجيل الدخول
             </Link>
             <Link
               href="/auth/register"
-              className="btn rounded-2xl bg-brand-dark text-white border-0">
+              className="btn rounded-2xl bg-brand-dark text-white border-0"
+            >
               ابدأ الآن
             </Link>
           </>
@@ -123,7 +131,8 @@ export default function Navbar() {
               className="h-8 w-8"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor">
+              stroke="currentColor"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -134,12 +143,14 @@ export default function Navbar() {
           </label>
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-white rounded-box w-64">
+            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-white rounded-box w-64"
+          >
             {navLinks.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="px-4 font-black hover:text-brand-primary hover:underline underline-offset-6">
+                  className="px-4 font-black hover:text-brand-primary hover:underline underline-offset-6"
+                >
                   {link.label}
                 </Link>
               </li>
@@ -154,7 +165,8 @@ export default function Navbar() {
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke="currentColor"
-                      className="size-8">
+                      className="size-8"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -171,7 +183,8 @@ export default function Navbar() {
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke="currentColor"
-                      className="size-8">
+                      className="size-8"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -182,14 +195,16 @@ export default function Navbar() {
                 </Link>
                 <button
                   onClick={logout}
-                  className="btn bg-brand-light text-brand-primary rounded-full h-12">
+                  className="btn bg-brand-light text-brand-primary rounded-full h-12"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="size-6">
+                    className="size-6"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -203,14 +218,16 @@ export default function Navbar() {
                 <li className="mt-2">
                   <Link
                     href="/auth/login"
-                    className="btn btn-sm rounded-2xl bg-white my-1 border-brand-primary text-brand-primary">
+                    className="btn btn-sm rounded-2xl bg-white my-1 border-brand-primary text-brand-primary"
+                  >
                     تسجيل الدخول
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/auth/register"
-                    className="btn btn-sm rounded-2xl bg-brand-dark text-white my-1">
+                    className="btn btn-sm rounded-2xl bg-brand-dark text-white my-1"
+                  >
                     ابدأ الآن
                   </Link>
                 </li>

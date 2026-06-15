@@ -1,6 +1,5 @@
 import AcceptedClient from "@/Modules/User/Features/Rent/components/AcceptedClient";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
+import { getAndGuardRental } from "@/modules/user/lib/getAndGuardRental";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -9,20 +8,10 @@ interface Props {
 export default async function AcceptedPage({ params }: Props) {
   const { id } = await params;
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
-
-  const res = await fetch(`${process.env.API_BASE_URL}/requests/${id}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    cache: "no-store",
-  });
-
-  if (!res.ok) notFound();
-
-  const { rental } = await res.json();
+  const rental = await getAndGuardRental(id, [
+    "accepted",
+    "waiting_for_deposit",
+  ]);
 
   const start = new Date(rental.startDate);
   const end = new Date(rental.endDate);
@@ -45,12 +34,12 @@ export default async function AcceptedPage({ params }: Props) {
     dailyRate: rental.rentalFee / (days || 1),
   };
 
-  // العربون = deposit + deliveryFee
   const depositTotal = rental.deposit + rental.deliveryFee;
 
   return (
     <AcceptedClient
       orderId={id}
+      status={rental.status} // ← من الـ API مباشرة
       acceptedAt={rental.acceptedAt}
       product={product}
       dates={dates}

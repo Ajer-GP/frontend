@@ -37,7 +37,7 @@ export default async function OrderRedirectPage({ params }: Props) {
     case "accepted":
       redirect(`/products/orders/${id}/accepted`);
     case "waiting_for_deposit":
-      redirect(`/products/orders/${id}/waiting-for-deposit`);
+      redirect(`/products/orders/${id}/accepted`);
     case "confirmed":
       redirect(`/products/orders/${id}/confirmed`);
     default:

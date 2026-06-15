@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useTransition, useEffect } from "react";
+import { useState, useRef, useTransition } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -9,12 +9,14 @@ import {
 } from "@stripe/react-stripe-js";
 import { payDepositInstapay } from "@/app/_actions/payDeposit.action";
 import { createStripeIntent } from "@/app/_actions/createStripeIntent.action";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY!);
 
 type Tab = "card" | "instapay";
 
+// PaymentSection — parent
 export default function PaymentSection({
   orderId,
   amount,
@@ -22,40 +24,28 @@ export default function PaymentSection({
   orderId: string;
   amount: number;
 }) {
-  const [tab, setTab] = useState<Tab>("card");
+  const [tab, setTab] = useState<Tab>("instapay");
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loadingStripe, setLoadingStripe] = useState(false);
+  const [stripeAddress, setStripeAddress] = useState<Address>(EMPTY_ADDRESS); // ← هنا
 
-  // ← جيبي الـ secret أول ما الـ component يتحمل
-  useEffect(() => {
+  // بيتنادى لما يدوس "متابعة" في step العنوان
+  const handleStripeConfirmAddress = async (address: Address) => {
+    setStripeAddress(address);
     setLoadingStripe(true);
-    createStripeIntent(orderId)
-      .then((secret) => {
-        console.log("clientSecret:", secret); // ← شوفي إيه اللي بيرجع
-        setClientSecret(secret);
-        setLoadingStripe(false);
-      })
-      .catch((err) => {
-        console.error("stripe error:", err); // ← لو في error
-        setLoadingStripe(false);
-      });
-  }, [orderId]);
-
-  // const handleTabChange = async (t: Tab) => {
-  //   setTab(t);
-  // };
-
-  const handleTabChange = async (t: Tab) => {
-    setTab(t);
-    if (t === "card" && !clientSecret) {
-      setLoadingStripe(true);
-
-      const secret = await createStripeIntent(orderId);
-      console.log("clientSecret:", secret);
-      console.log("orderId:", orderId);
+    try {
+      const secret = await createStripeIntent(orderId, address); // ← بيبعت العنوان
       setClientSecret(secret);
+    } catch (err) {
+      console.error("stripe intent error:", err);
+    } finally {
       setLoadingStripe(false);
     }
+  };
+
+  const handleTabChange = (t: Tab) => {
+    setTab(t);
+    // مش بتنادي createStripeIntent هنا خالص
   };
 
   return (
@@ -64,17 +54,16 @@ export default function PaymentSection({
 
       {/* Tabs */}
       <div className="flex rounded-xl border border-border-default overflow-hidden">
-        {(["card", "instapay"] as Tab[]).map((t) => (
+        {(["instapay", "card"] as Tab[]).map((t) => (
           <button
             key={t}
             type="button"
             onClick={() => handleTabChange(t)}
-            className={`flex-1 py-3 text-body-sm font-medium transition-colors
-              ${
-                tab === t
-                  ? "bg-brand-primary text-white"
-                  : "bg-surface-primary text-text-secondary"
-              }`}
+            className={`flex-1 py-3 text-body-sm font-medium transition-colors ${
+              tab === t
+                ? "bg-brand-primary text-white"
+                : "bg-surface-primary text-text-secondary"
+            }`}
           >
             {t === "card" ? "بطاقة ائتمان / خصم" : "انستا باي"}
           </button>
@@ -90,13 +79,25 @@ export default function PaymentSection({
               جاري التحضير...
             </p>
           )}
+          {/* لو لسه مفيش secret → اعرض step العنوان */}
+          {!clientSecret && !loadingStripe && (
+            <StripeAddressStep onConfirm={handleStripeConfirmAddress} />
+          )}
+          {/* لو جاب secret → اعرض PaymentElement */}
           {clientSecret && (
             <Elements
               stripe={stripePromise}
               options={{ clientSecret, locale: "ar" }}
             >
-              degrg
-              <StripeForm amount={amount} orderId={orderId} />
+              <StripeForm
+                amount={amount}
+                orderId={orderId}
+                onEditAddress={() => {
+                  // لو عايزة ترجعي للعنوان
+                  setClientSecret(null);
+                  setStripeAddress(EMPTY_ADDRESS);
+                }}
+              />
             </Elements>
           )}
         </>
@@ -104,6 +105,9 @@ export default function PaymentSection({
     </div>
   );
 }
+
+// ── Instapay ───────────────────────────────────────────────────────────────────
+
 function InstapayForm({
   orderId,
   amount,
@@ -111,10 +115,13 @@ function InstapayForm({
   orderId: string;
   amount: number;
 }) {
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [address, setAddress] = useState<Address>(EMPTY_ADDRESS); // ← جديد
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
+  const [waitingAdmin, setWaitingAdmin] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (f: File) => {
@@ -122,31 +129,55 @@ function InstapayForm({
     setPreview(URL.createObjectURL(f));
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const f = e.dataTransfer.files[0];
-    if (f) handleFile(f);
-  };
-
   const handleSubmit = () => {
     if (!file) {
       setError("ارفع صورة التحويل أولاً");
       return;
     }
+    const missing = Object.values(address).some((v) => !v.trim());
+    if (missing) {
+      setError("أكمل بيانات العنوان كاملة");
+      return;
+    } // ← جديد
     setError("");
 
     startTransition(async () => {
-      const fd = new FormData();
-      fd.append("payment_method", "instapay");
-      fd.append("screenshot", file);
-      await payDepositInstapay(orderId, fd);
-      // redirect or show success
+      try {
+        const fd = new FormData();
+        fd.append("payment_method", "instapay");
+        fd.append("screenshot", file);
+
+        // const result = await payDepositInstapay(orderId, fd, address);
+        // const fd = new FormData();
+        // fd.append("payment_method", "instapay");
+        // fd.append("screenshot", file);
+        // // ← أضف العنوان
+        // fd.append("street", address.street);
+        // fd.append("floor", address.floor);
+        // fd.append("apartment", address.apartment);
+        // fd.append("landmark", address.landmark);
+        // fd.append("building", address.building);
+        // formData.append("location", JSON.stringify(address));
+        const result = await payDepositInstapay(orderId, fd, address);
+        const status = result?.rental?.status ?? result?.status;
+        if (status === "confirmed" || status === "deposit_paid") {
+          router.push(`/products/orders/${orderId}/confirmed`);
+        } else {
+          setWaitingAdmin(true);
+        }
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "فشل الإرسال");
+      }
     });
   };
 
+  if (waitingAdmin) {
+    /* نفس الـ JSX القديم بدون تغيير */
+  }
+
   return (
     <div className="space-y-4 text-body-sm">
-      {/* Steps */}
+      {/* بيانات الدفع — نفس الـ JSX القديم */}
       <div className="bg-accent-light border border-accent-default rounded-xl p-4">
         <p className="font-medium text-warning mb-2">ℹ️ خطوات الدفع</p>
         <ul className="space-y-1.5 text-text-secondary list-disc list-inside">
@@ -160,9 +191,13 @@ function InstapayForm({
         </ul>
       </div>
 
-      {/* Upload */}
+      {/* drag & drop — نفس القديم */}
       <div
-        onDrop={handleDrop}
+        onDrop={(e) => {
+          e.preventDefault();
+          const f = e.dataTransfer.files[0];
+          if (f) handleFile(f);
+        }}
         onDragOver={(e) => e.preventDefault()}
         onClick={() => inputRef.current?.click()}
         className="border-2 border-dashed border-border-default rounded-xl p-8 flex flex-col items-center gap-3 cursor-pointer hover:border-brand-primary transition-colors"
@@ -199,6 +234,9 @@ function InstapayForm({
         />
       </div>
 
+      {/* ← العنوان */}
+      <AddressFields value={address} onChange={setAddress} />
+
       {error && <p className="text-caption text-danger">{error}</p>}
 
       <button
@@ -212,8 +250,20 @@ function InstapayForm({
     </div>
   );
 }
-// غيري الـ function signature
-function StripeForm({ amount, orderId }: { amount: number; orderId: string }) {
+
+// ── Stripe ─────────────────────────────────────────────────────────────────────
+
+type StripeStep = "address" | "payment";
+
+function StripeForm({
+  amount,
+  orderId,
+  onEditAddress,
+}: {
+  amount: number;
+  orderId: string;
+  onEditAddress: () => void;
+}) {
   const stripe = useStripe();
   const elements = useElements();
   const [isPending, startTransition] = useTransition();
@@ -221,7 +271,6 @@ function StripeForm({ amount, orderId }: { amount: number; orderId: string }) {
 
   const handlePay = () => {
     if (!stripe || !elements) return;
-    setError("");
 
     startTransition(async () => {
       const { error } = await stripe.confirmPayment({
@@ -236,8 +285,18 @@ function StripeForm({ amount, orderId }: { amount: number; orderId: string }) {
 
   return (
     <div className="space-y-4">
+      <button
+        type="button"
+        onClick={onEditAddress}
+        className="text-caption text-text-secondary underline"
+      >
+        ← تعديل العنوان
+      </button>
+
       <PaymentElement />
+
       {error && <p className="text-caption text-danger">{error}</p>}
+
       <button
         type="button"
         onClick={handlePay}
@@ -245,6 +304,95 @@ function StripeForm({ amount, orderId }: { amount: number; orderId: string }) {
         className="w-full bg-brand-primary text-white rounded-lg py-3 text-body-sm font-medium disabled:opacity-50"
       >
         {isPending ? "جاري الدفع..." : `ادفع ${amount} ج.م`}
+      </button>
+    </div>
+  );
+}
+// PaymentSection.tsx  — الجزء المتغير بس
+
+// ── نوع العنوان ────────────────────────────────────────────────────────────────
+type Address = {
+  street: string;
+  floor: string;
+  apartment: string;
+  landmark: string;
+  building: string;
+};
+
+const EMPTY_ADDRESS: Address = {
+  street: "",
+  floor: "",
+  apartment: "",
+  landmark: "",
+  building: "",
+};
+
+// ── مكوّن حقول العنوان (مشترك بين Instapay وStripe) ───────────────────────────
+function AddressFields({
+  value,
+  onChange,
+}: {
+  value: Address;
+  onChange: (v: Address) => void;
+}) {
+  const field = (key: keyof Address, label: string, placeholder: string) => (
+    <div className="flex flex-col gap-1">
+      <label className="text-caption text-text-secondary">{label}</label>
+      <input
+        type="text"
+        value={value[key]}
+        onChange={(e) => onChange({ ...value, [key]: e.target.value })}
+        placeholder={placeholder}
+        className="border border-border-default rounded-lg px-3 py-2 text-body-sm bg-surface-primary text-text-primary focus:outline-none focus:border-brand-primary"
+      />
+    </div>
+  );
+
+  return (
+    <div className="space-y-3">
+      <p className="text-body-sm font-medium text-text-primary">
+        عنوان التسليم
+      </p>
+      {field("street", "الشارع", "اسم الشارع")}
+      <div className="grid grid-cols-2 gap-3">
+        {field("building", "المبنى", "رقم / اسم المبنى")}
+        {field("floor", "الدور", "رقم الدور")}
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        {field("apartment", "الشقة", "رقم الشقة")}
+        {field("landmark", "المرحلة / علامة مميزة", "مثلاً: بجوار مسجد...")}
+      </div>
+    </div>
+  );
+}
+function StripeAddressStep({
+  onConfirm,
+}: {
+  onConfirm: (address: Address) => void;
+}) {
+  const [address, setAddress] = useState<Address>(EMPTY_ADDRESS);
+  const [error, setError] = useState("");
+
+  const handleContinue = () => {
+    const missing = Object.values(address).some((v) => !v.trim());
+    if (missing) {
+      setError("أكمل بيانات العنوان كاملة");
+      return;
+    }
+    setError("");
+    onConfirm(address); // ← يبعت للـ parent اللي ينادي createStripeIntent
+  };
+
+  return (
+    <div className="space-y-4">
+      <AddressFields value={address} onChange={setAddress} />
+      {error && <p className="text-caption text-danger">{error}</p>}
+      <button
+        type="button"
+        onClick={handleContinue}
+        className="w-full bg-brand-primary text-white rounded-lg py-3 text-body-sm font-medium"
+      >
+        متابعة للدفع
       </button>
     </div>
   );
