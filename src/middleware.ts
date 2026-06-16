@@ -9,7 +9,7 @@ const authRoutes = ["/auth/login", "/auth/register"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
+  console.log("Middleware running for:", request.nextUrl.pathname);
   const accessToken = request.cookies.get("access_token")?.value;
   const refreshToken = request.cookies.get("refresh_token")?.value;
   const user = request.cookies.get("user")?.value;
@@ -17,6 +17,7 @@ export function middleware(request: NextRequest) {
   // Consider the user "authenticated" if they have either a valid access token
   // OR a refresh token + user cookie (access token will be silently refreshed by /api/me)
   const isAuthenticated = !!(accessToken || (refreshToken && user));
+  console.log("isAuthenticated:", isAuthenticated);
 
   const isProtected = protectedRoutes.some((route) =>
     pathname.startsWith(route),

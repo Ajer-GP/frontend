@@ -21,7 +21,7 @@ export default function LivePreview({ coverPreview }: Props) {
       <div
         dir="rtl"
         className="bg-white rounded-2xl border border-border-default overflow-hidden">
-        <div className="relative aspect-[4/3] bg-surface-secondary">
+        <div className="relative aspect-4/3 bg-surface-secondary">
           <Image
             src={coverPreview ?? "/images/img.png"}
             alt={title || "معاينة المنتج"}
