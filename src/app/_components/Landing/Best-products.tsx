@@ -1,8 +1,20 @@
-import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getProductsAction } from "@/Modules/User/Features/products/services/products.actions";
-
+const conditionConfig = {
+  excellent: {
+    color: "bg-green-100 text-green-700",
+    label: "ممتاز",
+  },
+  good: {
+    color: "bg-yellow-100 text-yellow-700",
+    label: "جيد",
+  },
+  fair: {
+    color: "bg-gray-200 text-gray-600",
+    label: "مقبول",
+  },
+};
 export default async function Best_products() {
   const result = await getProductsAction();
   if (!result.success) return <div>حدث خطأ في تحميل المنتجات</div>;
@@ -32,8 +44,15 @@ export default async function Best_products() {
                   height={200}
                   className="w-full h-48 object-cover"
                 />
-                <span className="absolute top-4 left-2 badge badge-sm text-accent-default bg-[#FDF6E9] border-[#FDF6E9] font-black">
-                  جديد
+                <span
+                  className={`px-2 py-1 rounded-full text-sm absolute top-4 left-2 badge  ${
+                    conditionConfig[
+                      prd.condition.toLowerCase() as keyof typeof conditionConfig
+                    ]?.color ?? "bg-gray-100 text-gray-700"
+                  }`}>
+                  {conditionConfig[
+                    prd.condition.toLowerCase() as keyof typeof conditionConfig
+                  ]?.label ?? prd.condition}{" "}
                 </span>
               </div>
             </figure>
@@ -41,8 +60,8 @@ export default async function Best_products() {
               <p className="text-gray-400">{prd.category}</p>
               <div className="flex justify-between items-start gap-2">
                 <h2 className="card-title text-base">{prd.title}</h2>
-                <div className="badge bg-[#FDF6E9] border-[#FDF6E9] font-black text-black shrink-0">
-                  {prd.rating}
+                <div className="badge bg-[#FDF6E9] border-[#FDF6E9]  text-black shrink-0">
+                  {prd.rating || 0}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="currentColor"

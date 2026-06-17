@@ -10,7 +10,7 @@ export default function MainLayout({
   // const data = getDashboardData();
 
   return (
-    <div className="min-h-screen bg-surface-secondary" dir="rtl">
+    <div className="min-h-screen " dir="rtl">
       <DashboardSidebar activeHref="/dashboard" />
       <div className="mr-64 flex flex-col min-h-screen">
         {/* <DashboardTopbar
