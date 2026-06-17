@@ -1,9 +1,14 @@
 import { Product } from "@/modules/user/features/products/types/products.typs";
 import React from "react";
-
+import { CONDITION_STYLES } from "./handlingDetails";
 export default function Details({ data }: { data: Product }) {
   const product = data;
-  console.log(product);
+
+  const conditionStyle = CONDITION_STYLES[product.condition] ?? {
+    label: product.condition,
+    text: "text-gray-600",
+    bg: "bg-gray-200",
+  };
   return (
     <div className="mx-10">
       <h1 className="text-2xl font-black my-4"> تفاصيل المنتج</h1>
@@ -22,13 +27,14 @@ export default function Details({ data }: { data: Product }) {
             <div className="card w-96 bg-gray-50 card-lg shadow-sm border border-gray-300 rounded-3xl">
               <div className="card-body">
                 <h2 className="card-title">العمر والحالة</h2>
-                <div className="flex justify-between">
-                  <p>الحالة</p>
-                  {product.condition == "excellent" ? (
-                    <p>ممتازة</p>
-                  ) : (
-                    <p> {product.condition} </p>
-                  )}
+                <div className="flex gap-5">
+                  <div>
+                    <p>الحالة</p>
+                  </div>{" "}
+                  <div
+                    className={`badge rounded-2xl ${conditionStyle.text} ${conditionStyle.bg}`}>
+                    {conditionStyle.label}
+                  </div>
                 </div>
                 <div className="flex justify-between">
                   <p>ظروف الاستخدام</p>
@@ -76,7 +82,7 @@ export default function Details({ data }: { data: Product }) {
         />
         <div className="tab-content border-gray-300 bg-gray-50 p-10 rounded-2xl">
           {product.specs?.map((spec, i) => (
-            <div key={i} className="flex justify-between my-1">
+            <div key={i} className="flex gap-10 my-1">
               <p className="text-gray-500">{spec.label}</p>
               <p className="font-black">{spec.value}</p>
             </div>

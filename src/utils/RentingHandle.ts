@@ -3,6 +3,24 @@ const PLATFORM_COMMISSION_RATE = 0.05;
 const DEPOSIT_RATE = 0.1;
 export const MIN_HOURS_FROM_NOW = 25;
 
+export function diffInDaysAndHours(utcA: string | Date, utcB: string | Date) {
+  const dateA = new Date(utcA);
+  const dateB = new Date(utcB);
+
+  const diffInMs = dateB.getTime() - dateA.getTime();
+
+  const msPerHour = 1000 * 60 * 60;
+  const msPerDay = msPerHour * 24;
+
+  const days = Math.floor(diffInMs / msPerDay);
+  const remainingMs = diffInMs % msPerDay;
+  const hours = Math.floor(remainingMs / msPerHour);
+
+  return {
+    days,
+    hours,
+  };
+}
 function breakDownDuration(totalHours) {
   const weeks = Math.floor(totalHours / (7 * 24));
   const remainingAfterWeeks = totalHours % (7 * 24);

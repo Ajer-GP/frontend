@@ -4,6 +4,7 @@
 import DashboardStats from "@/app/_components/delivery/DashboardStats";
 import RightPanel from "@/app/_components/delivery/RightPanel";
 import TaskCard from "@/app/_components/delivery/TaskCard";
+import { getAllDeliveries } from "@/Modules/Delivery/Features/services/delivery.actions";
 import { cookies } from "next/headers";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -116,19 +117,19 @@ async function getDashboardData(): Promise<DashboardData> {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function DashboardPage() {
-  const data = await getDashboardData();
+  const data = await getAllDeliveries();
 
   return (
     <div className="flex-1 p-6 flex gap-6">
       {/* Left: stats + tasks */}
       <div className="flex-1 min-w-0 space-y-6">
         {/* Stats card — Client Component for the toggle */}
-        <DashboardStats
+        {/* <DashboardStats
           currentTasks={data.currentTasks}
           completedToday={data.completedToday}
           totalTasks={data.totalTasks}
           driverName={data.driverName}
-        />
+        /> */}
 
         {/* Tasks section */}
         <section>
@@ -141,22 +142,21 @@ export default async function DashboardPage() {
             </p>
             <a
               href="/dashboard/tasks"
-              className="text-caption text-brand-primary hover:underline"
-            >
+              className="text-caption text-brand-primary hover:underline">
               ‹ عرض الكل
             </a>
           </div>
 
           <div className="space-y-3">
-            {data.tasks.map((task) => (
-              <TaskCard key={task.id} task={task} />
+            {data.deliveryData.deliveries.map((task) => (
+              <TaskCard key={task._id} task={task} />
             ))}
           </div>
         </section>
       </div>
 
       {/* Right Panel */}
-      <RightPanel order={data.activeOrder} financial={data.financial} />
+      {/* <RightPanel order={data.activeOrder} financial={data.financial} /> */}
     </div>
   );
 }
