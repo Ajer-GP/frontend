@@ -3,6 +3,20 @@ const PLATFORM_COMMISSION_RATE = 0.05;
 const DEPOSIT_RATE = 0.1;
 export const MIN_HOURS_FROM_NOW = 25;
 
+export function formatEgyptArabicDate(utcDate: string) {
+  const date = new Date(utcDate);
+
+  return new Intl.DateTimeFormat("ar-EG", {
+    timeZone: "Africa/Cairo",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }).format(date);
+}
+
 export function diffInDaysAndHours(utcA: string | Date, utcB: string | Date) {
   const dateA = new Date(utcA);
   const dateB = new Date(utcB);
