@@ -14,11 +14,18 @@ export default function RentNow(data) {
   const [startVal, setStartVal] = useState("am");
   const [rentError, setRentError] = useState("");
   const [rentSuccess, setRentSuccess] = useState("");
-  const handleReturnHourChange = (e) => {
-    setReturnHour(e.target.value);
-  };
   const handleStartHourChange = (e) => {
-    setStartHour(e.target.value);
+    const val = parseInt(e.target.value);
+    if (e.target.value === "" || (val >= 1 && val <= 12)) {
+      setStartHour(e.target.value);
+    }
+  };
+
+  const handleReturnHourChange = (e) => {
+    const val = parseInt(e.target.value);
+    if (e.target.value === "" || (val >= 1 && val <= 12)) {
+      setReturnHour(e.target.value);
+    }
   };
   const handleReturnDateChange = (e) => {
     setReturnDate(e.target.value);

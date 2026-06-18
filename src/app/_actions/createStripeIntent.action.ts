@@ -29,7 +29,7 @@ export async function createStripeIntent(orderId: string, address: Address) {
   );
 
   const data = await res.json();
-  console.log(data);
+  // console.log(data);
 
   return data.data.clientSecret as string;
 }

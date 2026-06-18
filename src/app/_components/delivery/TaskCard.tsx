@@ -1,24 +1,24 @@
 // Server Component
 import Link from "next/link";
-
+import Image from "next/image";
 export type TaskStatus = "عاجل" | "في الطريق إلى المالك" | "استلام المنتج";
 
-interface Task {
-  id: string;
-  productName: string;
-  productImage?: string;
-  ownerName: string;
-  renterName: string;
-  status: TaskStatus;
-  scheduledTime: string;
-  deliveryTime: string;
-  address: string;
-  city: string;
-}
+// interface Task {
+//   id: string;
+//   productName: string;
+//   productImage?: string;
+//   ownerName: string;
+//   renterName: string;
+//   status: TaskStatus;
+//   scheduledTime: string;
+//   deliveryTime: string;
+//   address: string;
+//   city: string;
+// }
 
-interface TaskCardProps {
-  task: Task;
-}
+// interface TaskCardProps {
+//   task: Task;
+// }
 
 const statusStyles: Record<TaskStatus, string> = {
   عاجل: "bg-danger-bg text-danger",
@@ -26,19 +26,20 @@ const statusStyles: Record<TaskStatus, string> = {
   "استلام المنتج": "bg-accent-light text-accent-default",
 };
 
-export default function TaskCard({ task }: TaskCardProps) {
+export default function TaskCard({ task }) {
   return (
     <div
       className="bg-white border border-border-default rounded-xl p-4 flex items-start gap-4"
-      dir="rtl"
-    >
+      dir="rtl">
       {/* Product thumbnail */}
-      <div className="w-14 h-14 rounded-lg bg-surface-tertiary flex-shrink-0 overflow-hidden">
-        {task.productImage ? (
-          <img
-            src={task.productImage}
-            alt={task.productName}
+      <div className="w-14 h-14 rounded-lg bg-surface-tertiary shrink-0 overflow-hidden">
+        {task.productCoverImage ? (
+          <Image
+            src={task.productCoverImage}
+            alt={task.productTitle}
             className="w-full h-full object-cover"
+            width={100}
+            height={100}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-text-tertiary text-2xl">
@@ -60,11 +61,10 @@ export default function TaskCard({ task }: TaskCardProps) {
             </p>
           </div>
           <span
-            className={`flex-shrink-0 text-caption font-medium px-2 py-0.5 rounded-full ${
+            className={`shrink-0 text-caption font-medium px-2 py-0.5 rounded-full ${
               statusStyles[task.status] ??
               "bg-surface-secondary text-text-secondary"
-            }`}
-          >
+            }`}>
             {task.status}
           </span>
         </div>
@@ -90,9 +90,8 @@ export default function TaskCard({ task }: TaskCardProps) {
 
       {/* CTA */}
       <Link
-        href={`/dashboard/tasks/${task.id}`}
-        className="flex-shrink-0 px-4 py-2 rounded-lg bg-brand-primary text-white text-caption font-medium hover:bg-brand-dark transition-colors"
-      >
+        href={`/dashboard/${task._id}`}
+        className="shrink-0 px-4 py-2 rounded-lg bg-brand-primary text-white text-caption font-medium hover:bg-brand-dark transition-colors">
         متابعة المهمة
       </Link>
     </div>

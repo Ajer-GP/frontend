@@ -1,18 +1,13 @@
 "use client";
-import { useFormContext, useFieldArray } from "react-hook-form";
+import { useFormContext, useFieldArray, useFormState } from "react-hook-form";
 import Image from "next/image";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  step1Schema,
-  Step1Data,
-  FullFormData,
-} from "@/app/_schemas/addProduct.schema";
-import { useState } from "react";
+import { FullFormData } from "@/app/_schemas/addProduct.schema";
+import { useState, useEffect } from "react";
 
 const MAIN_CATEGORIES = [
   { id: "electronics", label: "الكترونيات", icon: "/images/cat-1.png" },
   { id: "clothes", label: "ملابس", icon: "/images/cat-2.png" },
-  { id: "events", label: "معدات حفلات", icon: "/images/cat-3.png" },
+  { id: "party tools", label: "معدات حفلات", icon: "/images/cat-3.png" },
   { id: "books", label: "كتب", icon: "/images/cat-4.png" },
 ];
 
@@ -23,70 +18,100 @@ const HANDLING_TIPS = [
   "بحفظ بعيداً عن الرطوبة",
 ];
 const STATES = [
-  { value: "New", label: "جديد", icon: "/images/new.png" },
-  {
-    value: "Excellent",
-    label: "ممتاز",
-    icon: "/images/excellent.png",
-  },
-  { value: "Good", label: "جيد", icon: "/images/like.png" },
+  { value: "excellent", label: "ممتاز", icon: "/images/excellent.png" },
+  { value: "good", label: "جديد", icon: "/images/new.png" },
+  { value: "fair", label: "جيد", icon: "/images/like.png" },
 ];
-type Props = { onNext: () => void };
+type Props = {
+  coverPreview: string | null;
+  setCoverPreview: React.Dispatch<React.SetStateAction<string | null>>;
+  galleryPreviews: string[];
+  setGalleryPreviews: React.Dispatch<React.SetStateAction<string[]>>;
+};
 
-export default function Step1Basics({ onNext }: Props) {
-  const {
-    register,
-    watch,
-    setValue,
-    trigger,
-    formState: { errors },
+function readFilePreview(file: File, onLoad: (dataUrl: string) => void) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target?.result as string;
+    onLoad(dataUrl);
+  };
+  reader.readAsDataURL(file);
+}
+
+export default function Step1Basics({
+  coverPreview,
+  setCoverPreview,
+  galleryPreviews,
+  setGalleryPreviews,
+}: Props) {
+  const { register, setValue, getValues, control } =
+    useFormContext<FullFormData>();
+  const { errors } = useFormState({ control });
+
+  const { fields: specFields, append: appendSpec } = useFieldArray({
     control,
-  } = useFormContext<FullFormData>();
-
-  const {
-    fields: specFields,
-    append: appendSpec,
-    remove: removeSpec,
-  } = useFieldArray({ control, name: "specs" });
-  const {
-    fields: accFields,
-    append: appendAcc,
-    remove: removeAcc,
-  } = useFieldArray({ control, name: "accessories" });
+    name: "specs",
+  });
+  const { fields: accFields, append: appendAcc } = useFieldArray({
+    control,
+    name: "accessories",
+  });
 
   const { fields: noteFields, append: appendNote } = useFieldArray({
     control,
     name: "notes",
   });
+  const { fields: conditionFields, append: appendCondition } = useFieldArray({
+    control,
+    name: "conditionNotes",
+  });
 
   const [mainCat, setMainCat] = useState("");
-  const [selectedTips, setSelectedTips] = useState<string[]>([]);
   const [condition, setCondition] = useState("");
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [dragging, setDragging] = useState(false);
+  const [selectedTips, setSelectedTips] = useState<string[]>([]);
+  const [draggingCover, setDraggingCover] = useState(false);
+  const [draggingGallery, setDraggingGallery] = useState(false);
 
-  const handleImageFiles = (files: FileList | null) => {
+  const handleCoverFile = (file: File | null) => {
+    if (!file || !file.type.startsWith("image/")) return;
+    readFilePreview(file, setCoverPreview);
+    setValue("coverImage", file, { shouldValidate: true });
+  };
+
+  const handleGalleryFiles = (files: FileList | null) => {
     if (!files) return;
     const accepted = Array.from(files)
       .filter((f) => f.type.startsWith("image/"))
-      .slice(0, 5 - imagePreviews.length);
-    const urls = accepted.map((f) => URL.createObjectURL(f));
-    setImagePreviews((prev) => [...prev, ...urls].slice(0, 5));
+      .slice(0, 2 - galleryPreviews.length);
+
+    accepted.forEach((file) => {
+      readFilePreview(file, (dataUrl) => {
+        setGalleryPreviews((prev) => {
+          if (prev.length >= 2) return prev;
+          return [...prev, dataUrl];
+        });
+      });
+    });
+
+    const current = getValues("images") ?? [];
+    setValue("images", [...current, ...accepted].slice(0, 2), {
+      shouldValidate: true,
+    });
   };
 
-  const removeImage = (index: number) => {
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  const removeCover = () => {
+    setCoverPreview(null);
+    setValue("coverImage", undefined as never, { shouldValidate: true });
   };
-  const handleNext = async () => {
-    const valid = await trigger([
-      "title",
-      "description",
-      "mainCategory",
-      "subCategory",
-      "condition",
-      "handlingTips",
-    ]);
-    if (valid) onNext();
+
+  const removeGalleryImage = (index: number) => {
+    setGalleryPreviews((prev) => prev.filter((_, i) => i !== index));
+    const current = getValues("images") ?? [];
+    setValue(
+      "images",
+      current.filter((_: File, i: number) => i !== index),
+      { shouldValidate: true },
+    );
   };
 
   const toggleTip = (tip: string) => {
@@ -94,24 +119,32 @@ export default function Step1Basics({ onNext }: Props) {
       ? selectedTips.filter((t) => t !== tip)
       : [...selectedTips, tip];
     setSelectedTips(updated);
-    setValue("handlingTips", updated);
+    setValue("handlingNotes", updated, { shouldValidate: true });
   };
+  useEffect(() => {
+    const values = getValues();
+    if (values.category) setMainCat(values.category);
+    if (values.condition) setCondition(values.condition);
+    if (values.handlingNotes?.length) setSelectedTips(values.handlingNotes);
+  }, []);
 
   return (
     <div className="space-y-6">
-      {/* Title */}
+      {/* Page heading */}
       <div>
-        <h1 className="text-3xl font-black">أخبرنا عن منتجك</h1>
+        <h1 className="text-2xl sm:text-3xl font-black">أخبرنا عن منتجك</h1>
         <p className="text-sm text-gray-400 my-2">
           العناوين الواضحة والأوصاف التفصيلية قد تساعدك في الحصول على حجوزات
           أكثر حتى 3 مرات.
         </p>
       </div>
-      <div className=" w-full border border-gray-300 px-4 py-4 bg-gray-50 rounded-3xl">
-        {" "}
+
+      <div className="w-full border border-gray-300 px-4 py-4 bg-gray-50 rounded-3xl space-y-5">
+        {/* Title */}
         <div>
-          <label className="block text-body-sm font-medium mb-1">
-            عنوان المنتج <span className="text-brand-primary text-lg">*</span>
+          <label className="block mb-1 text-sm text-gray-600">
+            عنوان المنتج
+            <span className="text-brand-primary text-lg">*</span>
           </label>
           <input
             {...register("title")}
@@ -124,9 +157,10 @@ export default function Step1Basics({ onNext }: Props) {
             </p>
           )}
         </div>
+
         {/* Description */}
         <div>
-          <label className="block text-body-sm font-medium my-2">
+          <label className="block mb-1 text-sm text-gray-600">
             الوصف <span className="text-brand-primary text-lg">*</span>
           </label>
           <textarea
@@ -141,42 +175,44 @@ export default function Step1Basics({ onNext }: Props) {
             </p>
           )}
         </div>
+
         {/* Main Category */}
-        <div className="mb-4">
-          <label className="block text-body-sm font-medium my-3">
+        <div>
+          <label className="block mb-1 text-sm text-gray-600">
             الفئة الرئيسية <span className="text-brand-primary text-lg">*</span>
           </label>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {MAIN_CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 type="button"
                 onClick={() => {
                   setMainCat(cat.id);
-                  setValue("mainCategory", cat.id);
+                  setValue("category", cat.id, { shouldValidate: true });
                 }}
                 className={`border rounded-xl py-3 flex flex-col items-center gap-1 text-body-sm transition-all duration-150
-        ${
-          mainCat === cat.id
-            ? "border-brand-primary bg-brand-light text-brand-primary"
-            : "border-border-default text-text-secondary hover:border-brand-primary"
-        }`}>
+                  ${
+                    mainCat === cat.id
+                      ? "border-brand-primary bg-brand-light text-brand-primary"
+                      : "border-border-default text-text-secondary hover:border-brand-primary"
+                  }`}>
                 <Image src={cat.icon} alt={cat.label} width={80} height={80} />
                 {cat.label}
               </button>
             ))}
           </div>
-          {errors.mainCategory && (
+          {errors.category && (
             <p className="text-caption text-danger mt-1">
-              {errors.mainCategory.message}
+              {errors.category.message}
             </p>
           )}
         </div>
+
         {/* Specs */}
-        <div className="border border-brand-primary rounded-2xl p-4 my-3 ">
+        <div className="border border-brand-primary rounded-2xl p-4">
           <div className="flex justify-between my-2">
             <div>
-              <h1 className="text-md font-black my-1">مواصفات المنتج</h1>
+              <h2 className="text-md font-black my-1">مواصفات المنتج</h2>
               <p className="text-caption text-text-secondary">
                 أضف مواصفات المؤثر على اتخاذ قراره
               </p>
@@ -187,17 +223,16 @@ export default function Step1Basics({ onNext }: Props) {
           <div className="grid grid-cols-3 gap-2 mb-1">
             <label className="text-sm font-black py-2">عنوان</label>
             <label className="text-sm font-black py-2">القيمة</label>
-
-            <div className="flex justify-between items-start mb-1">
-              {" "}
+            <div className="flex justify-end items-start">
               <button
                 type="button"
                 onClick={() => appendSpec({ title: "", value: "" })}
-                className="text-body-sm text-white bg-brand-primary px-2 py-2 w-20 rounded-xl text-center font-medium flex items-center gap-1 ">
+                className="text-body-sm text-white bg-brand-primary px-2 py-2 w-20 rounded-xl text-center font-medium flex items-center gap-1">
                 + أضف
               </button>
             </div>
           </div>
+
           {specFields.map((field, i) => (
             <div key={field.id} className="grid grid-cols-2 gap-2 mb-2">
               <input
@@ -228,18 +263,17 @@ export default function Step1Basics({ onNext }: Props) {
             يمكنك الضغط على زر Enter للإضافة
           </p>
         </div>
+
         {/* Accessories */}
-        <div className="border border-brand-primary rounded-2xl p-4 my-2">
+        <div className="border border-brand-primary rounded-2xl p-4">
           <div className="flex justify-between items-start mb-3">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-md font-black my-1">مرفقات المنتج</p>
-                <p className="text-caption text-text-secondary">
-                  أضف مرفقات المنتج إن وجدت لساعدة المؤجر على اتخاذ قراره
-                </p>
-              </div>
-              <span className="text-caption text-brand-primary">اختياري</span>
+            <div>
+              <p className="text-md font-black my-1">مرفقات المنتج</p>
+              <p className="text-caption text-text-secondary">
+                أضف مرفقات المنتج إن وجدت لساعدة المؤجر على اتخاذ قراره
+              </p>
             </div>
+            <span className="text-caption text-brand-primary">اختياري</span>
           </div>
           {accFields.map((field, i) => (
             <input
@@ -265,58 +299,111 @@ export default function Step1Basics({ onNext }: Props) {
             يمكنك الضغط على زر Enter للإضافة
           </p>
         </div>
+        <div>
+          <label htmlFor="name" className="block mb-1 text-sm text-gray-600">
+            اسم المنتج{" "}
+          </label>
+          <input
+            type="text"
+            id="name"
+            {...register("name")}
+            placeholder="مثال : كاميرا"
+            className="w-full border border-border-default rounded-lg px-3 py-2.5 text-body-sm text-right focus:border-brand-primary outline-none"
+          />
+          {errors.name && (
+            <p className="text-caption text-danger mt-1">
+              {errors.name.message}
+            </p>
+          )}
+        </div>
+        <div>
+          <label htmlFor="usage" className="block mb-1 text-sm text-gray-600">
+            ظروف استخدام المنتج{" "}
+          </label>
+          <input
+            type="text"
+            id="usage"
+            {...register("usage")}
+            placeholder=" تم استخدامها في استديو تصوير فقط"
+            className="w-full border border-border-default rounded-lg px-3 py-2.5 text-body-sm text-right focus:border-brand-primary outline-none"
+          />
+          {errors.usage && (
+            <p className="text-caption text-danger mt-1">
+              {errors.usage.message}
+            </p>
+          )}
+        </div>
         {/* Condition */}
         <div>
-          <label className="block text-body-sm font-medium my-2">
+          <label className="block mb-1 text-sm text-gray-600">
             الحالة <span className="text-brand-primary text-lg">*</span>
           </label>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {STATES.map((c) => (
               <button
                 key={c.value}
                 type="button"
-                onClick={() => setCondition(c.value)}
+                onClick={() => {
+                  setCondition(c.value);
+                  setValue(
+                    "condition",
+                    c.value as "excellent" | "good" | "fair",
+                    { shouldValidate: true },
+                  );
+                }}
                 className={`border rounded-xl py-4 flex flex-col items-center gap-1 text-body-sm transition-colors
-                ${
-                  condition === c.value
-                    ? "border-brand-primary bg-brand-light text-brand-primary"
-                    : "border-border-default text-text-secondary"
-                }`}>
+                  ${
+                    condition === c.value
+                      ? "border-brand-primary bg-brand-light text-brand-primary"
+                      : "border-border-default text-text-secondary"
+                  }`}>
                 <Image src={c.icon} alt={c.label} height={40} width={40} />
                 {c.label}
               </button>
             ))}
           </div>
-          <div className="flex justify-between items-end my-3 ">
-            {" "}
-            <div className="flex flex-col w-full me-3">
-              <label
-                htmlFor="condition"
-                className="text-body-sm font-medium my-2">
-                أضف وصف للحالة (اختياري){" "}
+          {errors.condition && (
+            <p className="text-caption text-danger mt-1">
+              {errors.condition.message}
+            </p>
+          )}
+          {/* Condition description inputs */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end my-3 gap-2">
+            <div className="flex flex-col w-full sm:me-3">
+              <label className="block mb-1 text-sm text-gray-600">
+                أضف وصف للحالة (اختياري)
               </label>
-              <input
-                type="text"
-                id="condition"
-                name="condition"
-                placeholder="مثال: استخدام طفيف"
-                className="border border-border-default rounded-lg px-3 py-2 my-1 text-body-sm text-right outline-none focus:border-brand-primary"
-              />
+              {conditionFields.map((field, i) => (
+                <input
+                  key={field.id}
+                  {...register(`conditionNotes.${i}.text`)}
+                  placeholder="مثال: استخدام طفيف"
+                  className="w-full border border-border-default rounded-lg px-3 py-2 text-body-sm text-right outline-none focus:border-brand-primary mb-2"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      appendCondition({ text: "" });
+                    }
+                  }}
+                />
+              ))}
             </div>
-            <div>
+            <div className="shrink-0">
               <button
                 type="button"
-                className="text-body-sm text-white bg-brand-primary px-3 py-2 my-1 w-20 rounded-xl text-center font-medium flex items-center gap-1 ">
+                onClick={() => appendCondition({ text: "" })}
+                className="text-body-sm text-white bg-brand-primary px-3 py-2 w-20 rounded-xl text-center font-medium flex items-center gap-1 my-2">
                 + أضف
               </button>
             </div>
           </div>
         </div>
+
         {/* Handling Tips */}
         <div>
-          <label className="block text-body-sm font-medium my-2">
+          <label className="block mb-1 text-sm text-gray-600">
             إرشادات التعامل{" "}
-            <span className="text-brand-primary text-lg ">*</span>
+            <span className="text-brand-primary text-lg">*</span>
           </label>
           <div className="flex flex-wrap gap-2">
             {HANDLING_TIPS.map((tip) => (
@@ -325,28 +412,26 @@ export default function Step1Basics({ onNext }: Props) {
                 type="button"
                 onClick={() => toggleTip(tip)}
                 className={`border rounded-full px-4 py-1.5 text-body-sm transition-colors
-                ${
-                  selectedTips.includes(tip)
-                    ? "border-brand-primary bg-brand-light text-brand-primary"
-                    : "border-border-default text-text-secondary"
-                }`}>
+                  ${
+                    selectedTips.includes(tip)
+                      ? "border-brand-primary bg-brand-light text-brand-primary"
+                      : "border-border-default text-text-secondary"
+                  }`}>
                 {tip}
               </button>
             ))}
           </div>
-
-          {errors.handlingTips && (
+          {errors.handlingNotes && (
             <p className="text-caption text-danger mt-1">
-              {errors.handlingTips.message}
+              {errors.handlingNotes.message}
             </p>
           )}
-          <div className="flex justify-between items-end my-3 ">
-            {" "}
-            <div className="flex flex-col w-full me-3">
-              <label
-                htmlFor="condition"
-                className="text-body-sm font-medium my-2">
-                أضف ملاحظة (اختياري){" "}
+
+          {/* Notes inputs */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end my-3 gap-2">
+            <div className="flex flex-col w-full sm:me-3">
+              <label className="block mb-1 text-sm text-gray-600">
+                أضف ملاحظة (اختياري)
               </label>
               {noteFields.map((field, i) => (
                 <input
@@ -363,136 +448,199 @@ export default function Step1Basics({ onNext }: Props) {
                 />
               ))}
             </div>
-            <div>
+            <div className="shrink-0">
               <button
                 type="button"
                 onClick={() => appendNote({ text: "" })}
-                className="text-body-sm text-white bg-brand-primary px-3 py-2 my-1 w-20 rounded-xl text-center font-medium flex items-center gap-1 ">
+                className="text-body-sm text-white bg-brand-primary px-3 py-2 w-20 rounded-xl text-center font-medium flex items-center gap-1 my-2">
                 + أضف
               </button>
             </div>
           </div>
         </div>
-        <div>
-          <label className="block text-body-sm font-medium my-2">
-            العنوان
-            <span className="text-brand-primary text-lg ">*</span>
-          </label>
 
-          <div>
-            <div className="flex my-2">
-              <div className="flex flex-col w-100 me-3 ">
-                <label
-                  htmlFor="address"
-                  className="text-body-sm font-medium my-2">
-                  اسم الشارع
-                </label>
-                <input
-                  type="text"
-                  id="address"
-                  name="address"
-                  placeholder="مثال: شارع أحمد ماهر"
-                  className="border border-border-default rounded-lg px-3 py-2 my-1 text-body-sm text-right outline-none focus:border-brand-primary"
-                />
-              </div>
-              <div className="flex flex-col w-75">
-                <label
-                  htmlFor="buildingNo"
-                  className="text-body-sm font-medium my-2">
-                  {" "}
-                  رقم المبنى
-                </label>
-                <input
-                  type="text"
-                  id="buildingNo"
-                  name="buildingNo"
-                  placeholder="مثال: 6"
-                  className="border border-border-default rounded-lg px-3 py-2 my-1 text-body-sm text-right outline-none focus:border-brand-primary"
-                />
-              </div>
+        {/* location */}
+        <div>
+          <label className="block mb-1 text-sm text-gray-600">
+            العنوان <span className="text-brand-primary text-lg">*</span>
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-2">
+            <div className="flex flex-col">
+              <label
+                htmlFor="street"
+                className="block mb-1 text-sm text-gray-600">
+                اسم الشارع
+              </label>
+              <input
+                type="text"
+                id="street"
+                placeholder="مثال: شارع أحمد ماهر"
+                {...register("location.street")}
+                className="border border-border-default rounded-lg px-3 py-2 text-body-sm text-right outline-none focus:border-brand-primary"
+              />
+              {errors.location?.street && (
+                <p className="text-caption text-danger mt-1">
+                  {errors.location.street.message}
+                </p>
+              )}
             </div>
-            <div className="flex my-2">
-              <div className="flex flex-col w-30 me-3">
-                <label
-                  htmlFor="floor"
-                  className="text-body-sm font-medium my-2">
-                  رقم الدور
-                </label>
-                <input
-                  type="text"
-                  id="floor"
-                  name="floor"
-                  placeholder="مثال: 3"
-                  className="border border-border-default rounded-lg px-3 py-2 my-1 text-body-sm text-right outline-none focus:border-brand-primary"
-                />
-              </div>
-              <div className="flex flex-col w-30 me-3">
-                <label
-                  htmlFor="houseNo"
-                  className="text-body-sm font-medium my-2">
-                  رقم المنزل
-                </label>
-                <input
-                  type="text"
-                  id="houseNo"
-                  name="houseNo"
-                  placeholder="مثال:6"
-                  className="border border-border-default rounded-lg px-3 py-2 my-1 text-body-sm text-right outline-none focus:border-brand-primary"
-                />
-              </div>
-              <div className="flex flex-col w-100">
-                <label
-                  htmlFor="nearestSign"
-                  className="text-body-sm font-medium my-2">
-                  أقرب علامة مميزة للعنوان
-                </label>
-                <input
-                  type="text"
-                  id="nearestSign"
-                  name="nearestSign"
-                  placeholder="مثال: بجوار مترو"
-                  className="border border-border-default rounded-lg px-3 py-2 my-1 text-body-sm text-right outline-none focus:border-brand-primary"
-                />
-              </div>
+            <div className="flex flex-col ">
+              <label
+                htmlFor="buildingNum"
+                className="block mb-1 text-sm text-gray-600">
+                رقم المبنى
+              </label>
+              <input
+                type="text"
+                id="buildingNum"
+                {...register("location.buildingNum")}
+                placeholder="مثال: 6"
+                className="border border-border-default rounded-lg px-3 py-2 text-body-sm text-right outline-none focus:border-brand-primary"
+              />
+              {errors.location?.buildingNum && (
+                <p className="text-caption text-danger mt-1">
+                  {errors.location.buildingNum.message}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-2">
+            <div className="flex flex-col">
+              <label
+                htmlFor="floorNum"
+                className="block mb-1 text-sm text-gray-600">
+                رقم الدور
+              </label>
+              <input
+                type="text"
+                id="floorNum"
+                {...register("location.floorNum")}
+                placeholder="مثال: 3"
+                className="border border-border-default rounded-lg px-3 py-2 text-body-sm text-right outline-none focus:border-brand-primary"
+              />
+              {errors.location?.floorNum && (
+                <p className="text-caption text-danger mt-1">
+                  {errors.location.floorNum.message}
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col ">
+              <label
+                htmlFor="houseNum"
+                className="block mb-1 text-sm text-gray-600">
+                رقم المنزل
+              </label>
+              <input
+                type="text"
+                id="houseNum"
+                {...register("location.houseNum")}
+                placeholder="مثال: 6"
+                className="border border-border-default rounded-lg px-3 py-2 text-body-sm text-right outline-none focus:border-brand-primary"
+              />
+              {errors.location?.houseNum && (
+                <p className="text-caption text-danger mt-1">
+                  {errors.location.houseNum.message}
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col ">
+              <label
+                htmlFor="landmark"
+                className="block mb-1 text-sm text-gray-600">
+                أقرب علامة مميزة للعنوان
+              </label>
+              <input
+                type="text"
+                id="landmark"
+                {...register("location.landmark")}
+                placeholder="مثال: بجوار مترو"
+                className="border border-border-default rounded-lg px-3 py-2 text-body-sm text-right outline-none focus:border-brand-primary"
+              />
+              {errors.location?.landmark && (
+                <p className="text-caption text-danger mt-1">
+                  {errors.location.landmark.message}
+                </p>
+              )}
             </div>
           </div>
         </div>
-        {/* Image Upload */}
+
+        {/* Cover Image */}
         <div>
-          <label className="block text-body-sm font-medium mb-2">
-            صور المنتج <span className="text-brand-primary text-lg">*</span>
+          <label className="block mb-1 text-sm text-gray-600">
+            صورة الغلاف <span className="text-brand-primary text-lg">*</span>
           </label>
           <div
             onDragOver={(e) => {
               e.preventDefault();
-              setDragging(true);
+              setDraggingCover(true);
             }}
-            onDragLeave={() => setDragging(false)}
+            onDragLeave={() => setDraggingCover(false)}
             onDrop={(e) => {
               e.preventDefault();
-              setDragging(false);
-              handleImageFiles(e.dataTransfer.files);
+              setDraggingCover(false);
+              handleCoverFile(e.dataTransfer.files[0] ?? null);
             }}
-            className={`border-2 border-dashed rounded-2xl p-10 flex flex-col items-center gap-3 transition-colors
-      ${dragging ? "border-brand-primary bg-brand-light" : "border-gray-300 bg-gray-50"}`}>
-            <div className="bg-brand-primary rounded-2xl p-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-8 h-8 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}>
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0-12L8 8m4-4l4 4"
-                />
-              </svg>
+            className={`border-2 border-dashed rounded-2xl p-6 sm:p-8 flex flex-col items-center gap-3 transition-colors
+              ${draggingCover ? "border-brand-primary bg-brand-light" : "border-gray-300 bg-gray-50"}`}>
+            <p className="text-body-sm text-text-secondary text-center">
+              الصورة الرئيسية التي تظهر في نتائج البحث
+            </p>
+            <label className="mt-2 w-full cursor-pointer">
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleCoverFile(e.target.files?.[0] ?? null)}
+              />
+              <div className="w-full bg-brand-primary text-white text-center rounded-xl py-3 text-body-sm font-medium hover:opacity-90 transition-opacity">
+                {coverPreview ? "تغيير صورة الغلاف" : "رفع صورة الغلاف"}
+              </div>
+            </label>
+          </div>
+          {coverPreview && (
+            <div className="relative w-24 h-24 mt-4 rounded-xl overflow-hidden border border-border-default">
+              <Image
+                src={coverPreview}
+                alt="cover-preview"
+                fill
+                className="object-cover"
+              />
+              <button
+                type="button"
+                onClick={removeCover}
+                className="absolute top-1 right-1 bg-black/50 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                ×
+              </button>
             </div>
-            <p className="text-lg font-black">اسحب وأفلت صورك هنا</p>
-            <p className="text-body-sm text-text-secondary">
-              يمكنك رفع حتى 5 صور
+          )}
+          {errors.coverImage && (
+            <p className="text-caption text-danger mt-1">
+              {errors.coverImage.message as string}
+            </p>
+          )}
+        </div>
+
+        {/* Gallery Images */}
+        <div>
+          <label className="block mb-1 text-sm text-gray-600">
+            صور إضافية <span className="text-brand-primary text-lg">*</span>
+          </label>
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDraggingGallery(true);
+            }}
+            onDragLeave={() => setDraggingGallery(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDraggingGallery(false);
+              handleGalleryFiles(e.dataTransfer.files);
+            }}
+            className={`border-2 border-dashed rounded-2xl p-6 sm:p-8 flex flex-col items-center gap-3 transition-colors
+              ${draggingGallery ? "border-brand-primary bg-brand-light" : "border-gray-300 bg-gray-50"}`}>
+            <p className="text-body-sm text-text-secondary text-center">
+              أضف صورتين إضافيتين لعرض المنتج من زوايا مختلفة
             </p>
             <label className="mt-2 w-full cursor-pointer">
               <input
@@ -500,28 +648,33 @@ export default function Step1Basics({ onNext }: Props) {
                 accept="image/*"
                 multiple
                 className="hidden"
-                onChange={(e) => handleImageFiles(e.target.files)}
+                disabled={galleryPreviews.length >= 2}
+                onChange={(e) => handleGalleryFiles(e.target.files)}
               />
-              <div className="w-full bg-brand-primary text-white text-center rounded-xl py-3 text-body-sm font-medium hover:opacity-90 transition-opacity">
-                تصفح ملفات الجهاز
+              <div
+                className={`w-full text-center rounded-xl py-3 text-body-sm font-medium transition-opacity
+                  ${galleryPreviews.length >= 2 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-brand-primary text-white hover:opacity-90 cursor-pointer"}`}>
+                {galleryPreviews.length >= 2
+                  ? "تم رفع صورتين"
+                  : "رفع الصور الإضافية"}
               </div>
             </label>
           </div>
-          {imagePreviews.length > 0 && (
+          {galleryPreviews.length > 0 && (
             <div className="flex flex-wrap gap-3 mt-4">
-              {imagePreviews.map((src, i) => (
+              {galleryPreviews.map((src, i) => (
                 <div
                   key={i}
                   className="relative w-20 h-20 rounded-xl overflow-hidden border border-border-default">
                   <Image
                     src={src}
-                    alt={`preview-${i}`}
+                    alt={`gallery-preview-${i}`}
                     fill
                     className="object-cover"
                   />
                   <button
                     type="button"
-                    onClick={() => removeImage(i)}
+                    onClick={() => removeGalleryImage(i)}
                     className="absolute top-1 right-1 bg-black/50 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
                     ×
                   </button>
@@ -529,10 +682,17 @@ export default function Step1Basics({ onNext }: Props) {
               ))}
             </div>
           )}
+
+          {errors.images && (
+            <p className="text-caption text-danger mt-1">
+              {errors.images.message as string}
+            </p>
+          )}
         </div>
-        <div className="border border-gray-200 px-4 py-2 rounded-xl bg-white my-4">
-          <h1 className="text-brand-primary text-xl my-3 flex gap-2 ">
-            {" "}
+
+        {/* Image guidelines */}
+        <div className="border border-gray-200 px-4 py-2 rounded-xl bg-white">
+          <h2 className="text-brand-primary text-xl my-3 flex gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -547,33 +707,15 @@ export default function Step1Basics({ onNext }: Props) {
               />
             </svg>
             إرشادات رفع الصور
-          </h1>
-          <ol className="list-disc list-inside space-y-2 text-gray-500">
+          </h2>
+          <ul className="list-disc list-inside space-y-2 text-gray-500">
             <li>
               استخدم صورًا واضحة ومضيئة جيدًا (الإضاءة الطبيعية هي الأفضل).
             </li>
             <li>اعرض المنتج من عدة زوايا مختلفة.</li>
             <li>أظهر جميع الملحقات والإكسسوارات المرفقة مع المنتج.</li>
             <li>وضّح أي آثار استخدام أو تلف ظاهر بكل شفافية.</li>
-          </ol>
-        </div>
-        {/* Navigation */}
-        <div className="flex justify-between items-center pt-4 border-t border-border-default">
-          <span className="text-body-sm text-text-secondary flex items-center gap-1">
-            ارجع ←
-          </span>
-
-          <button
-            type="button"
-            className="border border-border-default text-text-secondary rounded-lg px-6 py-2.5 text-body-sm">
-            احفظ كمسودة
-          </button>
-          <button
-            type="button"
-            onClick={handleNext}
-            className="bg-brand-primary text-white rounded-lg px-8 py-2.5 text-body-sm font-medium flex items-center gap-2">
-            ← أكمل
-          </button>
+          </ul>
         </div>
       </div>
     </div>
