@@ -135,7 +135,12 @@ export default function AcceptedClient({
 
       {/* Summary + Deposit */}
       <div className="grid grid-cols-2 gap-3">
-        <OrderSummaryCard product={product} dates={dates} pricing={null} />
+        <OrderSummaryCard
+          product={product}
+          dates={dates}
+          pricing={null}
+          type={"accepted"}
+        />
         <div className="border border-border-default rounded-xl p-4">
           <p className="text-caption text-text-secondary mb-3">
             تفاصيل تكلفة العربون

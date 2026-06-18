@@ -26,7 +26,8 @@ export default async function OrderRedirectPage({ params }: Props) {
   console.log(rental.renterId);
   console.log(rental.ownerId);
   console.log(user._id);
-
+  // console.log("rental.status:", rental.status);
+  // console.log("expectedStatus:", expectedStatus);
   if (rental.renterId !== user._id && rental.ownerId !== user._id) {
     redirect("/unauthorized");
   }
