@@ -1,26 +1,12 @@
 "use server";
 import { cookies } from "next/headers";
 
-type Address = {
-  street: string;
-  floor: string;
-  apartment: string;
-  landmark: string;
-  building: string;
-};
-
-export async function payDepositInstapay(
-  orderId: string,
-  formData: FormData,
-  address: Address,
-) {
+export async function payRemaining(orderId: string, formData: FormData) {
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value;
 
-  // ضيف العنوان على الـ FormData الجاية
-  formData.append("location", JSON.stringify(address));
   const res = await fetch(
-    `${process.env.API_BASE_URL}/requests/deposit/${orderId}`,
+    `${process.env.API_BASE_URL}/requests/${orderId}/pay-remaining`,
     {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
@@ -30,7 +16,7 @@ export async function payDepositInstapay(
 
   if (!res.ok) {
     const errBody = await res.json().catch(() => ({}));
-    console.error("payDepositInstapay error:", errBody);
+    console.error("payRemaining error:", errBody);
     throw new Error(errBody?.error.message || "فشل الدفع");
   }
 

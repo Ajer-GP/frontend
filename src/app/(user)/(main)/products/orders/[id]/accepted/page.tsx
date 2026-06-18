@@ -21,7 +21,7 @@ export default async function AcceptedPage({ params }: Props) {
 
   const product = {
     name: rental.product.title,
-    category: "",
+    category: rental.product.name,
     image: rental.product.coverImage.url,
     ownerName: rental.owner.fullName,
     ownerAvatar: rental.owner.profileImage.url,
