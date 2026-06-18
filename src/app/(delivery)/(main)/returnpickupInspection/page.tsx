@@ -1,6 +1,6 @@
 // ─── Route: /orders/[orderId]/return-pickup ────────────────────────────────
 
-import ReturnPickupInspectionPage from "@/modules/delivery/components/Returnpickupinspection";
+import ReturnPickupInspectionPage from "@/Modules/Delivery/components/Returnpickupinspection";
 
 interface Props {
   params: Promise<{ orderId: string }>;
