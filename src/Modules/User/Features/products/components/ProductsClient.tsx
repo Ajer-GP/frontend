@@ -187,7 +187,7 @@ export default function ProductsClient({
     const term = searchInput.trim().toLowerCase();
     return products.filter((p) => p.title.toLowerCase().includes(term));
   }, [products, searchInput]);
-  // console.log(products, "ioihoih");
+  console.log(products, "ioihoih");
   // console.log(result, "uuuuuuuuu");
 
   const hasError = !result.success;
@@ -225,7 +225,9 @@ export default function ProductsClient({
         </button>
         <div className="px-4 pb-4 pt-3 flex flex-col gap-3">
           {/* Range slider */}
+
           <div className="relative h-2 bg-surface-tertiary rounded-full mt-2">
+            {/* الجزء المحدد */}
             <div
               className="absolute h-2 bg-brand-primary rounded-full"
               style={{
@@ -233,6 +235,23 @@ export default function ProductsClient({
                 left: `${100 - (priceRange[1] / 5000) * 100}%`,
               }}
             />
+
+            {/* دائرة الـ Min - بتتبع نفس منطق الـ right */}
+            {/* <div
+              className="absolute top-1/2 w-5 h-5 bg-white border-2 border-brand-primary rounded-full -translate-y-1/2 shadow pointer-events-none"
+              style={{
+                right: `calc(${(priceRange[0] / 5000) * 100}% - 10px)`,
+              }}
+            /> */}
+
+            {/* دائرة الـ Max - بتتبع نفس منطق الـ left */}
+            <div
+              className="absolute top-1/2 w-5 h-5 bg-white border-2 border-brand-primary rounded-full -translate-y-1/2 shadow pointer-events-none"
+              style={{
+                left: `calc(${100 - (priceRange[1] / 5000) * 100}% - 10px)`,
+              }}
+            />
+
             <input
               type="range"
               min={0}
@@ -249,6 +268,7 @@ export default function ProductsClient({
               onTouchEnd={handlePriceApply}
               className="absolute inset-0 w-full opacity-0 cursor-pointer h-2"
             />
+
             <input
               type="range"
               min={0}

@@ -87,6 +87,10 @@ function getDays(start: string, end: string) {
   );
 }
 
+function isExpired(endDate: string) {
+  return new Date() > new Date(endDate);
+}
+
 // ── Confirm Dialog ────────────────────────────────────────────────────────────
 
 function ConfirmDialog({
@@ -173,29 +177,35 @@ function RentalCard({
   const days = getDays(rental.startDate, rental.endDate);
   const subPage = STATUS_PAGE[rental.status] ?? "request-sent";
   const person = isOwner ? rental.renter : rental.owner;
+  const expired = isExpired(rental.endDate);
+
+  // الستاتوس المعروض: لو المستأجر وانتهى التاريخ والطلب لسه pending → مرفوض
+  const displayStatus: Rental["status"] =
+    !isOwner && expired && rental.status === "pending"
+      ? "rejected"
+      : rental.status;
 
   return (
     <div
       dir="ltr"
       className="bg-white border border-border-default rounded-2xl overflow-hidden hover:shadow-sm transition-all duration-200"
     >
-      {/* <h1>Hello123</h1> */}
       <div className="flex items-stretch min-h-[160px]">
-        {/* Col 1: Status badge - أقصى اليمين */}
+        {/* Col 1: Status badge */}
         <div className="flex items-start pt-5 px-4 shrink-0">
           <span
-            className={`text-[11px] font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${STATUS_STYLE[rental.status]}`}
+            className={`text-[11px] font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${STATUS_STYLE[displayStatus]}`}
           >
-            {STATUS_LABEL[rental.status]}
+            {STATUS_LABEL[displayStatus]}
           </span>
         </div>
 
-        {/* Col 2: Content - المنتصف */}
+        {/* Col 2: Content */}
         <div className="flex-1 py-5 flex flex-col justify-between gap-3">
           {/* Product name + category */}
           <div className="flex items-start justify-between">
             <span className="text-[11px] text-text-secondary bg-surface-tertiary px-2 py-0.5 rounded-full">
-              {rental.product?.name}
+              {rental.product?.title}
             </span>
             <h3 className="text-h3 font-medium text-text-primary">
               {rental.product?.title ??
@@ -233,7 +243,8 @@ function RentalCard({
 
           {/* Actions */}
           <div className="flex gap-2" dir="rtl">
-            {isOwner && rental.status === "pending" ? (
+            {/* ① المالك + pending + مش منتهي → قبول/رفض */}
+            {isOwner && rental.status === "pending" && !expired ? (
               <>
                 <button
                   onClick={() => onReject(rental._id)}
@@ -248,7 +259,10 @@ function RentalCard({
                   قبول
                 </button>
               </>
-            ) : (
+            ) : /* ② المستأجر + pending → مفيش زرار (في انتظار المالك) */
+            !isOwner &&
+              rental.status ===
+                "pending" ? null /* ③ التاريخ عدى → مفيش زرار */ : expired ? null /* ④ باقي الحالات → عرض التفاصيل */ : (
               <Link
                 href={`/products/orders/${rental._id}/${subPage}`}
                 className="px-6 text-center border border-border-default text-text-secondary rounded-xl py-2 text-body-sm hover:border-brand-primary hover:text-brand-primary transition-colors"
@@ -259,7 +273,7 @@ function RentalCard({
           </div>
         </div>
 
-        {/* Col 3: صورة + person - أقصى اليسار */}
+        {/* Col 3: صورة + person */}
         <div className="flex flex-col items-end shrink-0 p-4 gap-3">
           {/* Person info */}
           {person && (
@@ -291,7 +305,7 @@ function RentalCard({
             </div>
           )}
 
-          {/* Product image - مربعة */}
+          {/* Product image */}
           <div className="relative w-[120px] h-[110px] rounded-xl overflow-hidden bg-surface-secondary">
             {rental.product?.coverImage?.url ? (
               <Image
@@ -324,6 +338,7 @@ function RentalCard({
     </div>
   );
 }
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 export default function OrdersClient({ initialOrders, currentUserId }: Props) {
@@ -356,11 +371,21 @@ export default function OrdersClient({ initialOrders, currentUserId }: Props) {
         const res = await acceptRentalAction(confirmRental._id);
         if (!res.success) throw new Error(res.error);
         setOrders((prev) =>
-          prev.map((o) =>
-            o._id === confirmRental._id
-              ? { ...o, status: "accepted" as const }
-              : o,
-          ),
+          prev
+            .map((o) =>
+              o._id === confirmRental._id
+                ? { ...o, status: "accepted" as const }
+                : o,
+            )
+            // شيل كل الطلبات الـ pending على نفس المنتج غير اللي اتقبل
+            .filter(
+              (o) =>
+                !(
+                  o.productId === confirmRental.productId &&
+                  o.status === "pending" &&
+                  o._id !== confirmRental._id
+                ),
+            ),
         );
       } catch (err) {
         console.error(err);

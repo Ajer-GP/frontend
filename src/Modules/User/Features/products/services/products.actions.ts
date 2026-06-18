@@ -85,7 +85,7 @@ export async function getProductByIdAction(
     }
 
     const data: ProductResponse = await res.json();
-    console.log(data);
+    // console.log(data);
 
     return { success: true, data };
   } catch {

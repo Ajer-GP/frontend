@@ -1,6 +1,6 @@
 // src/app/(user)/(main)/dashboard/page.tsx
 // Server Component — fetches data, no "use client"
-
+import Link from "next/link";
 import DashboardStats from "@/app/_components/delivery/DashboardStats";
 import RightPanel from "@/app/_components/delivery/RightPanel";
 import TaskCard from "@/app/_components/delivery/TaskCard";
@@ -140,11 +140,11 @@ export default async function DashboardPage() {
             <p className="text-caption text-text-tertiary">
               مرتبة حسب الأولوية والوقت المتوقع للتسليم
             </p>
-            <a
+            <Link
               href="/dashboard/tasks"
               className="text-caption text-brand-primary hover:underline">
               ‹ عرض الكل
-            </a>
+            </Link>
           </div>
 
           <div className="space-y-3">

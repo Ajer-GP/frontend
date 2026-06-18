@@ -5,6 +5,8 @@ import OrderSummaryCard from "@/app/_components/orders/OrderSummaryCard";
 import Image from "next/image";
 import Link from "next/link";
 import { getAndGuardRental } from "@/Modules/User/lib/getAndGuardRental";
+import HowItWorks from "@/app/_components/ProductDetails/How-it-works";
+import ReturnRefundPolicy from "@/app/_components/ProductDetails/ReturnRefundPolicy";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -22,7 +24,7 @@ export default async function RequestSentPage({ params }: Props) {
 
   const product = {
     name: rental.product.title,
-    category: "",
+    category: rental.product.name,
     image: rental.product.coverImage.url,
     ownerName: rental.owner.fullName,
     ownerAvatar: rental.owner.profileImage.url,
@@ -86,13 +88,18 @@ export default async function RequestSentPage({ params }: Props) {
 
       {/* Two columns */}
       <div className="grid grid-cols-2 gap-3">
-        <OrderSummaryCard product={product} dates={dates} pricing={pricing} />
+        <OrderSummaryCard
+          product={product}
+          dates={dates}
+          pricing={pricing}
+          type={"request"}
+        />
 
         {/* Info + Actions */}
         <div className="border border-border-default rounded-xl p-4 space-y-4">
           <div>
-            <p className="text-body-sm font-medium mb-2">ℹ️ معلومات مهمة</p>
-            <ul className="space-y-2">
+            <p className="text-body-xl font-medium mb-2">ℹ️ معلومات مهمة</p>
+            <ul className="space-y-2 text-body-lg ">
               {[
                 "لا يلزم أن تدفع أي مبلغ حتى يقبل المالك طلبك.",
                 "ستتلقى إشعارات بكل تحديث لحالة الطلب.",
@@ -110,26 +117,44 @@ export default async function RequestSentPage({ params }: Props) {
           </div>
 
           <div className="border border-border-default rounded-lg p-3">
-            <p className="text-caption font-medium mb-1">🛡️ محمي بواسطة أجر</p>
-            <p className="text-caption text-text-secondary">
+            <p className="text-md flex font-medium mb-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width={24}
+                height={24}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="icon icon-tabler icons-tabler-outline icon-tabler-shield text-green-900">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" />
+              </svg>{" "}
+              محمي بواسطة أجر
+            </p>
+            <p className="text-sm text-text-secondary">
               كل عملية إيجار مؤمنة عبر مالكين، وعطاءات، تأمينية، ودعم متواصل.
             </p>
           </div>
 
           <div className="space-y-2">
             <Link href="/products">
-              <button className="w-full bg-brand-primary text-white rounded-lg py-2.5 text-body-sm font-medium">
+              <button className="w-full cursor-pointer mb-1 bg-brand-primary text-white rounded-lg py-2.5 text-body-sm font-medium">
                 استكشف منتجات أخرى
               </button>
             </Link>
             <Link href="/products/orders">
-              <button className="w-full border border-border-default text-text-secondary rounded-lg py-2.5 text-body-sm">
+              <button className="w-full cursor-pointer border border-border-default text-text-secondary rounded-lg py-2.5 text-body-sm">
                 شاهد طلبات إيجارك
               </button>
             </Link>
           </div>
         </div>
       </div>
+      <HowItWorks />
+      <ReturnRefundPolicy />
     </div>
   );
 }
