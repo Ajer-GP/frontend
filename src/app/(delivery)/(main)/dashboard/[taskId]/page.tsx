@@ -1,7 +1,10 @@
 import { getDeliveryById } from "@/Modules/Delivery/Features/services/delivery.actions";
 import Image from "next/image";
 import Link from "next/link";
-import { diffInDaysAndHours } from "@/utils/RentingHandle";
+import {
+  diffInDaysAndHours,
+  formatEgyptArabicDate,
+} from "@/utils/RentingHandle";
 export default async function page({
   params,
 }: {
@@ -13,59 +16,87 @@ export default async function page({
     result.delivery.endDate,
     result.delivery.startDate,
   );
-  console.log(days, hours);
-  console.log(result);
+  const totalFees =
+    result.delivery.insuranceAmount +
+    result.delivery.remainingAmount +
+    result.delivery.commissionFee;
+
+  const startDate = formatEgyptArabicDate(result.delivery.startDate);
+
   return (
     <div className="px-3 sm:px-4 md:px-6">
       {/* menu top  */}
-      <div className="breadcrumbs text-sm">
+      <div className="breadcrumbs text-sm overflow-x-auto">
         <ul>
           <li>
             <Link href="/dashboard">الرئيسية</Link>
           </li>
-          <li>{taskId}</li>
+          <li className="break-all">{taskId}</li>
         </ul>
       </div>
       {/* Mission details */}
-      <div className="rounded-xl bg-linear-to-r to-brand-mid from-brand-primary p-4 flex flex-col sm:flex-row items-center my-3 text-white gap-3 text-center sm:text-start">
-        <div className="rounded-full p-3 bg-white/10 backdrop-blur-md border border-white/20 shrink-0">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="size-10 sm:size-12">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"
-            />
-          </svg>
-        </div>
-        <div>
-          <p className="text-gray-300">
-            رقم المهمة : <span className="text-white">{taskId}</span>{" "}
-          </p>
-          <p>تفاصيل المهمة</p>
+      <div className="rounded-xl bg-linear-to-r to-brand-mid from-brand-primary p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between my-3 text-white gap-3 text-center sm:text-start">
+        <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-start">
+          <div className="rounded-full p-3 bg-white/10 backdrop-blur-md border border-white/20 shrink-0">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-10 sm:size-12">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"
+              />
+            </svg>
+          </div>
+          <div className="min-w-0">
+            <p className="text-gray-300 break-words">
+              رقم المهمة :{" "}
+              <span className="text-white break-all">{taskId}</span>{" "}
+            </p>
+            <p>تفاصيل المهمة</p>
 
-          {result.delivery.type === "from_owner_to_renter" ? (
-            <p>
-              {" "}
-              أنت حالياً في طريقك إلى المالك لاستلام المنتج. تأكد من فحصه قبل
-              التوقيع على الاستلام.
-            </p>
-          ) : (
-            <p>
-              {" "}
-              أنت حالياً في طريقك إلى المستأجر لاستلام المنتج. تأكد من فحصه قبل
-              التوقيع على الاستلام.
-            </p>
-          )}
+            {result.delivery.type === "from_owner_to_renter" ? (
+              <p className="break-words">
+                {" "}
+                أنت حالياً في طريقك إلى المالك لاستلام المنتج. تأكد من فحصه قبل
+                التوقيع على الاستلام.
+              </p>
+            ) : (
+              <p className="break-words">
+                {" "}
+                أنت حالياً في طريقك إلى المستأجر لاستلام المنتج. تأكد من فحصه
+                قبل التوقيع على الاستلام.
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="w-full sm:w-auto shrink-0">
+          <button className="btn bg-white rounded-4xl w-full sm:w-auto whitespace-nowrap text-brand-primary">
+            تأكيد الوصول
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-6">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 19.5 8.25 12l7.5-7.5"
+              />
+            </svg>
+          </button>
         </div>
       </div>
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="border border-gray-400 px-3 py-3 rounded-2xl w-full lg:flex-1">
+          <h1 className="font-black text-xl">ملخص الطلب</h1>
           <div className="flex flex-col sm:flex-row gap-3 items-center sm:items-start my-4 text-center sm:text-start">
             <Image
               loading="eager"
@@ -76,38 +107,78 @@ export default async function page({
               className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl border border-gray-500 object-cover shrink-0"
             />
 
-            <div className="w-full">
+            <div className="w-full min-w-0">
               <div className="badge bg-gray-200 text-gray-500 rounded-2xl">
                 {result.delivery.productName}{" "}
               </div>
-              <h1>{result.delivery.productTitle} </h1>
+              <h1 className="font-bold text-lg sm:text-xl break-words">
+                {result.delivery.productTitle}
+              </h1>
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 mt-2">
-                {result?.delivery?.ownerImage ? (
-                  <div className="w-16 sm:w-24 rounded-full shrink-0">
-                    <Image
-                      src={result.delivery.ownerImage}
-                      alt="userImage"
-                      width={100}
-                      height={100}
-                    />
+                {result.delivery.type === "from_owner_to_renter" ? (
+                  <div>
+                    {result?.delivery?.ownerImage ? (
+                      <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full shrink-0 overflow-hidden">
+                        <Image
+                          src={result.delivery.ownerImage}
+                          alt="userImage"
+                          width={100}
+                          height={100}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="avatar avatar-placeholder">
+                        <div className="bg-brand-primary text-neutral-content w-16 rounded-full">
+                          <span className="text-2xl">
+                            {result.delivery.ownerName[0]}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <div className="avatar avatar-placeholder">
-                    <div className="bg-brand-primary text-neutral-content w-16 rounded-full">
-                      <span className="text-2xl">
-                        {result.delivery.ownerName[0]}
-                      </span>
-                    </div>
+                  <div>
+                    {" "}
+                    {result?.delivery?.renterImage ? (
+                      <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full shrink-0 overflow-hidden">
+                        <Image
+                          src={result.delivery.renterImage}
+                          alt="userImage"
+                          width={100}
+                          height={100}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="avatar avatar-placeholder">
+                        <div className="bg-brand-primary text-neutral-content w-16 rounded-full">
+                          <span className="text-2xl">
+                            {result.delivery.renterName[0]}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
                 <div>
-                  <h3>{result.delivery.ownerName}</h3>
-                  <p>المالك</p>
+                  {result.delivery.type === "from_owner_to_renter" ? (
+                    <div>
+                      <h3>{result.delivery.ownerName}</h3>
+                      <p>المالك</p>
+                    </div>
+                  ) : (
+                    <div>
+                      {" "}
+                      <h3>{result.delivery.renterName}</h3>
+                      <p>المستأجر</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 my-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 my-2">
             <div className="border-s px-1">
               <p>
                 {" "}
@@ -126,7 +197,9 @@ export default async function page({
                 </svg>
                 تاريخ البداية{" "}
               </p>
-              <p>{result.delivery.startDate.split("T")[0]}</p>
+              <p className="font-black my-1">
+                {result.delivery.startDate.split("T")[0]}
+              </p>
             </div>
             <div className="border-s px-1">
               <p>
@@ -145,7 +218,9 @@ export default async function page({
                 </svg>
                 تاريخ التسليم{" "}
               </p>
-              <p>{result.delivery.endDate.split("T")[0]}</p>
+              <p className="font-black my-1">
+                {result.delivery.endDate.split("T")[0]}
+              </p>
             </div>
 
             <div className="border-s px-1">
@@ -166,6 +241,10 @@ export default async function page({
                 </svg>
                 المدة
               </p>
+              <p className="font-black my-1">
+                {" "}
+                {Math.abs(days)} ايام {Math.abs(hours)} ساعات
+              </p>
             </div>
             <div className="border-s px-1">
               {" "}
@@ -185,9 +264,10 @@ export default async function page({
                 </svg>
                 الحساب اليومي
               </p>
+              <p className="font-black my-1">{result.delivery.pricePerDay}</p>
             </div>
           </div>
-          <div className="bg-accent-light border border-warning text-warning px-3 py-3 rounded-2xl">
+          <div className="bg-[#FFFDFA] border border-warning text-warning px-3 py-3 rounded-2xl">
             <h1>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -204,16 +284,36 @@ export default async function page({
               </svg>
               ملاحظات التعامل
             </h1>
-            <p className="text-black">{result.delivery.handlingNotes}</p>
+            <div>
+              {result.delivery.checklist ? (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {result.delivery.checklist.map((c, i) => (
+                    <div
+                      key={i}
+                      className="badge text-[#AC7825] bg-[#FDF6EA] rounded-2xl">
+                      {c}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p></p>
+              )}
+            </div>
+            <p className="text-black my-2 break-words">
+              {result.delivery.handlingNotes}
+            </p>
           </div>
         </div>
-
         <div className="w-full lg:w-96 flex flex-col gap-4">
           <div className="border border-gray-400 rounded-2xl">
             <div className="text-white bg-linear-to-r to-brand-mid from-brand-primary rounded-t-2xl px-4 py-2 mb-3">
               <p>الإجراء المطلوب الآن</p>
-              <p className="font-black my-1">استلام المنتج من المالك</p>
-              <p>توجّه إلى عنوان المالك واستلم المنتج بعد فحصه</p>
+              <p className="font-black my-1 break-words">
+                استلام المنتج من المالك
+              </p>
+              <p className="break-words">
+                توجّه إلى عنوان المالك واستلم المنتج بعد فحصه
+              </p>
             </div>
             <div className="flex gap-4 px-4 py-2">
               <div className="bg-brand-light text-brand-primary px-2 py-2 rounded-xl shrink-0 self-start">
@@ -231,34 +331,14 @@ export default async function page({
                   />
                 </svg>
               </div>
-              <div>
+              <div className="min-w-0">
                 <p>موعد الاستلام المجدول</p>
-              </div>
-            </div>
-            <div className="flex gap-4 px-4 py-2">
-              <div className="bg-[#FBDFE1] text-danger px-2 py-2 rounded-xl shrink-0 self-start">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p>الموعد النهائي للتلسيم للمستأجر</p>
-                <p></p>
+                <p className="font-black break-words">{startDate}</p>
               </div>
             </div>
           </div>
           <div className="border border-gray-400 px-3 py-3 rounded-2xl">
-            <h3 className="font-black">ملخص مالي</h3>
+            <h3 className="font-black mb-3">ملخص مالي</h3>
             <div className="flex flex-wrap justify-between gap-2">
               <p>سعر التأمين</p>
               <p className="font-black">{result.delivery.insuranceAmount}</p>
@@ -268,20 +348,20 @@ export default async function page({
               <p className="font-black"> {result.delivery.remainingAmount}</p>
             </div>
             <div className="flex flex-wrap justify-between gap-2">
-              <p> نسبة المنصة (7.5%)</p>
+              <p> نسبة المنصة (5%)</p>
               <p className="font-black">{result.delivery.commissionFee}</p>
             </div>
-            <div className="flex flex-wrap justify-between gap-2 text-brand-primary bg-gray-50 rounded-xl px-2">
-              <p> الاجمالي</p>
-              <p className="font-black"></p>
+            <div className="flex flex-wrap justify-between gap-2 text-brand-primary bg-gray-50 rounded-xl px-2 py-2 my-1">
+              <p className="font-black"> الاجمالي</p>
+              <p className="font-black">{totalFees}ج.م </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 my-5">
+      <div className="flex flex-col md:flex-row gap-4 my-5">
         {/* Owner Info */}
-        <div className="card w-full sm:w-1/2 bg-base-100 card-lg shadow-sm px-3">
+        <div className="card w-full md:w-1/2 bg-base-100 card-lg shadow-sm px-3">
           <div className="flex flex-wrap justify-between gap-2 my-3 ">
             <p>
               <svg
@@ -306,12 +386,13 @@ export default async function page({
           <div className="flex gap-3 items-center">
             <div className="avatar">
               {result?.delivery?.ownerImage ? (
-                <div className="w-16 sm:w-24 rounded-full">
+                <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden">
                   <Image
                     src={result.delivery.ownerImage}
                     alt="userImage"
                     width={100}
                     height={100}
+                    className="w-full h-full object-cover"
                   />
                 </div>
               ) : (
@@ -324,7 +405,7 @@ export default async function page({
                 </div>
               )}
             </div>
-            <p>{result.delivery.ownerName}</p>
+            <p className="break-words">{result.delivery.ownerName}</p>
           </div>
           <div className="flex flex-wrap gap-2 my-1">
             <p className="flex items-center gap-1 shrink-0">
@@ -368,13 +449,15 @@ export default async function page({
               العنوان
             </p>
             <p className="break-words">
-              شارع {result.delivery.ownerLocation.street}، مبني رقم{" "}
-              {result.delivery.ownerLocation.building}، دور{" "}
-              {result.delivery.ownerLocation.floor}، علامة مميزة{" "}
-              {result.delivery.ownerLocation.mark}
+              شارع {result.delivery.ownerLocation?.street}، مبني رقم{" "}
+              {result.delivery.ownerLocation?.building}، دور{" "}
+              {result.delivery.ownerLocation?.floor}، علامة مميزة{" "}
+              {result.delivery.ownerLocation?.mark}
             </p>
           </div>
-          <button type="button" className="py-2 my-2">
+          <a
+            href={`tel:${result.delivery.ownerPhoneNumber}`}
+            className="btn bg-white py-2 my-2 ">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -389,10 +472,10 @@ export default async function page({
               />
             </svg>{" "}
             اتصال{" "}
-          </button>
+          </a>
         </div>
         {/* renter Info */}
-        <div className="card w-full sm:w-1/2 bg-base-100 card-lg shadow-sm px-3 ">
+        <div className="card w-full md:w-1/2 bg-base-100 card-lg shadow-sm px-3 ">
           <div className="flex flex-wrap justify-between gap-2 my-3">
             <p>
               <svg
@@ -417,26 +500,27 @@ export default async function page({
           </div>
           <div className="flex gap-3 items-center">
             <div className="avatar">
-              {result?.delivery?.ownerImage ? (
-                <div className="w-16 sm:w-24 rounded-full">
+              {result?.delivery?.renterImage ? (
+                <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden">
                   <Image
-                    src={result.delivery.ownerImage}
+                    src={result.delivery.renterImage}
                     alt="userImage"
                     width={100}
                     height={100}
+                    className="w-full h-full object-cover"
                   />
                 </div>
               ) : (
                 <div className="avatar avatar-placeholder">
                   <div className="bg-brand-primary text-neutral-content w-16 rounded-full">
                     <span className="text-2xl">
-                      {result.delivery.ownerName[0]}
+                      {result.delivery.renterName[0]}
                     </span>
                   </div>
                 </div>
               )}
             </div>
-            <p>{result.delivery.ownerName}</p>
+            <p className="break-words">{result.delivery.renterName}</p>
           </div>
           <div className="flex flex-wrap gap-2 my-1">
             <p className="flex items-center gap-1 shrink-0">
@@ -486,7 +570,9 @@ export default async function page({
               {result.delivery.renterLocation.mark}
             </p>
           </div>
-          <button type="button" className="py-2 my-1">
+          <a
+            href={`tel:${result.delivery.renterPhoneNumber}`}
+            className="btn bg-white py-2 my-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -501,7 +587,7 @@ export default async function page({
               />
             </svg>{" "}
             اتصال{" "}
-          </button>
+          </a>
         </div>
       </div>
     </div>
