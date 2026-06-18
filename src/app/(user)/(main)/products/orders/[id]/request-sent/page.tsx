@@ -4,7 +4,7 @@ import OrderStepper from "@/app/_components/orders/OrderStepper";
 import OrderSummaryCard from "@/app/_components/orders/OrderSummaryCard";
 import Image from "next/image";
 import Link from "next/link";
-import { getAndGuardRental } from "@/modules/user/lib/getAndGuardRental";
+import { getAndGuardRental } from "@/Modules/User/lib/getAndGuardRental";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -67,8 +67,7 @@ export default async function RequestSentPage({ params }: Props) {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-4 inline-block ml-1"
-          >
+            className="size-4 inline-block ml-1">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -103,8 +102,7 @@ export default async function RequestSentPage({ params }: Props) {
               ].map((item, i) => (
                 <li
                   key={i}
-                  className="text-caption text-text-secondary border-r-2 border-brand-light pr-2"
-                >
+                  className="text-caption text-text-secondary border-r-2 border-brand-light pr-2">
                   {item}
                 </li>
               ))}

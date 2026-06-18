@@ -1,5 +1,5 @@
 import AcceptedClient from "@/Modules/User/Features/Rent/components/AcceptedClient";
-import { getAndGuardRental } from "@/modules/user/lib/getAndGuardRental";
+import { getAndGuardRental } from "@/Modules/User/lib/getAndGuardRental";
 
 interface Props {
   params: Promise<{ id: string }>;

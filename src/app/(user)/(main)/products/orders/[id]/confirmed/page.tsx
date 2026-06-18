@@ -4,7 +4,7 @@ import OrderStepper from "@/app/_components/orders/OrderStepper";
 import OrderSummaryCard from "@/app/_components/orders/OrderSummaryCard";
 import HowItWorks from "@/app/_components/ProductDetails/How-it-works";
 import Image from "next/image";
-import { getAndGuardRental } from "@/modules/user/lib/getAndGuardRental";
+import { getAndGuardRental } from "@/Modules/User/lib/getAndGuardRental";
 
 interface Props {
   params: Promise<{ id: string }>;
