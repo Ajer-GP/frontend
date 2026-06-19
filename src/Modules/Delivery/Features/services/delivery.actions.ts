@@ -19,8 +19,7 @@ export async function DeliveryLogin(prevState: any, formData: FormData) {
   });
 
   const data = await res.json();
-
-  if (!res.ok) return { message: data.message || "فشل تسجيل الدخول" };
+  if (!res.ok) return { message: data.error.message || "فشل تسجيل الدخول" };
   const cookieStore = await cookies();
   const isProduction = process.env.NODE_ENV === "production";
 
@@ -42,7 +41,7 @@ export async function DeliveryLogin(prevState: any, formData: FormData) {
     maxAge: 60 * 60 * 24 * 7, // 15 days
   });
 
-  return { success: true };
+  return { success: true, deliveryPerson: data };
 }
 
 export async function getAllDeliveries() {
@@ -89,5 +88,75 @@ export async function getDeliveryById(id: string) {
     return { success: true, delivery: data.delivery };
   } catch (err) {
     return { success: false, error: err };
+  }
+}
+
+export async function confirmOTPRenter(OTP: number, id: string) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("delivery_token")?.value;
+
+  try {
+    const res = await fetch(
+      `${process.env.API_BASE_URL}/delivery/${id}/confirm-renter-otp`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ otpCode: OTP }),
+      },
+    );
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      return {
+        success: false,
+        error: errData?.message || `HTTP error: ${res.status}`,
+      };
+    }
+
+    const data = await res.json();
+    return { success: true, delivery: data.delivery };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "حدث خطأ غير متوقع",
+    };
+  }
+}
+
+export async function confirmOTPOwner(OTP: number, id: string) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("delivery_token")?.value;
+
+  try {
+    const res = await fetch(
+      `${process.env.API_BASE_URL}/delivery/${id}/confirm-owner-otp`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ otpCode: OTP }),
+      },
+    );
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      return {
+        success: false,
+        error: errData?.message || `HTTP error: ${res.status}`,
+      };
+    }
+
+    const data = await res.json();
+    return { success: true, delivery: data.delivery };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "حدث خطأ غير متوقع",
+    };
   }
 }

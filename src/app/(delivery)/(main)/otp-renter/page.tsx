@@ -2,28 +2,34 @@ import React from "react";
 import Link from "next/link";
 import { getDeliveryById } from "@/Modules/Delivery/Features/services/delivery.actions";
 import OTPInputs from "@/app/_components/delivery/OTPInputs";
+
 export default async function page({
   params,
 }: {
   params: Promise<{ taskId: string }>;
 }) {
-  // const { taskId } = await params;
-  // const result = await getDeliveryById(taskId);
-  // const task = result.delivery;
+  const { taskId } = await params;
+  const result = await getDeliveryById("6a307da2964a2a7f702aec71");
+  const task = result.delivery;
+
+  const totalFees =
+    task.insuranceAmount + task.remainingAmount + task.commissionFee;
+
   return (
-    <div>
-      {/* menu top  */}
+    <div className="px-3 sm:px-4 md:px-6">
+      {/* Breadcrumbs */}
       <div className="breadcrumbs text-sm overflow-x-auto">
         <ul>
           <li>
             <Link href="/dashboard">الرئيسية</Link>
           </li>
-          <li className="break-all">{}</li>
+          <li className="break-all">{taskId}</li>
         </ul>
       </div>
-      {/* Mission details */}
+
+      {/* Mission header */}
       <div className="rounded-xl bg-linear-to-r to-brand-mid from-brand-primary p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between my-3 text-white gap-3 text-center sm:text-start">
-        <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-start">
+        <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="rounded-full p-3 bg-white/10 backdrop-blur-md border border-white/20 shrink-0">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -40,12 +46,11 @@ export default async function page({
             </svg>
           </div>
           <div className="min-w-0">
-            <p className="text-gray-300 break-words">
-              رقم المهمة :{" "}
-              {/* <span className="text-white break-all">{taskId}</span>{" "} */}
+            <p className="text-gray-300 text-sm">
+              رقم المهمة: <span className="text-white break-all">{taskId}</span>
             </p>
-            <p className="text-lg">التسليم للمستأجر</p>
-            <p className="text-caption">
+            <p className="text-lg font-semibold">التسليم للمستأجر</p>
+            <p className="text-sm text-white/80">
               أكمل خطوات التسليم وتحقق من الرمز السري قبل تسليم المنتج للمستأجر.
             </p>
           </div>
@@ -71,28 +76,35 @@ export default async function page({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="border border-gray-300 rounded-2xl px-4 py-4 ">
+      {/* Main grid — stacks on mobile, side by side on lg+ */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        {/* OTP card */}
+        <div className="border border-gray-300 rounded-2xl px-4 py-4">
           <h1 className="font-black text-xl my-3">التحقق من رمز التسليم</h1>
-          <OTPInputs />
+          <OTPInputs taskId={taskId} />
         </div>
+
+        {/* Financial summary card */}
         <div className="border border-gray-400 px-3 py-3 rounded-2xl">
-          <h3 className="font-black mb-3">ملخص مالي</h3>
-          <div className="flex flex-wrap justify-between gap-2">
-            <p>سعر التأمين</p>
-            {/* <p className="font-black">{result.delivery.insuranceAmount}</p> */}
-          </div>
-          <div className="flex flex-wrap justify-between gap-2">
-            <p> باقي الحساب</p>
-            {/* <p className="font-black"> {result.delivery.remainingAmount}</p> */}
-          </div>
-          <div className="flex flex-wrap justify-between gap-2">
-            <p> نسبة المنصة (5%)</p>
-            {/* <p className="font-black">{result.delivery.commissionFee}</p> */}
-          </div>
-          <div className="flex flex-wrap justify-between gap-2 text-brand-primary bg-gray-50 rounded-xl px-2 py-2 my-1">
-            <p className="font-black"> الاجمالي</p>
-            {/* <p className="font-black">{totalFees}</p> */}
+          <h3 className="font-black text-xl mb-4">ملخص مالي</h3>
+
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between gap-2">
+              <p className="text-gray-600">سعر التأمين</p>
+              <p className="font-black">{task.insuranceAmount} </p>
+            </div>
+            <div className="flex justify-between gap-2">
+              <p className="text-gray-600">باقي الحساب</p>
+              <p className="font-black">{task.remainingAmount} </p>
+            </div>
+            <div className="flex justify-between gap-2">
+              <p className="text-gray-600">نسبة المنصة (5%)</p>
+              <p className="font-black">{task.commissionFee} </p>
+            </div>
+            <div className="flex justify-between gap-2 text-brand-primary bg-gray-50 rounded-xl px-3 py-2 mt-2">
+              <p className="font-black">الاجمالي</p>
+              <p className="font-black">{totalFees} ج.م</p>
+            </div>
           </div>
         </div>
       </div>
