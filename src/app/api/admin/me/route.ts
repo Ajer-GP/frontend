@@ -33,13 +33,15 @@ export async function GET(request: Request) {
 
     // Access token expired — delegate to the admin refresh route
     if (refreshToken) {
-      const origin = new URL(request.url).origin;
-      const refreshRes = await fetch(`${origin}/admin/refresh-token`, {
-        method: "POST",
-        headers: {
-          Cookie: request.headers.get("cookie") ?? "",
+      const refreshRes = await fetch(
+        `${process.env.API_BASE_URL}/admin/refresh-token`,
+        {
+          method: "POST",
+          headers: {
+            Cookie: request.headers.get("cookie") ?? "",
+          },
         },
-      });
+      );
 
       if (!refreshRes.ok) {
         return clearAdminCookies(NextResponse.json({ admin: null }));
