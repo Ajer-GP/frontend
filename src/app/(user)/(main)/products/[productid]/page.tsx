@@ -1,4 +1,3 @@
-import Footer from "@/app/_components/Landing/Footer";
 import Details from "@/app/_components/ProductDetails/Details";
 import How_it_works from "@/app/_components/ProductDetails/How-it-works";
 import Owner from "@/app/_components/ProductDetails/Owner";
@@ -9,6 +8,18 @@ import { getProductByIdAction } from "@/Modules/User/Features/products/services/
 import RentNow from "@/app/_components/ProductDetails/RentNow";
 import Checklist from "@/app/_components/ProductDetails/Checklist";
 import Link from "next/link";
+
+import { cookies } from "next/headers";
+async function getCurrentUser() {
+  const cookieStore = await cookies();
+  const raw = cookieStore.get("user")?.value; // replace "user" with your actual cookie name
+  if (!raw) return null;
+  try {
+    return JSON.parse(decodeURIComponent(raw));
+  } catch {
+    return null;
+  }
+}
 export default async function page({
   params,
 }: {
@@ -21,14 +32,10 @@ export default async function page({
     return <div>حدث خطأ في تحميل المنتج , {result.error}</div>;
 
   const data = result.data.product;
-
-  // if (!result.success)
-  //   return <div>حدث خطأ في تحميل المنتج , {result.error}</div>;
-  // const res = result.data;
-  // const data = res.product;
-
-  // console.log(data, "ppp");
-
+  console.log(data);
+  const currentUser = await getCurrentUser();
+  const isOwner = currentUser?._id === data.owner._id;
+  console.log(currentUser?._id, isOwner);
   return (
     <div dir="rtl" className="">
       <div className="breadcrumbs text-sm max-w-7xl mx-8 my-4 px-4 py-2.5 text-[#676767]">
@@ -43,7 +50,7 @@ export default async function page({
         </ul>
       </div>
       <Product data={data} />
-      <RentNow data={data} />
+      {!isOwner && <RentNow data={data} />}
       <Details data={data} />
       <Checklist data={data} />
       <Owner data={data} />

@@ -2,10 +2,13 @@
 import { useFormContext, useFormState } from "react-hook-form";
 import Image from "next/image";
 import { FullFormData } from "@/app/_schemas/addProduct.schema";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { forwardRef, useImperativeHandle } from "react";
+import { AIPricingSuggetions } from "@/Modules/User/Features/products/services/products.actions";
 
 type PriceField = "pricePerHour" | "pricePerDay" | "pricePerWeek";
+type AISuggestionState = "idle" | "loading" | "done" | "error";
+
 const PRICING_OPTIONS = [
   { key: "pricePerHour", label: "السعر في الساعة", icon: "/images/clock.png" },
   {
@@ -19,16 +22,22 @@ const PRICING_OPTIONS = [
     icon: "/images/calendar.png",
   },
 ];
+
 export type Step2Ref = { triggerPricingError: () => void };
 
 const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
-  const { setValue, getValues, watch, control } = useFormContext<FullFormData>();
+  const { setValue, getValues, watch, control } =
+    useFormContext<FullFormData>();
   const { errors } = useFormState({ control });
 
   const pricePerHour = watch("pricePerHour");
   const pricePerDay = watch("pricePerDay");
   const pricePerWeek = watch("pricePerWeek");
   const insuranceAmount = watch("insuranceAmount");
+  const title = watch("title");
+  const category = watch("category");
+  const condition = watch("condition");
+  const description = watch("description");
 
   const priceValues: Record<PriceField, number | undefined> = {
     pricePerHour,
@@ -36,8 +45,18 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
     pricePerWeek,
   };
 
-  // --- Pricing selection ---
   const [selectedPricing, setSelectedPricing] = useState<string[]>([]);
+  const [pricingError, setPricingError] = useState(false);
+  const [checklistInput, setChecklistInput] = useState("");
+  const [checklist, setChecklist] = useState<string[]>([]);
+  const [aiState, setAiState] = useState<AISuggestionState>("idle");
+  const [aiMessage, setAiMessage] = useState<string | null>(null);
+  const [aiSuggestions, setAiSuggestions] = useState<any>(null);
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    triggerPricingError: () => setPricingError(true),
+  }));
 
   useEffect(() => {
     const values = getValues();
@@ -45,10 +64,50 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
       const value = values[option.key as PriceField];
       return typeof value === "number" && !Number.isNaN(value) && value > 0;
     }).map((option) => option.key);
-    if (selected.length > 0) {
-      setSelectedPricing(selected);
-    }
+    if (selected.length > 0) setSelectedPricing(selected);
   }, [getValues]);
+
+  useEffect(() => {
+    const filledPrices = [pricePerHour, pricePerDay, pricePerWeek].filter(
+      (v) => typeof v === "number" && !Number.isNaN(v) && v > 0,
+    );
+
+    if (filledPrices.length < 2) {
+      setAiState("idle");
+      setAiMessage(null);
+      return;
+    }
+
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(async () => {
+      setAiState("loading");
+      setAiMessage(null);
+
+      const result = await AIPricingSuggetions({
+        title,
+        category,
+        condition,
+        description,
+        pricePerHour,
+        pricePerDay,
+        pricePerWeek,
+        insuranceAmount,
+      });
+
+      if (!result.success) {
+        setAiState("error");
+        setAiMessage("تعذر الحصول على اقتراح الذكاء الاصطناعي");
+        return;
+      }
+
+      setAiSuggestions(result.data.data);
+      setAiState("done");
+    }, 800);
+
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
+  }, [pricePerHour, pricePerDay, pricePerWeek, insuranceAmount]);
 
   const handlePriceChange = (key: PriceField, raw: string) => {
     const next = raw === "" ? undefined : Number(raw);
@@ -58,13 +117,6 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
     });
   };
 
-  const [pricingError, setPricingError] = useState(false);
-  // --- Checklist ---
-  const [checklistInput, setChecklistInput] = useState("");
-  const [checklist, setChecklist] = useState<string[]>([]);
-  useImperativeHandle(ref, () => ({
-    triggerPricingError: () => setPricingError(true),
-  }));
   const togglePricing = (key: string) => {
     setSelectedPricing((prev) => {
       const updated = prev.includes(key)
@@ -79,7 +131,6 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
   };
 
   const addToChecklist = () => {
-    console.log("input:", checklistInput);
     if (!checklistInput.trim()) return;
     const updated = [...checklist, checklistInput.trim()];
     setChecklist(updated);
@@ -95,7 +146,7 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
 
   return (
     <div className="space-y-6">
-      {/* Page heading */}
+      {/* Heading */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-black">حدد سعر تأجير منتجك</h1>
         <p className="text-sm text-gray-400 my-2">
@@ -104,12 +155,13 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
       </div>
 
       <div className="w-full border border-gray-300 px-4 py-4 bg-gray-50 rounded-3xl space-y-5">
-        {/* Pricing duration selection */}
+        {/* ── Pricing duration selection ── */}
         <div>
           <label className="block mb-1 text-sm text-gray-600">
             اختر مدة التأجير{" "}
             <span className="text-brand-primary text-lg">*</span>
           </label>
+
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {PRICING_OPTIONS.map((option) => (
               <button
@@ -133,41 +185,93 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
             ))}
           </div>
 
-          {/* Price inputs for selected options */}
+          {/* Price inputs */}
           {selectedPricing.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
               {PRICING_OPTIONS.filter((o) =>
                 selectedPricing.includes(o.key),
-              ).map((option) => (
-                <div key={option.key} className="flex flex-col gap-1">
-                  <label className="text-body-sm font-medium">
-                    {option.label}
-                  </label>
-                  <input
-                    type="number"
-                    min={0}
-                    placeholder="0"
-                    value={priceValues[option.key as PriceField] ?? ""}
-                    onChange={(e) =>
-                      handlePriceChange(option.key as PriceField, e.target.value)
-                    }
-                    className="w-full border border-border-default rounded-lg px-3 py-2 text-body-sm outline-none focus:border-brand-primary"
-                  />
-                  {errors[option.key as keyof typeof errors] && (
-                    <p className="text-caption text-danger mt-1">
-                      {
-                        (errors[option.key as keyof typeof errors] as any)
-                          ?.message
+              ).map((option) => {
+                const flag = aiSuggestions?.flags?.find(
+                  (f: any) => f[option.key],
+                );
+                const flagMessage = flag?.[option.key];
+                const suggestedKey =
+                  `suggested${option.key.charAt(0).toUpperCase() + option.key.slice(1)}` as keyof typeof aiSuggestions;
+                const suggestedValue = aiSuggestions?.[suggestedKey];
+
+                return (
+                  <div key={option.key} className="flex flex-col gap-1">
+                    <label className="text-body-sm font-medium">
+                      {option.label}
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      placeholder="0"
+                      value={priceValues[option.key as PriceField] ?? ""}
+                      onChange={(e) =>
+                        handlePriceChange(
+                          option.key as PriceField,
+                          e.target.value,
+                        )
                       }
-                    </p>
-                  )}
+                      className={`w-full border rounded-lg px-3 py-2 text-body-sm outline-none transition-colors
+                        ${
+                          flagMessage
+                            ? "border-yellow-400 focus:border-yellow-500"
+                            : "border-border-default focus:border-brand-primary"
+                        }`}
+                    />
+                    {errors[option.key as keyof typeof errors] && (
+                      <p className="text-caption text-danger mt-1">
+                        {
+                          (errors[option.key as keyof typeof errors] as any)
+                            ?.message
+                        }
+                      </p>
+                    )}
+                    {/* AI per-field hint */}
+                    {aiState === "done" && (
+                      <div
+                        className={`text-xs px-2 py-1.5 rounded-lg mt-1 border
+                        ${
+                          flagMessage
+                            ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                            : "bg-green-50 text-green-700 border-green-200"
+                        }`}>
+                        {flagMessage ? (
+                          <p>{flagMessage}</p>
+                        ) : (
+                          <p>✓ السعر مناسب — المقترح: {suggestedValue} ج.م</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* AI loading / error banner */}
+          {aiState !== "idle" && (
+            <div className="mt-4 space-y-2">
+              {aiState === "loading" && (
+                <div className="flex items-center gap-2 px-4 py-3 rounded-xl border bg-gray-50 border-gray-200 text-gray-400 text-body-sm">
+                  <span className="loading loading-spinner loading-sm shrink-0" />
+                  <p>جارٍ تحليل التسعير بالذكاء الاصطناعي...</p>
                 </div>
-              ))}
+              )}
+              {aiState === "error" && (
+                <div className="px-4 py-3 rounded-xl border bg-red-50 border-danger text-danger text-body-sm">
+                  {aiMessage}
+                </div>
+              )}
             </div>
           )}
         </div>
+        {/* ── end pricing duration div ── */}
 
-        {/* Insurance */}
+        {/* ── Insurance ── */}
         <div>
           <label className="block mb-1 text-sm text-gray-600">
             سعر التأمين <span className="text-brand-primary text-lg">*</span>
@@ -178,11 +282,15 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
             placeholder="0 ج.م"
             value={insuranceAmount ?? ""}
             onChange={(e) => {
-              const next = e.target.value === "" ? undefined : Number(e.target.value);
+              const next =
+                e.target.value === "" ? undefined : Number(e.target.value);
               setValue(
                 "insuranceAmount",
                 Number.isNaN(next) ? undefined : next,
-                { shouldValidate: true, shouldDirty: true },
+                {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                },
               );
             }}
             className="w-full border border-border-default rounded-lg px-3 py-2.5 text-body-sm text-right focus:border-brand-primary outline-none"
@@ -192,11 +300,40 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
               {errors.insuranceAmount.message}
             </p>
           )}
+          {/* AI insurance hint */}
+          {aiState === "done" &&
+            aiSuggestions &&
+            (() => {
+              const flag = aiSuggestions.flags?.find(
+                (f: any) => f["insuranceAmount"],
+              );
+              const flagMessage = flag?.["insuranceAmount"];
+              return (
+                <div
+                  className={`text-xs px-2 py-1.5 rounded-lg mt-2 border
+        ${
+          flagMessage
+            ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+            : "bg-green-50 text-green-700 border-green-200"
+        }`}>
+                  {flagMessage ? (
+                    <p>{flagMessage}</p>
+                  ) : (
+                    <p>
+                      ✓ سعر التأمين مناسب — المقترح:{" "}
+                      {aiSuggestions.suggestedInsuranceAmount} ج.م
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
         </div>
       </div>
-      {/* Error banner */}
+      {/* ── end gray card ── */}
+
+      {/* Pricing error banner */}
       {pricingError && (
-        <div className="flex items-center gap-2 bg-red-50 border border-danger rounded-xl px-4 py-3 mt-3">
+        <div className="flex items-center gap-2 bg-red-50 border border-danger rounded-xl px-4 py-3">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="w-5 h-5 text-danger shrink-0"
@@ -215,6 +352,7 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
           </p>
         </div>
       )}
+
       {/* Commission info */}
       <div className="flex border border-brand-primary px-3 py-3 rounded-xl bg-brand-light gap-2 text-brand-primary">
         <svg
@@ -244,7 +382,6 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
           يجريها فريق التوصيل عند استلام المنتج وإعادته.
         </p>
         <div className="w-full border border-gray-300 px-4 py-4 bg-gray-50 rounded-3xl">
-          {/* Items list */}
           {checklist.length > 0 && (
             <div className="space-y-3 mb-4">
               {checklist.map((item, i) => (
@@ -262,9 +399,7 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
                       d="m4.5 12.75 6 6 9-13.5"
                     />
                   </svg>
-
                   <span className="text-body-sm">{item}</span>
-
                   <button
                     type="button"
                     onClick={() => removeFromChecklist(i)}
@@ -290,7 +425,6 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
           <label className="block mb-1 text-sm text-gray-600">
             إضافة عنصر إلى قائمة التحقق
           </label>
-          {/* Input row */}
           <div className="flex items-center gap-2 pt-3">
             <input
               type="text"
@@ -317,5 +451,6 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
     </div>
   );
 });
+
 Step2Pricing.displayName = "Step2Pricing";
 export default Step2Pricing;

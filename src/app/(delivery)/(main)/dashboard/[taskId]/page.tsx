@@ -5,6 +5,7 @@ import {
   diffInDaysAndHours,
   formatEgyptArabicDate,
 } from "@/utils/RentingHandle";
+import InspectionButton from "@/app/_components/delivery/InspectionButton";
 export default async function page({
   params,
 }: {
@@ -12,6 +13,7 @@ export default async function page({
 }) {
   const { taskId } = await params;
   const result = await getDeliveryById(taskId);
+  console.log(result);
   const { days, hours } = diffInDaysAndHours(
     result.delivery.endDate,
     result.delivery.startDate,
@@ -76,22 +78,11 @@ export default async function page({
         </div>
 
         <div className="w-full sm:w-auto shrink-0">
-          <button className="btn bg-white rounded-4xl w-full sm:w-auto whitespace-nowrap text-brand-primary">
-            تأكيد الوصول
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 19.5 8.25 12l7.5-7.5"
-              />
-            </svg>
-          </button>
+          {result.delivery.status === "assigned" ? (
+            <InspectionButton type={result.delivery.type} />
+          ) : (
+            <></>
+          )}
         </div>
       </div>
       <div className="flex flex-col lg:flex-row gap-4">

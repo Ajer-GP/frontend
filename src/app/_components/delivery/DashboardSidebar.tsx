@@ -132,33 +132,35 @@ const icons = {
 
 const navItems = [
   { label: "الرئيسية", href: "/dashboard", icon: "home" },
-  { label: "جميع المهام", href: "/dashboard/tasks", icon: "tasks" },
-  { label: "الاستلام", href: "/dashboard/pickup", icon: "pickup" },
-  { label: "التسليم", href: "/dashboard/delivery", icon: "delivery" },
-  { label: "المرتجعات", href: "/dashboard/returns", icon: "returns" },
-  { label: "الفحوصات", href: "/dashboard/inspections", icon: "inspections" },
+  { label: "جميع المهام", href: "/tasks", icon: "tasks" },
+
+  { label: "الاستلام", href: "/pickup", icon: "pickup" },
+  { label: "التسليم", href: "/delivery", icon: "delivery" },
+  { label: "المرتجعات", href: "/returns", icon: "returns" },
+  { label: "الفحوصات", href: "/inspections", icon: "inspections" },
 ];
 
 // Full labels for the desktop sidebar
 const navItemsFull = [
   { label: "الرئيسية", href: "/dashboard", icon: "home" },
-  { label: "جميع المهام", href: "/dashboard/tasks", icon: "tasks" },
+  { label: "جميع المهام", href: "/tasks", icon: "tasks" },
+
   {
     label: "عمليات الاستلام من المالكين",
-    href: "/dashboard/pickup",
+    href: "/pickup",
     icon: "pickup",
   },
   {
     label: "عمليات التسليم للمستأجرين",
-    href: "/dashboard/delivery",
+    href: "/delivery",
     icon: "delivery",
   },
   {
     label: "المرتجعات من فترة الإيجار",
-    href: "/dashboard/returns",
+    href: "/returns",
     icon: "returns",
   },
-  { label: "الفحوصات", href: "/dashboard/inspections", icon: "inspections" },
+  { label: "الفحوصات", href: "/inspections", icon: "inspections" },
 ];
 
 export default function DashboardSidebar() {
@@ -185,10 +187,10 @@ export default function DashboardSidebar() {
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-4 px-3">
           <ul className="space-y-1">
-            {navItemsFull.map((item) => {
+            {navItemsFull.map((item, i) => {
               const isActive = activeHref === item.href;
               return (
-                <li key={item.href}>
+                <li key={i}>
                   <Link
                     href={item.href}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-body-sm transition-colors ${
@@ -196,7 +198,7 @@ export default function DashboardSidebar() {
                         ? "bg-brand-light text-brand-primary font-medium"
                         : "text-text-secondary hover:bg-surface-secondary hover:text-text-primary"
                     }`}>
-                    <span className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                    <span className="w-5 h-5 flex items-center justify-center flex-shrink-0 text-brand-primary">
                       {icons[item.icon as keyof typeof icons]}
                     </span>
                     <span>{item.label}</span>
@@ -228,10 +230,10 @@ export default function DashboardSidebar() {
         className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-border-default z-40 safe-area-inset-bottom"
         dir="rtl">
         <ul className="flex items-center justify-around px-2 py-2">
-          {navItems.map((item) => {
+          {navItems.map((item, i) => {
             const isActive = activeHref === item.href;
             return (
-              <li key={item.href}>
+              <li key={i}>
                 <Link
                   href={item.href}
                   className={`flex flex-col items-center gap-1 px-2 py-1.5 rounded-lg transition-colors min-w-[52px] ${

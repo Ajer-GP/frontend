@@ -1,4 +1,5 @@
 "use server";
+import { cookies } from "next/headers";
 
 import {
   ActionResult,
@@ -86,6 +87,37 @@ export async function getProductByIdAction(
 
     const data: ProductResponse = await res.json();
     // console.log(data);
+
+    return { success: true, data };
+  } catch {
+    return { success: false, error: "تعذر الاتصال بالخادم، حاول مجدداً" };
+  }
+}
+
+export async function AIPricingSuggetions(productInfo) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
+  try {
+    const res = await fetch(
+      `${process.env.API_BASE_URL}/products/ai-pricing-suggestion`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ ...productInfo }),
+      },
+    );
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return {
+        success: false,
+        error: err?.message || `HTTP error: ${res.status}`,
+      };
+    }
+
+    const data = await res.json();
 
     return { success: true, data };
   } catch {
