@@ -4,17 +4,17 @@ import Link from "next/link";
 
 import { useRouter } from "next/navigation";
 const initialState = { ZodErrors: undefined, message: undefined };
-import { adminLogin } from "../services/actions";
+import { AdminLoginService } from "../services/actions";
 export default function AdminLogin() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [formState, action, isPending] = useActionState(
-    adminLogin,
+    AdminLoginService,
     initialState,
   );
   useEffect(() => {
     if (formState && (formState as any).success) {
-      router.push("/dashboard");
+      router.push("/admin/dashboard");
     }
   }, [formState, router]);
   return (
