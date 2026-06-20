@@ -1,45 +1,102 @@
-// Server Component
-import Link from "next/link";
+"use client";
+
 import Image from "next/image";
-export type TaskStatus = "عاجل" | "في الطريق إلى المالك" | "استلام المنتج";
+import Link from "next/link";
+import { useState } from "react";
+import { startDelivery } from "@/Modules/Delivery/Features/services/delivery.actions";
 
-// interface Task {
-//   id: string;
-//   productName: string;
-//   productImage?: string;
-//   ownerName: string;
-//   renterName: string;
-//   status: TaskStatus;
-//   scheduledTime: string;
-//   deliveryTime: string;
-//   address: string;
-//   city: string;
-// }
+// ─── Types ────────────────────────────────────────────────────────────────────
 
-// interface TaskCardProps {
-//   task: Task;
-// }
+export type DeliveryStatus =
+  | "assigned"
+  | "on_the_way"
+  | "picked_up"
+  | "delivered";
 
-const statusStyles: Record<TaskStatus, string> = {
-  عاجل: "bg-danger-bg text-danger",
-  "في الطريق إلى المالك": "bg-brand-light text-brand-primary",
-  "استلام المنتج": "bg-accent-light text-accent-default",
+export interface DeliveryTask {
+  _id: string;
+  type: string;
+  status: DeliveryStatus;
+  assignedAt: string;
+  pickedUpAt: string | null;
+  deliveredAt: string | null;
+  ownerName: string;
+  renterName: string;
+  productTitle: string;
+  productCoverImage: string;
+  pickupLocation: {
+    street: string;
+    building: string;
+    floor: string;
+    home?: string;
+    mark?: string;
+  } | null;
+  deliveryLocation: {
+    street: string;
+    building: string;
+    floor: string;
+    home?: string;
+    mark?: string;
+  } | null;
+  deliveryDate: string;
+}
+
+// ─── Status badge config ───────────────────────────────────────────────────────
+
+const statusLabel: Record<DeliveryStatus, string> = {
+  assigned: "مُعيَّنة",
+  on_the_way: "في الطريق",
+  picked_up: "تم الاستلام",
+  delivered: "تم التوصيل",
 };
 
-export default function TaskCard({ task }) {
+const statusStyles: Record<DeliveryStatus, string> = {
+  assigned: "bg-accent-light text-accent-default",
+  on_the_way: "bg-brand-light text-brand-primary",
+  picked_up: "bg-warning-bg text-warning",
+  delivered: "bg-success-bg text-success",
+};
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export default function TaskCard({
+  task,
+  canStart,
+}: {
+  task: DeliveryTask;
+  canStart: boolean;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [started, setStarted] = useState(false);
+
+  const isAssigned = task.status === "assigned";
+
+  async function handleStart() {
+    setLoading(true);
+    try {
+      await startDelivery(task._id);
+      setStarted(true);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div
       className="bg-white border border-border-default rounded-xl p-4 flex items-start gap-4"
-      dir="rtl">
-      {/* Product thumbnail */}
+      dir="rtl"
+    >
+      {/* Thumbnail */}
       <div className="w-14 h-14 rounded-lg bg-surface-tertiary shrink-0 overflow-hidden">
         {task.productCoverImage ? (
           <Image
             src={task.productCoverImage}
             alt={task.productTitle}
             className="w-full h-full object-cover"
-            width={100}
-            height={100}
+            width={56}
+            height={56}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-text-tertiary text-2xl">
@@ -48,52 +105,78 @@ export default function TaskCard({ task }) {
         )}
       </div>
 
-      {/* Main content */}
+      {/* Content */}
       <div className="flex-1 min-w-0">
-        {/* Header row */}
         <div className="flex items-start justify-between gap-2 mb-1">
           <div>
-            <p className="text-body-sm font-medium text-text-primary">
-              {task.productName}
+            <p className="text-body-sm font-medium text-text-primary truncate">
+              {task.productTitle}
             </p>
             <p className="text-caption text-text-tertiary">
               المالك: {task.ownerName} · المستأجر: {task.renterName}
             </p>
           </div>
           <span
-            className={`shrink-0 text-caption font-medium px-2 py-0.5 rounded-full ${
-              statusStyles[task.status] ??
-              "bg-surface-secondary text-text-secondary"
-            }`}>
-            {task.status}
+            className={`shrink-0 text-caption font-medium px-2 py-0.5 rounded-full ${statusStyles[task.status] ?? "bg-surface-secondary text-text-secondary"}`}
+          >
+            {statusLabel[task.status] ?? task.status}
           </span>
         </div>
 
-        {/* Info row */}
-        <div className="flex items-center gap-4 mt-2 text-caption text-text-tertiary">
+        <div className="flex flex-wrap items-center gap-4 mt-2 text-caption text-text-tertiary">
           <span className="flex items-center gap-1">
-            <span>🕐</span>
-            <span>الموعد: {task.scheduledTime}</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <span>📍</span>
+            <span>🗓️</span>
             <span>
-              الاستلام: {task.address}، {task.city}
+              {new Date(task.deliveryDate).toLocaleDateString("ar-EG", {
+                day: "numeric",
+                month: "short",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </span>
           </span>
-          <span className="flex items-center gap-1">
-            <span>🚚</span>
-            <span>التوصيل: {task.deliveryTime}</span>
-          </span>
+          {task.pickupLocation && (
+            <span className="flex items-center gap-1">
+              <span>📍</span>
+              <span>
+                {task.pickupLocation.street}، مبنى{" "}
+                {task.pickupLocation.building}
+              </span>
+            </span>
+          )}
+          {task.deliveryLocation && (
+            <span className="flex items-center gap-1">
+              <span>🚚</span>
+              <span>
+                {task.deliveryLocation.street}، مبنى{" "}
+                {task.deliveryLocation.building}
+              </span>
+            </span>
+          )}
         </div>
       </div>
 
-      {/* CTA */}
-      <Link
-        href={`/dashboard/${task._id}`}
-        className="shrink-0 px-4 py-2 rounded-lg bg-brand-primary text-white text-caption font-medium hover:bg-brand-dark transition-colors">
-        متابعة المهمة
-      </Link>
+      {/* Actions */}
+      <div className="shrink-0 flex flex-col gap-2">
+        {/* بدء المهمة — assigned + canStart + لسه مبدأتش */}
+        {isAssigned && canStart && !started && (
+          <button
+            onClick={handleStart}
+            disabled={loading}
+            className="px-4 py-2 rounded-lg bg-success text-white text-caption font-medium hover:opacity-90 transition-opacity disabled:opacity-60"
+          >
+            {loading ? "جارٍ..." : "بدء المهمة"}
+          </button>
+        )}
+
+        {/* متابعة المهمة — موجودة دايماً */}
+        <Link
+          href={`/dashboard/${task._id}`}
+          className="px-4 py-2 rounded-lg bg-brand-primary text-white text-caption font-medium hover:bg-brand-dark transition-colors text-center"
+        >
+          متابعة المهمة
+        </Link>
+      </div>
     </div>
   );
 }

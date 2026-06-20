@@ -116,47 +116,57 @@ async function getDashboardData(): Promise<DashboardData> {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+// في getDashboardData أو مباشرة في الـ page
+
 export default async function DashboardPage() {
   const data = await getAllDeliveries();
 
+  const sortedDeliveries = [...data.deliveryData.deliveries].sort((a, b) => {
+    const isActive = (s: string) => s !== "assigned" && s !== "delivered";
+    const aActive = isActive(a.status);
+    const bActive = isActive(b.status);
+
+    // المهام الـ active تيجي الأول
+    if (aActive && !bActive) return -1;
+    if (!aActive && bActive) return 1;
+
+    // لو نفس الـ group → ترتيب بـ deliveryDate
+    return (
+      new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime()
+    );
+  });
+
+  // لو في أي مهمة مش assigned ومش delivered → مينفعش يبدأ
+  const canStartNew = sortedDeliveries.every(
+    (d) => d.status === "assigned" || d.status === "delivered",
+  );
+
   return (
     <div className="flex-1 p-6 flex gap-6">
-      {/* Left: stats + tasks */}
       <div className="flex-1 min-w-0 space-y-6">
-        {/* Stats card — Client Component for the toggle */}
-        {/* <DashboardStats
-          currentTasks={data.currentTasks}
-          completedToday={data.completedToday}
-          totalTasks={data.totalTasks}
-          driverName={data.driverName}
-        /> */}
-
-        {/* Tasks section */}
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-h3 text-text-primary font-medium">
               المهام الحالية
             </h2>
             <p className="text-caption text-text-tertiary">
-              مرتبة حسب الأولوية والوقت المتوقع للتسليم
+              مرتبة حسب تاريخ التوصيل
             </p>
             <Link
               href="/dashboard/tasks"
-              className="text-caption text-brand-primary hover:underline">
+              className="text-caption text-brand-primary hover:underline"
+            >
               ‹ عرض الكل
             </Link>
           </div>
 
           <div className="space-y-3">
-            {data.deliveryData.deliveries.map((task) => (
-              <TaskCard key={task._id} task={task} />
+            {sortedDeliveries.map((task) => (
+              <TaskCard key={task._id} task={task} canStart={canStartNew} />
             ))}
           </div>
         </section>
       </div>
-
-      {/* Right Panel */}
-      {/* <RightPanel order={data.activeOrder} financial={data.financial} /> */}
     </div>
   );
 }

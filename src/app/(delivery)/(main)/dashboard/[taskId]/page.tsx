@@ -44,7 +44,8 @@ export default async function page({
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-10 sm:size-12">
+              className="size-10 sm:size-12"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -76,7 +77,14 @@ export default async function page({
         </div>
 
         <div className="w-full sm:w-auto shrink-0">
-          <button className="btn bg-white rounded-4xl w-full sm:w-auto whitespace-nowrap text-brand-primary">
+          <Link
+            href={
+              result.delivery.type === "from_owner_to_renter"
+                ? `/dashboard/${result.delivery._id}/ownerpickupinspection`
+                : `/dashboard/${result.delivery._id}/returnpickupInspection`
+            }
+            className="btn bg-white rounded-4xl w-full sm:w-auto whitespace-nowrap text-brand-primary"
+          >
             تأكيد الوصول
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -84,14 +92,15 @@ export default async function page({
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-6">
+              className="size-6"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 d="M15.75 19.5 8.25 12l7.5-7.5"
               />
             </svg>
-          </button>
+          </Link>
         </div>
       </div>
       <div className="flex flex-col lg:flex-row gap-4">
@@ -188,7 +197,8 @@ export default async function page({
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-6 inline mx-1">
+                  className="size-6 inline mx-1"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -209,7 +219,8 @@ export default async function page({
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-5 inline mx-1">
+                  className="size-5 inline mx-1"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -232,7 +243,8 @@ export default async function page({
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-5 inline mx-1">
+                  className="size-5 inline mx-1"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -255,7 +267,8 @@ export default async function page({
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-5 mx-1 inline">
+                  className="size-5 mx-1 inline"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -275,7 +288,8 @@ export default async function page({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-6 mx-1 inline">
+                className="size-6 mx-1 inline"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -290,7 +304,8 @@ export default async function page({
                   {result.delivery.checklist.map((c, i) => (
                     <div
                       key={i}
-                      className="badge text-[#AC7825] bg-[#FDF6EA] rounded-2xl">
+                      className="badge text-[#AC7825] bg-[#FDF6EA] rounded-2xl"
+                    >
                       {c}
                     </div>
                   ))}
@@ -323,7 +338,8 @@ export default async function page({
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-6">
+                  className="size-6"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -370,7 +386,8 @@ export default async function page({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-8 bg-brand-light text-brand-primary rounded-full py-1 inline mx-1">
+                className="size-8 bg-brand-light text-brand-primary rounded-full py-1 inline mx-1"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -415,7 +432,8 @@ export default async function page({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-4 inline">
+                className="size-4 inline"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -434,7 +452,8 @@ export default async function page({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-4 inline">
+                className="size-4 inline"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -457,14 +476,16 @@ export default async function page({
           </div>
           <a
             href={`tel:${result.delivery.ownerPhoneNumber}`}
-            className="btn bg-white py-2 my-2 ">
+            className="btn bg-white py-2 my-2 "
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-4 inline">
+              className="size-4 inline"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -484,7 +505,8 @@ export default async function page({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-8 bg-brand-light text-brand-primary rounded-full py-1 inline mx-1">
+                className="size-8 bg-brand-light text-brand-primary rounded-full py-1 inline mx-1"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -530,7 +552,8 @@ export default async function page({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-4 inline">
+                className="size-4 inline"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -549,7 +572,8 @@ export default async function page({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-4 inline">
+                className="size-4 inline"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -572,14 +596,16 @@ export default async function page({
           </div>
           <a
             href={`tel:${result.delivery.renterPhoneNumber}`}
-            className="btn bg-white py-2 my-1">
+            className="btn bg-white py-2 my-1"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-4 inline">
+              className="size-4 inline"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
