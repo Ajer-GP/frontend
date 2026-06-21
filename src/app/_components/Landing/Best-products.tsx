@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getProductsAction } from "@/Modules/User/Features/products/services/products.actions";
+import { CATEGORY_LABELS } from "../ProductDetails/handlingDetails";
 const conditionConfig = {
   excellent: {
     color: "bg-green-100 text-green-700",
@@ -57,7 +58,9 @@ export default async function Best_products() {
               </div>
             </figure>
             <div className="card-body">
-              <p className="text-gray-400">{prd.category}</p>
+              <p className="text-gray-400">
+                {CATEGORY_LABELS[prd.category] ?? prd.category}
+              </p>
               <div className="flex justify-between items-start gap-2">
                 <h2 className="card-title text-base">{prd.title}</h2>
                 <div className="badge bg-[#FDF6E9] border-[#FDF6E9]  text-black shrink-0">

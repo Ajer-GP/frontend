@@ -5,6 +5,7 @@ import {
   useEffect,
   useReducer,
   useCallback,
+  useRef,
 } from "react";
 import { logoutAction } from "@/Modules/User/Features/Auth/services/actions";
 
@@ -50,18 +51,39 @@ interface AuthContextValue extends AuthState {
   refreshUser: () => Promise<void>;
 }
 
+const TOKEN_TTL_MS = 15 * 60 * 1000; // 15 minutes
+const REFRESH_BEFORE_MS = 60 * 1000; // refresh 1 minute before expiry
+
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Reads the httpOnly access_token cookie via /api/me and syncs state
+  const scheduleRefresh = useCallback(() => {
+    if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
+
+    refreshTimerRef.current = setTimeout(async () => {
+      const res = await fetch("/api/auth/refresh", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (res.ok) {
+        scheduleRefresh(); // token refreshed — schedule the next one
+      } else {
+        dispatch({ type: "CLEAR_USER" });
+        await logoutAction();
+      }
+    }, TOKEN_TTL_MS - REFRESH_BEFORE_MS); // fires after 14 minutes
+  }, []);
+
   const refreshUser = useCallback(async () => {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
       const res = await fetch("/api/me", {
         cache: "no-store",
-        credentials: "same-origin",
+        credentials: "include",
       });
       if (!res.ok) {
         dispatch({ type: "CLEAR_USER" });
@@ -70,33 +92,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       if (data?.user) {
         dispatch({ type: "SET_USER", payload: data.user });
+        scheduleRefresh(); // start the countdown once we confirm the user is authenticated
       } else {
         dispatch({ type: "CLEAR_USER" });
       }
     } catch {
       dispatch({ type: "CLEAR_USER" });
     }
-  }, []);
+  }, [scheduleRefresh]);
 
   // Check auth on mount
   useEffect(() => {
     refreshUser();
   }, [refreshUser]);
 
-  // Silently refresh the access_token every 14 minutes (token TTL is 15 min)
-  // This calls /api/me which detects the expired access_token, uses the
-  // refresh_token to get a new one from the backend, and sets it as a cookie
+  // Clean up timer on unmount
   useEffect(() => {
-    const FOURTEEN_MINUTES = 14 * 60 * 1000;
-    const interval = setInterval(() => {
-      refreshUser();
-    }, FOURTEEN_MINUTES);
-    return () => clearInterval(interval);
-  }, [refreshUser]);
+    return () => {
+      if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
+    };
+  }, []);
 
   const logout = useCallback(async () => {
+    if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
     dispatch({ type: "CLEAR_USER" });
-    await logoutAction(); // deletes cookies + redirects to /auth/login
+    await logoutAction();
   }, []);
 
   return (

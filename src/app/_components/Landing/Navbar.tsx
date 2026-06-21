@@ -35,8 +35,7 @@ export default function Navbar() {
           <Link
             key={link.href}
             href={link.href}
-            className="px-4 font-black hover:text-brand-primary hover:underline underline-offset-6"
-          >
+            className="px-4 font-black hover:text-brand-primary hover:underline underline-offset-6">
             {link.label}
           </Link>
         ))}
@@ -48,24 +47,6 @@ export default function Navbar() {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
         ) : user ? (
           <>
-            <Link href="/notifications">
-              <span className="flex items-center justify-center size-12 bg-brand-light text-brand-primary rounded-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-8"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-                  />
-                </svg>
-              </span>
-            </Link>
             <Link href="/auth/profile">
               <span className="flex items-center justify-center size-12 bg-brand-light text-brand-primary rounded-full">
                 <svg
@@ -74,8 +55,7 @@ export default function Navbar() {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-8"
-                >
+                  className="size-8">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -86,16 +66,14 @@ export default function Navbar() {
             </Link>
             <button
               onClick={logout}
-              className="btn bg-brand-light text-brand-primary rounded-full h-12"
-            >
+              className="btn bg-brand-light text-brand-primary rounded-full h-12">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-6"
-              >
+                className="size-6">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -108,14 +86,12 @@ export default function Navbar() {
           <>
             <Link
               href="/auth/login"
-              className="btn rounded-2xl bg-white text-brand-primary border-brand-primary"
-            >
+              className="btn rounded-2xl bg-white text-brand-primary border-brand-primary">
               تسجيل الدخول
             </Link>
             <Link
               href="/auth/register"
-              className="btn rounded-2xl bg-brand-dark text-white border-0"
-            >
+              className="btn rounded-2xl bg-brand-dark text-white border-0">
               ابدأ الآن
             </Link>
           </>
@@ -131,8 +107,7 @@ export default function Navbar() {
               className="h-8 w-8"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+              stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -143,38 +118,18 @@ export default function Navbar() {
           </label>
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-white rounded-box w-64"
-          >
+            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-white rounded-box w-64">
             {navLinks.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="px-4 font-black hover:text-brand-primary hover:underline underline-offset-6"
-                >
+                  className="px-4 font-black hover:text-brand-primary hover:underline underline-offset-6">
                   {link.label}
                 </Link>
               </li>
             ))}
             {user ? (
               <span className="flex my-3">
-                <Link href="/notifications">
-                  <span className="flex items-center justify-center size-12 bg-brand-light text-brand-primary rounded-full mx-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="size-8"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-                      />
-                    </svg>
-                  </span>
-                </Link>
                 <Link href="/auth/profile">
                   <span className="flex items-center justify-center size-12 bg-brand-light text-brand-primary rounded-full mx-1">
                     <svg
@@ -183,8 +138,7 @@ export default function Navbar() {
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke="currentColor"
-                      className="size-8"
-                    >
+                      className="size-8">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -195,16 +149,14 @@ export default function Navbar() {
                 </Link>
                 <button
                   onClick={logout}
-                  className="btn bg-brand-light text-brand-primary rounded-full h-12"
-                >
+                  className="btn bg-brand-light text-brand-primary rounded-full h-12">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="size-6"
-                  >
+                    className="size-6">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -218,16 +170,14 @@ export default function Navbar() {
                 <li className="mt-2">
                   <Link
                     href="/auth/login"
-                    className="btn btn-sm rounded-2xl bg-white my-1 border-brand-primary text-brand-primary"
-                  >
+                    className="btn btn-sm rounded-2xl bg-white my-1 border-brand-primary text-brand-primary">
                     تسجيل الدخول
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/auth/register"
-                    className="btn btn-sm rounded-2xl bg-brand-dark text-white my-1"
-                  >
+                    className="btn btn-sm rounded-2xl bg-brand-dark text-white my-1">
                     ابدأ الآن
                   </Link>
                 </li>

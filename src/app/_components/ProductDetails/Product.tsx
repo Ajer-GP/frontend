@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { CONDITION_STYLES } from "./handlingDetails";
+import { CONDITION_STYLES, CATEGORY_LABELS } from "./handlingDetails";
 
 import type { Product } from "@/modules/user/features/products/types/products.typs";
 export default async function Product({ data }: { data: Product }) {
@@ -46,7 +46,7 @@ export default async function Product({ data }: { data: Product }) {
             {conditionStyle.label}
           </div>
           <div className="badge bg-gray-200 rounded-2xl">
-            {ProductInfo.category}
+            {CATEGORY_LABELS[ProductInfo.category] ?? ProductInfo.category}
           </div>
         </div>
 

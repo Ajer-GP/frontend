@@ -68,13 +68,20 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
   }, [getValues]);
 
   useEffect(() => {
-    const filledPrices = [pricePerHour, pricePerDay, pricePerWeek].filter(
-      (v) => typeof v === "number" && !Number.isNaN(v) && v > 0,
-    );
+    const allFilled =
+      typeof pricePerHour === "number" &&
+      pricePerHour > 0 &&
+      typeof pricePerDay === "number" &&
+      pricePerDay > 0 &&
+      typeof pricePerWeek === "number" &&
+      pricePerWeek > 0 &&
+      typeof insuranceAmount === "number" &&
+      insuranceAmount > 0;
 
-    if (filledPrices.length < 2) {
+    if (!allFilled) {
       setAiState("idle");
       setAiMessage(null);
+      setAiSuggestions(null);
       return;
     }
 
@@ -369,8 +376,8 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
           />
         </svg>
         <p className="text-body-sm">
-          يتم خصم عمولة بنسبة 7.5% من قيمة كل عملية تأجير، وتشمل معالجة
-          المدفوعات، وتغطية الحماية، وخدمة الدعم.
+          يتم خصم عمولة بنسبة 5% من قيمة كل عملية تأجير، وتشمل معالجة المدفوعات،
+          وتغطية الحماية، وخدمة الدعم.
         </p>
       </div>
 

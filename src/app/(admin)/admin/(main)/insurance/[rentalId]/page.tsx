@@ -1,148 +1,8 @@
+import { getInsuranceDetails } from "@/Modules/Admin/Features/Auth/services/actions";
 import InsuranceDecisionPanel from "@/Modules/Admin/components/InsuranceDecisionPanel";
-import InsuranceSidebar from "@/Modules/Admin/components/insurancesidebar";
 import InspectionReview from "@/Modules/Admin/components/inspectionreview";
-
-const API_BASE_URL = "http://localhost:5000/api";
-
-// ── Types matching the backend response ──
-interface AddressLike {
-  street?: string;
-  building?: string;
-  floor?: string;
-  home?: string;
-  mark?: string;
-}
-
-interface PersonInfo {
-  _id: string;
-  fullName: string;
-  phoneNumber: string;
-  address?: AddressLike | string | null;
-}
-
-interface ProductInfo {
-  _id: string;
-  title: string;
-  category: string;
-  pricePerHour?: number;
-  pricePerDay?: number;
-  pricePerWeek?: number;
-  insurancePrice?: number;
-}
-
-interface RentalRequestInfo {
-  _id: string;
-  status: string;
-  startDate: string;
-  endDate: string;
-  totalAmount: number;
-  insuranceAmount: number;
-  deposit: number;
-  rentalFee: number;
-  deliveryFee: number;
-  commissionFee: number;
-  insuranceDeductionAmount?: number;
-  insuranceDeductionReason?: string | null;
-  insuranceDecision?: string | null;
-  location?: AddressLike | null;
-}
-
-export interface ChecklistItem {
-  label: string;
-  checked: boolean;
-}
-
-export interface DeliveryFormData {
-  _id: string;
-  checklist: ChecklistItem[];
-  accessories: ChecklistItem[];
-  issues: string[];
-  images: string[];
-  deliveryRepNotes: string;
-  reviewStatus: "pending" | "no_claim" | "claim_raised";
-  adminNotes: string | null;
-  createdAt: string;
-}
-
-export interface DeliveryData {
-  _id: string;
-  status: string;
-  assignedAt: string | null;
-  pickedUpAt: string | null;
-  deliveredAt: string | null;
-}
-
-export interface DeliveryBlock {
-  delivery: DeliveryData | null;
-  form: DeliveryFormData | null;
-}
-
-interface InsuranceDetailsResponse {
-  rentalRequest: RentalRequestInfo;
-  owner: PersonInfo | null;
-  renter: PersonInfo | null;
-  product: ProductInfo | null;
-  deliveries: {
-    fromOwnerToRenter: DeliveryBlock;
-    fromRenterToOwner: DeliveryBlock;
-  };
-}
-
-// TEMP: hand-set bearer token while auth wiring isn't connected yet.
-// Put it in .env.local as ADMIN_TEMP_BEARER_TOKEN=<token> — replace this
-// with real session/cookie-based auth once that's in place.
-const TEMP_BEARER_TOKEN = "";
-
-// ── Data fetching ──
-async function getInsuranceDetails(rentalId: string): Promise<InsuranceDetailsResponse | null> {
-  try {
-    const res = await fetch(`${API_BASE_URL}/admin/rentals/${rentalId}`, {
-      cache: "no-store",
-      headers: {
-        ...(TEMP_BEARER_TOKEN ? { Authorization: `Bearer ${TEMP_BEARER_TOKEN}` } : {}),
-      },
-    });
-
-    if (!res.ok) return null;
-
-    const json = await res.json();
-    return json?.data ?? null;
-  } catch (err) {
-    console.error("Failed to fetch insurance details:", err);
-    return null;
-  }
-}
-
-// ── Helpers ──
-function formatAddress(address?: AddressLike | string | null): string {
-  if (!address) return "—";
-  if (typeof address === "string") return address;
-  const parts = [address.street, address.building, address.floor, address.home, address.mark].filter(Boolean);
-  return parts.length ? parts.join("، ") : "—";
-}
-
-function formatRentalDuration(startDate: string, endDate: string): string {
-  const start = new Date(startDate).getTime();
-  const end = new Date(endDate).getTime();
-  if (Number.isNaN(start) || Number.isNaN(end)) return "—";
-  const days = Math.max(1, Math.round(Math.abs(end - start) / (1000 * 60 * 60 * 24)));
-  return `${days} ${days === 1 ? "يوم" : "أيام"}`;
-}
-
-const CATEGORY_LABELS: Record<string, string> = {
-  cameras: "كاميرات",
-  laptops: "لابتوبات",
-  tablets: "أجهزة لوحية",
-  gaming: "ألعاب",
-  audio: "صوتيات",
-  electronics: "الإلكترونيات",
-  clothes: "ملابس",
-  books: "كتب",
-  drones: "طائرات مسيّرة",
-  lighting: "إضاءة",
-  "party tools": "أدوات حفلات",
-  other: "أخرى",
-};
+import { CATEGORY_LABELS } from "@/Modules/Admin/types/rentals.types";
+import { formatRentalDuration, formatAddress } from "@/utils/Insurances";
 
 export default async function InsurancePage({
   params,
@@ -151,126 +11,226 @@ export default async function InsurancePage({
 }) {
   const { rentalId } = await params;
   const data = await getInsuranceDetails(rentalId);
-
-
-  if (!data) {
-    return (
-      <div className="flex min-h-screen bg-[#F8F9FA]" dir="rtl">
-        <InsuranceSidebar />
-        <main className="flex flex-1 items-center justify-center">
-          <p className="text-sm text-[color:var(--color-text-tertiary)]">
-            تعذر العثور على بيانات هذا التأمين
-          </p>
-        </main>
-      </div>
-    );
-  }
-
-  const { rentalRequest, owner, renter, product, deliveries } = data;
+  console.log(data.data);
+  const { rentalRequest, owner, renter, product, deliveries } = data.data;
   const shortId = rentalRequest._id.slice(-6).toUpperCase();
 
   return (
-    <div className="flex min-h-screen bg-[#F8F9FA]" dir="rtl">
-      {/* ── Sidebar ── */}
-      <InsuranceSidebar />
-
-      {/* ── Main scroll area ── */}
-      <main className="flex-1 overflow-y-auto px-6 py-6 lg:px-8">
-        <div className="flex flex-col gap-6">
-
+    <div className="min-h-screen " dir="rtl">
+      <main className="px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+        <div className="flex flex-col gap-4 sm:gap-6">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-[color:var(--color-text-tertiary)]">
+          <nav className="flex flex-wrap items-center gap-1.5 text-xs text-gray-500">
             <span>الرئيسية</span>
             <span>&gt;</span>
             <span>إدارة التأمينات</span>
             <span>&gt;</span>
-            <span className="font-medium text-[color:var(--color-text-primary)]">{shortId}</span>
+            <span className="font-medium text-brand-primary">{shortId}</span>
           </nav>
 
           {/* Page title */}
-          <h1 className="text-2xl font-semibold text-[color:var(--color-text-primary)]">
+          <h1 className="text-xl font-semibold  sm:text-2xl">
             تفاصيل تأمين {shortId}
           </h1>
 
           {/* ── Row 1: Info cards ── */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {/* معلومات المالك */}
-            <div className="rounded-[20px] border border-[color:var(--color-border-default)] bg-white p-5">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-[color:var(--color-text-tertiary)]">معلومات المالك</p>
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[color:var(--color-brand-light)]">
-                  <svg className="h-3.5 w-3.5 text-[color:var(--color-brand-primary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+            <div className="rounded-[20px] border border-gray-300 bg-white p-4 sm:p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="bg-brand-light rounded-full p-1.5 shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-4 text-brand-primary">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                    />
                   </svg>
                 </span>
+                <p className="text-xs font-semibold text-gray-500">
+                  معلومات المالك
+                </p>
               </div>
-              <div className="mt-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-[11px] text-[color:var(--color-text-tertiary)]">الاسم</p>
-                  <p className="text-sm font-semibold text-[color:var(--color-text-primary)]">{owner?.fullName ?? "—"}</p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="shrink-0 text-[11px] text-gray-500">الاسم</p>
+                  <p className="text-sm text-gray-500 truncate">
+                    {owner?.fullName ?? "—"}
+                  </p>
                 </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-[11px] text-[color:var(--color-text-tertiary)]">الهاتف</p>
-                  <p className="text-sm text-[color:var(--color-text-secondary)]">{owner?.phoneNumber ?? "—"}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="shrink-0 text-[11px] text-gray-500">الهاتف</p>
+                  <p className="text-sm text-text-secondary">
+                    {owner?.phoneNumber ?? "—"}
+                  </p>
                 </div>
                 <div className="flex items-start justify-between gap-2">
-                  <p className="flex-shrink-0 text-[11px] text-[color:var(--color-text-tertiary)]">العنوان</p>
-                  <p className="text-sm text-[color:var(--color-text-secondary)]">{formatAddress(owner?.address)}</p>
+                  <p className="shrink-0 text-[11px] text-gray-500">العنوان</p>
+                  <p className="text-sm text-text-secondary text-left">
+                    {formatAddress(owner?.address)}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* معلومات المستأجر */}
-            <div className="rounded-[20px] border border-[color:var(--color-border-default)] bg-white p-5">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-[color:var(--color-text-tertiary)]">معلومات المستأجر</p>
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[color:var(--color-surface-tertiary)]">
-                  <svg className="h-3.5 w-3.5 text-[color:var(--color-text-secondary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+            <div className="rounded-[20px] border border-gray-300 bg-white p-4 sm:p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="bg-brand-light rounded-full p-1.5 shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={24}
+                    height={24}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="icon icon-tabler icons-tabler-outline icon-tabler-building-store text-brand-primary size-4">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M3 21l18 0" />
+                    <path d="M3 7v1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1h-18l2 -4h14l2 4" />
+                    <path d="M5 21l0 -10.15" />
+                    <path d="M19 21l0 -10.15" />
+                    <path d="M9 21v-4a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v4" />
                   </svg>
                 </span>
+                <p className="text-xs font-semibold text-gray-500">
+                  معلومات المستأجر
+                </p>
               </div>
-              <div className="mt-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-[11px] text-[color:var(--color-text-tertiary)]">الاسم</p>
-                  <p className="text-sm font-semibold text-[color:var(--color-text-primary)]">{renter?.fullName ?? "—"}</p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="shrink-0 text-[11px] text-gray-500">الاسم</p>
+                  <p className="text-sm text-gray-500 truncate">
+                    {renter?.fullName ?? "—"}
+                  </p>
                 </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-[11px] text-[color:var(--color-text-tertiary)]">الهاتف</p>
-                  <p className="text-sm text-[color:var(--color-text-secondary)]">{renter?.phoneNumber ?? "—"}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="shrink-0 text-[11px] text-gray-500">الهاتف</p>
+                  <p className="text-sm text-text-secondary">
+                    {renter?.phoneNumber ?? "—"}
+                  </p>
                 </div>
                 <div className="flex items-start justify-between gap-2">
-                  <p className="flex-shrink-0 text-[11px] text-[color:var(--color-text-tertiary)]">العنوان</p>
-                  <p className="text-sm text-[color:var(--color-text-secondary)]">{formatAddress(renter?.address)}</p>
+                  <p className="shrink-0 text-[11px] text-gray-500">العنوان</p>
+                  <p className="text-sm text-text-secondary text-left">
+                    {formatAddress(renter?.address)}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* معلومات المنتج */}
-            <div className="rounded-[20px] border border-[color:var(--color-border-default)] bg-white p-5">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-[color:var(--color-text-tertiary)]">معلومات المنتج</p>
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[color:var(--color-brand-light)]">
-                  <svg className="h-3.5 w-3.5 text-[color:var(--color-brand-primary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+            <div className="rounded-[20px] border border-gray-300 bg-white p-4 sm:p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="bg-brand-light rounded-full p-1.5 shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={24}
+                    height={24}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="icon icon-tabler icons-tabler-outline icon-tabler-package text-brand-primary size-4">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" />
+                    <path d="M12 12l8 -4.5" />
+                    <path d="M12 12l0 9" />
+                    <path d="M12 12l-8 -4.5" />
+                    <path d="M16 5.25l-8 4.5" />
                   </svg>
                 </span>
+                <p className="text-xs font-semibold text-gray-500">
+                  معلومات المنتج
+                </p>
               </div>
-              <div className="mt-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-[11px] text-[color:var(--color-text-tertiary)]">المنتج</p>
-                  <p className="text-sm font-semibold text-[color:var(--color-text-primary)]">{product?.title ?? "—"}</p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-[11px] text-[color:var(--color-text-tertiary)]">الفئة</p>
-                  <p className="text-sm text-[color:var(--color-text-secondary)]">
-                    {product?.category ? (CATEGORY_LABELS[product.category] ?? product.category) : "—"}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="shrink-0 text-[11px] text-gray-500">المنتج</p>
+                  <p className="text-sm text-gray-500 truncate">
+                    {product?.title ?? "—"}
                   </p>
                 </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-[11px] text-[color:var(--color-text-tertiary)]">مدة الإيجار</p>
-                  <p className="text-sm text-[color:var(--color-text-secondary)]">
-                    {formatRentalDuration(rentalRequest.startDate, rentalRequest.endDate)}
+                <div className="flex items-center justify-between gap-2">
+                  <p className="shrink-0 text-[11px] text-gray-500">الفئة</p>
+                  <p className="text-sm text-text-secondary">
+                    {product?.category
+                      ? (CATEGORY_LABELS[product.category] ?? product.category)
+                      : "—"}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="shrink-0 text-[11px] text-gray-500">
+                    مدة الإيجار
+                  </p>
+                  <p className="text-sm text-text-secondary">
+                    {formatRentalDuration(
+                      rentalRequest.startDate,
+                      rentalRequest.endDate,
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* معلومات الدفع */}
+            <div className="rounded-[20px] border border-gray-300 bg-white p-4 sm:p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="bg-brand-light rounded-full p-1.5 shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={16}
+                    height={16}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-brand-primary">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12" />
+                    <path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" />
+                  </svg>
+                </span>
+                <p className="text-xs font-semibold text-gray-500">
+                  معلومات الدفع
+                </p>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="shrink-0 text-[11px] text-gray-500">اجمالي</p>
+                  <p className="text-sm text-gray-500 truncate">
+                    {rentalRequest?.rentalFee} ج.م
+                  </p>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="shrink-0 text-[11px] text-gray-500">
+                    مبلغ التأمين
+                  </p>
+                  <p className="text-sm text-text-secondary">
+                    {rentalRequest?.insuranceAmount} ج.م
+                  </p>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="shrink-0 text-[11px] text-gray-500">
+                    طريقة الدفع
+                  </p>
+                  <p className="text-sm text-text-secondary">
+                    {rentalRequest?.paymentMethod === "instapay"
+                      ? "انستا باي"
+                      : "فيزا"}
                   </p>
                 </div>
               </div>

@@ -4,14 +4,12 @@
 
 export default function InsuranceFullRefund() {
   return (
-    <div className="rounded-2xl bg-[color:var(--color-surface-secondary)] px-5 py-4 text-right">
-      <p className="text-xs text-[color:var(--color-text-tertiary)]">
+    <div className="rounded-2xl px-5 py-4 text-right">
+      <p className="text-xs text-text-tertiary">
         سيتم إعادة كامل مبلغ التأمين للمستأجر دون أي خصومات.
       </p>
-      <p className="mt-2 text-2xl font-semibold text-[color:var(--color-brand-dark)]">
-        1000 ج.م
-      </p>
-      <p className="mt-1 text-xs text-[color:var(--color-text-tertiary)]">المبلغ المسترد للمستأجر</p>
+      <p className="mt-2 text-2xl font-semibold text-brand-dark">1000 ج.م</p>
+      <p className="mt-1 text-xs text-text-tertiary">المبلغ المسترد للمستأجر</p>
     </div>
   );
 }

@@ -2,6 +2,7 @@
 import { cookies } from "next/headers";
 import { loginSchema } from "../schemas/admin.validation";
 import { redirect } from "next/navigation";
+import { access } from "fs";
 
 export async function AdminLoginService(prevState: any, formData: FormData) {
   const parsed = loginSchema.safeParse({
@@ -32,24 +33,8 @@ export async function AdminLoginService(prevState: any, formData: FormData) {
     secure: isProduction,
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 15,
+    maxAge: 60 * 60 * 24 * 7,
   });
-
-  // 2. Extract refresh token from Set-Cookie header (backend sets it as httpOnly)
-  //    Fall back to response body if backend also sends it there
-  const setCookieHeader = res.headers.get("set-cookie");
-  const refreshToken =
-    setCookieHeader?.match(/refresh_token=([^;]+)/)?.[1] ?? data.refreshToken;
-
-  if (refreshToken) {
-    cookieStore.set("admin_refresh_token", refreshToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 15, // 15 days
-    });
-  }
 
   // 3. User profile cookie — readable by JS for UI (not httpOnly)
   cookieStore.set("admin", JSON.stringify(data.admin), {
@@ -75,7 +60,6 @@ export async function AdminLogoutSerivce() {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    console.log(res);
   } catch (err) {
     console.error("Logout API call failed:", err);
   }
@@ -86,4 +70,97 @@ export async function AdminLogoutSerivce() {
   cookieStore.delete("admin");
 
   redirect("/auth/AdminLogin");
+}
+
+export async function getDashboard() {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("admin_access_token")?.value;
+
+  if (!accessToken) {
+    return { success: false, message: "غير مصرح" };
+  }
+
+  try {
+    const res = await fetch(`${process.env.API_BASE_URL}/admin/dashboard`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const data = await res.json();
+    if (!res.ok) return { message: data.error?.message || "فشل جلب البيانات" };
+
+    return data;
+  } catch {
+    return { success: false, message: "تعذر الاتصال بالخادم" };
+  }
+}
+
+export async function getRentals(page: number = 1) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("admin_access_token")?.value;
+
+  if (!accessToken) {
+    return { success: false, message: "غير مصرح" };
+  }
+
+  try {
+    const res = await fetch(
+      `${process.env.API_BASE_URL}/admin/rentals?page=${page}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        cache: "no-store",
+      },
+    );
+
+    const data = await res.json();
+    console.log(page);
+    if (!res.ok) return { message: data.error?.message || "فشل جلب البيانات" };
+
+    return data;
+  } catch {
+    return { success: false, message: "تعذر الاتصال بالخادم" };
+  }
+}
+
+export async function getAdminData() {
+  const cookieStore = await cookies();
+  const adminRaw = cookieStore.get("admin")?.value;
+  if (!adminRaw) return null;
+  try {
+    return JSON.parse(adminRaw);
+  } catch {
+    return null;
+  }
+}
+
+export async function getInsuranceDetails(rentalId: string) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("admin_access_token")?.value;
+  try {
+    const res = await fetch(
+      `${process.env.API_BASE_URL}/admin/rentals/${rentalId}`,
+      {
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Failed to fetch insurance details:", err);
+    return null;
+  }
 }

@@ -357,7 +357,13 @@ export default function Step1Basics({
                       ? "border-brand-primary bg-brand-light text-brand-primary"
                       : "border-border-default text-text-secondary"
                   }`}>
-                <Image src={c.icon} alt={c.label} height={40} width={40} />
+                <Image
+                  src={c.icon}
+                  alt={c.label}
+                  height={40}
+                  width={40}
+                  loading="eager"
+                />
                 {c.label}
               </button>
             ))}
