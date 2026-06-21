@@ -256,9 +256,10 @@ function ConfirmButton({
       for (const file of files) {
         if (file) formData.append("images", file);
       }
+
       await submitPickupForm(formData);
       setDone(true);
-      //  router.push("/dashboard");
+      router.push(`/dashboard/${deliveryId}/otp-renter`);
     } catch (err) {
       console.error(err);
     } finally {
@@ -299,7 +300,7 @@ function ConfirmButton({
                 d="M5 13l4 4L19 7"
               />
             </svg>
-            تم التأكيد بنجاح
+            تم التأكيد بنجاح جار التحويل ...
           </>
         ) : (
           <>

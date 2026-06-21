@@ -73,8 +73,26 @@ export async function getOrderByIdAction(id: string): Promise<GetRentalResult> {
 
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get("access_token")?.value;
+    let token = cookieStore.get("access_token")?.value;
+    const refreshToken = cookieStore.get("refresh_token")?.value;
 
+    if (!token) {
+      if (!refreshToken) {
+        return { success: false, error: "يجب تسجيل الدخول أولاً" };
+      }
+
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/me`, {
+        cache: "no-store",
+      });
+
+      // اقرأ الـ token تاني بعد الـ refresh
+      const updatedCookies = await cookies();
+      token = updatedCookies.get("access_token")?.value;
+
+      if (!token) {
+        return { success: false, error: "يجب تسجيل الدخول أولاً" };
+      }
+    }
     const res = await fetch(`${process.env.API_BASE_URL}/requests/${id}`, {
       headers: {
         "Content-Type": "application/json",
@@ -132,4 +150,39 @@ export async function rejectRentalAction(id: string) {
   }
 
   return { success: true };
+}
+
+export async function cancelRental(rentalId: string) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("access_token")?.value;
+
+  if (!token) {
+    return { success: false, message: "غير مصرح لك" };
+  }
+
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/requests/${rentalId}/cancellation`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        message: data?.message || "فشل الإلغاء، حاول مرة أخرى",
+      };
+    }
+
+    return { success: true };
+  } catch {
+    return { success: false, message: "خطأ في الاتصال بالسيرفر" };
+  }
 }

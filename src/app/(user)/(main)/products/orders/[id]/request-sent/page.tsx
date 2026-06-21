@@ -7,6 +7,7 @@ import Link from "next/link";
 import { getAndGuardRental } from "@/Modules/User/lib/getAndGuardRental";
 import HowItWorks from "@/app/_components/ProductDetails/How-it-works";
 import ReturnRefundPolicy from "@/app/_components/ProductDetails/ReturnRefundPolicy";
+import CancelRentalButton from "@/Modules/User/Features/Rent/components/CancelRentalButton";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -69,7 +70,8 @@ export default async function RequestSentPage({ params }: Props) {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-4 inline-block ml-1">
+            className="size-4 inline-block ml-1"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -109,7 +111,8 @@ export default async function RequestSentPage({ params }: Props) {
               ].map((item, i) => (
                 <li
                   key={i}
-                  className="text-caption text-text-secondary border-r-2 border-brand-light pr-2">
+                  className="text-caption text-text-secondary border-r-2 border-brand-light pr-2"
+                >
                   {item}
                 </li>
               ))}
@@ -128,7 +131,8 @@ export default async function RequestSentPage({ params }: Props) {
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="icon icon-tabler icons-tabler-outline icon-tabler-shield text-green-900">
+                className="icon icon-tabler icons-tabler-outline icon-tabler-shield text-green-900"
+              >
                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                 <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" />
               </svg>{" "}
@@ -150,6 +154,7 @@ export default async function RequestSentPage({ params }: Props) {
                 شاهد طلبات إيجارك
               </button>
             </Link>
+            <CancelRentalButton rentalId={id} />
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { startDelivery } from "@/Modules/Delivery/Features/services/delivery.actions";
+import { useRouter } from "next/navigation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -56,7 +57,23 @@ const statusStyles: Record<DeliveryStatus, string> = {
   picked_up: "bg-warning-bg text-warning",
   delivered: "bg-success-bg text-success",
 };
+// الـ helper فوق الـ component
+function getTaskRoute(task: DeliveryTask): string {
+  const base = `/dashboard/${task._id}`;
+  const isOwnerToRenter = task.type === "from_owner_to_renter";
 
+  switch (task.status) {
+    case "on_the_way":
+      return isOwnerToRenter
+        ? `${base}/ownerpickupinspection`
+        : `${base}/return-pickup`;
+    case "picked_up":
+      return isOwnerToRenter ? `${base}/otp-renter` : `${base}/otp-owner`;
+    default:
+      // assigned, delivered
+      return base;
+  }
+}
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function TaskCard({
@@ -70,12 +87,13 @@ export default function TaskCard({
   const [started, setStarted] = useState(false);
 
   const isAssigned = task.status === "assigned";
-
+  const router = useRouter();
   async function handleStart() {
     setLoading(true);
     try {
       await startDelivery(task._id);
       setStarted(true);
+      router.refresh();
     } catch (err) {
       console.error(err);
     } finally {
@@ -171,7 +189,7 @@ export default function TaskCard({
 
         {/* متابعة المهمة — موجودة دايماً */}
         <Link
-          href={`/dashboard/${task._id}`}
+          href={getTaskRoute(task)}
           className="px-4 py-2 rounded-lg bg-brand-primary text-white text-caption font-medium hover:bg-brand-dark transition-colors text-center"
         >
           متابعة المهمة

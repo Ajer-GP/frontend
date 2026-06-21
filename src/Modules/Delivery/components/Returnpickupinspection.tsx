@@ -3,6 +3,8 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { submitReturnPickupForm } from "@/Modules/Delivery/Features/services/delivery.actions";
+import { useRouter } from "next/navigation";
+import { TaskDetails } from "../types";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -28,7 +30,8 @@ const INITIAL_CHECKLIST: ChecklistItem[] = [
 
 // ─── StatusBanner ─────────────────────────────────────────────────────────────
 
-function StatusBanner({ orderId }: { orderId: string }) {
+function StatusBanner({ orderId, type }: { orderId: string; type: string }) {
+  const isReturn = type === "from_renter_to_owner";
   return (
     <div className="rounded-2xl bg-[var(--brand-primary)] px-5 py-4 flex items-center justify-between flex-row-reverse">
       <div className="text-right">
@@ -37,14 +40,14 @@ function StatusBanner({ orderId }: { orderId: string }) {
           <span className="text-white/60 text-caption">:رقم المهمة</span>
         </div>
         <h1 className="text-white text-h1 mt-0.5">
-          استلام المرتجع من المستأجر
+          {isReturn ? "استلام المرتجع من المستأجر" : "توصيل المنتج للمستأجر"}
         </h1>
         <p className="text-white text-caption opacity-70 mt-1">
           تأكد من فحص المنتج قبل إتمام الاستلام
         </p>
       </div>
       <span className="bg-white/20 text-white text-body-sm font-medium px-3 py-1.5 rounded-xl whitespace-nowrap">
-        تأكيد الاستلام المرتجع
+        {isReturn ? "تأكيد الاستلام المرتجع" : "تأكيد التوصيل"}
       </span>
     </div>
   );
@@ -52,7 +55,15 @@ function StatusBanner({ orderId }: { orderId: string }) {
 
 // ─── OrderSummary ─────────────────────────────────────────────────────────────
 
-function OrderSummary() {
+function OrderSummary({ task }: { task: TaskDetails }) {
+  const startDate = task.startDate.split("T")[0];
+  const endDate = task.endDate.split("T")[0];
+
+  const start = new Date(task.startDate);
+  const end = new Date(task.endDate);
+  const diffMs = Math.abs(end.getTime() - start.getTime());
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
   return (
     <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-primary)] p-5">
       <h2 className="text-h2 text-[var(--text-primary)] mb-4 text-right">
@@ -62,25 +73,25 @@ function OrderSummary() {
       <div className="flex items-start gap-4 flex-row-reverse">
         <div className="relative w-[88px] h-[88px] shrink-0 rounded-xl overflow-hidden border border-[var(--border-default)] bg-[var(--surface-tertiary)]">
           <Image
-            src="/camera-placeholder.jpg"
-            alt="المنتج"
+            src={task.productCoverImage}
+            alt={task.productTitle}
             fill
             className="object-cover"
           />
         </div>
         <div className="flex-1 text-right">
           <span className="inline-block bg-[var(--surface-tertiary)] text-[var(--text-secondary)] text-caption px-2 py-0.5 rounded-full mb-1">
-            كاميرا
+            {task.productName}
           </span>
           <h3 className="text-h3 text-[var(--text-primary)] leading-snug">
-            كاميرا سوني ألفا A7 IV بدون مرآة (Mirrorless)
+            {task.productTitle}
           </h3>
           <div className="flex items-center gap-1.5 justify-end mt-1">
             <span className="text-caption text-[var(--text-secondary)]">
               المالك
             </span>
             <span className="text-caption text-[var(--text-primary)] font-medium">
-              بسنت خالد
+              {task.ownerName}
             </span>
           </div>
         </div>
@@ -90,10 +101,10 @@ function OrderSummary() {
 
       <div className="grid grid-cols-4 gap-3 text-right">
         {[
-          { label: "تاريخ البداية", value: "02/05/2026" },
-          { label: "تاريخ التسليم", value: "05/05/2026" },
-          { label: "المدة", value: "3 أيام" },
-          { label: "الحساب اليومي", value: "100" },
+          { label: "تاريخ البداية", value: startDate },
+          { label: "تاريخ التسليم", value: endDate },
+          { label: "المدة", value: `${days} أيام` },
+          { label: "الحساب اليومي", value: `${task.pricePerDay} ج.م` },
         ].map((stat) => (
           <div key={stat.label} className="flex flex-col gap-0.5">
             <span className="text-caption text-[var(--text-tertiary)]">
@@ -365,6 +376,7 @@ function ConfirmButton({
 }) {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const router = useRouter();
 
   const handleConfirm = async () => {
     if (!isActive || loading || done) return;
@@ -384,6 +396,7 @@ function ConfirmButton({
 
       await submitReturnPickupForm(formData);
       setDone(true);
+      router.push(`/dashboard/${deliveryId}/otp-owner`);
     } catch (err) {
       console.error(err);
     } finally {
@@ -424,7 +437,7 @@ function ConfirmButton({
                 d="M5 13l4 4L19 7"
               />
             </svg>
-            تم التأكيد بنجاح
+            تم التأكيد بنجاح جار التحويل ...
           </>
         ) : (
           <>
@@ -465,7 +478,11 @@ interface ReturnPickupInspectionPageProps {
 
 export default function ReturnPickupInspectionPage({
   orderId,
-}: ReturnPickupInspectionPageProps) {
+  taskDeatils,
+}: {
+  orderId: string;
+  taskDeatils: TaskDetails;
+}) {
   const [uploadedCount, setUploadedCount] = useState(0);
   const [files, setFiles] = useState<(File | null)[]>(
     Array(REQUIRED_PHOTOS).fill(null),
@@ -492,8 +509,8 @@ export default function ReturnPickupInspectionPage({
       </div>
 
       <div className="px-4 flex flex-col gap-4 max-w-full mx-auto">
-        <StatusBanner orderId={orderId} />
-        <OrderSummary />
+        <StatusBanner orderId={orderId} type={taskDeatils.type} />
+        <OrderSummary task={taskDeatils} />
 
         <InspectionChecklist
           items={checklistItems}

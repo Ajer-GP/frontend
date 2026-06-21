@@ -19,8 +19,7 @@ export async function DeliveryLogin(prevState: any, formData: FormData) {
   });
 
   const data = await res.json();
-
-  if (!res.ok) return { message: data.message || "فشل تسجيل الدخول" };
+  if (!res.ok) return { message: data.error.message || "فشل تسجيل الدخول" };
   const cookieStore = await cookies();
   const isProduction = process.env.NODE_ENV === "production";
 
@@ -42,7 +41,7 @@ export async function DeliveryLogin(prevState: any, formData: FormData) {
     maxAge: 60 * 60 * 24 * 7, // 15 days
   });
 
-  return { success: true };
+  return { success: true, deliveryPerson: data };
 }
 
 export async function getAllDeliveries() {
@@ -56,7 +55,7 @@ export async function getAllDeliveries() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      next: { revalidate: 60 },
+      cache: "no-store",
     });
     if (!res.ok) {
       return { success: false, error: `HTTP error: ${res.status}` };
@@ -95,11 +94,11 @@ export async function getDeliveryById(id: string) {
 export async function startDelivery(deliveryId: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("delivery_token")?.value;
-
+  console.log("deliveryId", deliveryId);
   const res = await fetch(
     `${process.env.API_BASE_URL}/delivery/pick-up/on-the-way/${deliveryId}`,
     {
-      method: "PATCH",
+      method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -118,6 +117,7 @@ export async function startDelivery(deliveryId: string) {
 export async function submitPickupForm(formData: FormData) {
   const cookieStore = await cookies();
   const token = cookieStore.get("delivery_token")?.value;
+  console.log(formData);
 
   const id = formData.get("deliveryId") as string;
 
@@ -174,7 +174,7 @@ export async function submitReturnPickupForm(formData: FormData) {
   }
 
   const res = await fetch(
-    `${process.env.API_BASE_URL}/delivery/pick-up-form/${id}`,
+    `${process.env.API_BASE_URL}/delivery/renter-pick-up-form/${id}`,
     {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
@@ -186,6 +186,108 @@ export async function submitReturnPickupForm(formData: FormData) {
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
     throw new Error(error?.error.message ?? "فشل إرسال نموذج الاستلام");
+  }
+
+  return await res.json();
+}
+export async function confirmOTPRenter(OTP: number, id: string) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("delivery_token")?.value;
+  console.log("confirmOTPRenter");
+
+  try {
+    const res = await fetch(
+      `${process.env.API_BASE_URL}/delivery/${id}/confirm-renter-otp`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ otpCode: `${OTP}` }),
+      },
+    );
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      return {
+        success: false,
+        error: errData?.error.message || `HTTP error: ${res.status}`,
+      };
+    }
+
+    const data = await res.json();
+    return { success: true, delivery: data.delivery };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "حدث خطأ غير متوقع",
+    };
+  }
+}
+
+export async function confirmOTPOwner(OTP: number, id: string) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("delivery_token")?.value;
+
+  try {
+    const res = await fetch(
+      `${process.env.API_BASE_URL}/delivery/${id}/confirm-owner-otp`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ otpCode: `${OTP}` }),
+      },
+    );
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      return {
+        success: false,
+        error: errData?.error.message || `HTTP error: ${res.status}`,
+      };
+    }
+
+    const data = await res.json();
+    return { success: true, delivery: data.delivery };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "حدث خطأ غير متوقع",
+    };
+  }
+}
+export async function setDeliveryRepOnline(state: boolean) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("delivery_token")?.value;
+  const delivery = cookieStore.get("delivery")?.value;
+
+  const res = await fetch(`${process.env.API_BASE_URL}/delivery-reps/online`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ state }),
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error?.error?.message ?? "فشل تغيير الحالة");
+  }
+
+  // ← حدّثي الـ cookie بعد النجاح
+  if (delivery) {
+    const deliveryData = JSON.parse(decodeURIComponent(delivery));
+    deliveryData.isOnline = state;
+    cookieStore.set(
+      "delivery",
+      encodeURIComponent(JSON.stringify(deliveryData)),
+    );
   }
 
   return await res.json();

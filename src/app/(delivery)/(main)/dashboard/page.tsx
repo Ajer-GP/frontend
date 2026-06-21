@@ -6,6 +6,8 @@ import RightPanel from "@/app/_components/delivery/RightPanel";
 import TaskCard from "@/app/_components/delivery/TaskCard";
 import { getAllDeliveries } from "@/Modules/Delivery/Features/services/delivery.actions";
 import { cookies } from "next/headers";
+import OnlineToggle from "@/Modules/Delivery/components/OnlineToggle";
+import StatsCard from "@/Modules/Delivery/components/StatsCard";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -47,7 +49,12 @@ interface DashboardData {
 
 async function getDashboardData(): Promise<DashboardData> {
   const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
+  const token = cookieStore.get("delivery_token")?.value;
+  const delivery = cookieStore.get("delivery")?.value;
+  const deliveryData = delivery
+    ? JSON.parse(decodeURIComponent(delivery))
+    : null;
+  console.log(deliveryData, "feffedf");
 
   // TODO: Replace with real API call
   // const res = await fetch(`${process.env.API_BASE_URL}/delivery/dashboard`, {
@@ -117,25 +124,43 @@ async function getDashboardData(): Promise<DashboardData> {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 // في getDashboardData أو مباشرة في الـ page
-
-export default async function DashboardPage() {
-  const data = await getAllDeliveries();
-
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const [{ q }, data, cookieStore] = await Promise.all([
+    searchParams,
+    getAllDeliveries(),
+    cookies(),
+  ]);
+  const token = cookieStore.get("delivery_token")?.value;
+  const delivery = cookieStore.get("delivery")?.value;
+  const deliveryData = delivery
+    ? JSON.parse(decodeURIComponent(delivery))
+    : null;
+  console.log(deliveryData, "feffedf");
   const sortedDeliveries = [...data.deliveryData.deliveries].sort((a, b) => {
-    const isActive = (s: string) => s !== "assigned" && s !== "delivered";
-    const aActive = isActive(a.status);
-    const bActive = isActive(b.status);
-
-    // المهام الـ active تيجي الأول
-    if (aActive && !bActive) return -1;
-    if (!aActive && bActive) return 1;
-
-    // لو نفس الـ group → ترتيب بـ deliveryDate
+    const priority = (s: string) => {
+      if (s === "on_the_way" || s === "picked_up") return 0; // أعلى أولوية
+      if (s === "assigned") return 1;
+      return 2; // delivered في الآخر
+    };
+    const pd = priority(a.status) - priority(b.status);
+    if (pd !== 0) return pd;
     return (
       new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime()
     );
   });
-
+  const filtered = q?.trim()
+    ? sortedDeliveries.filter(
+        (t) =>
+          t.productTitle?.includes(q) ||
+          t.ownerName?.includes(q) ||
+          t.renterName?.includes(q) ||
+          t._id?.includes(q),
+      )
+    : sortedDeliveries;
   // لو في أي مهمة مش assigned ومش delivered → مينفعش يبدأ
   const canStartNew = sortedDeliveries.every(
     (d) => d.status === "assigned" || d.status === "delivered",
@@ -145,6 +170,17 @@ export default async function DashboardPage() {
     <div className="flex-1 p-6 flex gap-6">
       <div className="flex-1 min-w-0 space-y-6">
         <section>
+          <StatsCard
+            driverName={deliveryData?.fullName ?? ""}
+            currentTasks={
+              sortedDeliveries.filter((d) => d.status !== "delivered").length
+            }
+            completedToday={
+              sortedDeliveries.filter((d) => d.status === "delivered").length
+            }
+            totalTasks={sortedDeliveries.length}
+            initialOnline={deliveryData?.isOnline}
+          />
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-h3 text-text-primary font-medium">
               المهام الحالية
@@ -152,16 +188,10 @@ export default async function DashboardPage() {
             <p className="text-caption text-text-tertiary">
               مرتبة حسب تاريخ التوصيل
             </p>
-            <Link
-              href="/dashboard/tasks"
-              className="text-caption text-brand-primary hover:underline"
-            >
-              ‹ عرض الكل
-            </Link>
           </div>
 
           <div className="space-y-3">
-            {sortedDeliveries.map((task) => (
+            {filtered.map((task) => (
               <TaskCard key={task._id} task={task} canStart={canStartNew} />
             ))}
           </div>

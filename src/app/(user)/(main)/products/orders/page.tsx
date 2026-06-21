@@ -1,14 +1,13 @@
 import OrdersClient from "@/Modules/User/Features/Rent/components/OrdersClient";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { getTokenOrRefresh } from "@/Modules/User/lib/getTokenOrRefresh";
 
 export default async function OrdersPage() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
   const userCookie = cookieStore.get("user")?.value;
   const user = userCookie ? JSON.parse(decodeURIComponent(userCookie)) : null;
-  if (!token) redirect("/auth/login");
-
+  const token = await getTokenOrRefresh();
   // 1. جيبي الـ list
   const res = await fetch(`${process.env.API_BASE_URL}/requests`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -31,6 +30,6 @@ export default async function OrdersPage() {
   const fullRentals = detailed
     .filter((d) => d.status === "success")
     .map((d) => d.rental);
-  // console.log("Full rentals:", fullRentals);
+  console.log("Full rentals:", fullRentals);
   return <OrdersClient initialOrders={fullRentals} currentUserId={user?._id} />;
 }
