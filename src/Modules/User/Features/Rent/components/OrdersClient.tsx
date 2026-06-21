@@ -18,10 +18,15 @@ export interface Rental {
   status:
     | "pending"
     | "accepted"
+    | "waiting_for_deposit"
     | "confirmed"
+    | "rejected"
+    | "cancelled"
+    | "delivering_to_renter"
     | "active"
-    | "returned"
-    | "rejected";
+    | "returning_to_owner"
+    | "suspended"
+    | "completed";
   totalAmount: number;
   insuranceAmount: number;
   deposit: number;
@@ -42,27 +47,41 @@ interface Props {
 const STATUS_LABEL: Record<Rental["status"], string> = {
   pending: "قيد الانتظار",
   accepted: "مقبول",
+  waiting_for_deposit: "في انتظار الدفعة المقدمة",
   confirmed: "مؤكد",
-  active: "نشط",
-  returned: "مكتمل",
   rejected: "مرفوض",
+  cancelled: "ملغي",
+  delivering_to_renter: "في الطريق إلى المستأجر",
+  active: "نشط",
+  returning_to_owner: "في طريق الإرجاع للمالك",
+  suspended: "معلق",
+  completed: "مكتمل",
 };
 
 const STATUS_STYLE: Record<Rental["status"], string> = {
   pending: "bg-[#FDF6E9] text-[#BA801A]",
   accepted: "bg-[#E1F5EE] text-[#0F6E56]",
+  waiting_for_deposit: "bg-[#FFF4E5] text-[#B26A00]",
   confirmed: "bg-[#E6F1FB] text-[#185FA5]",
-  active: "bg-[#EAF3DE] text-[#3B6D11]",
-  returned: "bg-[#F1EFE8] text-[#5F5E5A]",
   rejected: "bg-[#FCEBEB] text-[#A32D2D]",
+  cancelled: "bg-[#F3F3F3] text-[#6B6B6B]",
+  delivering_to_renter: "bg-[#EEF6FF] text-[#1E63B5]",
+  active: "bg-[#EAF3DE] text-[#3B6D11]",
+  returning_to_owner: "bg-[#FFF1E8] text-[#B45309]",
+  suspended: "bg-[#F5E9FF] text-[#6B21A8]",
+  completed: "bg-[#F1EFE8] text-[#5F5E5A]",
 };
 
 const STATUS_PAGE: Record<string, string> = {
   pending: "request-sent",
   accepted: "accepted",
+  waiting_for_deposit: "accepted",
   confirmed: "confirmed",
   active: "active",
   returned: "returned",
+  cancelled: "cancelled",
+  returning_to_owner: "cancelled",
+  completed: "cancelled",
 };
 
 const STATUS_TABS = [
@@ -87,13 +106,19 @@ function getDays(start: string, end: string) {
   );
 }
 
+// انتهى الإيجار كلياً (بعد endDate)
 function isExpired(endDate: string) {
   return new Date() > new Date(endDate);
 }
 
-// ── Confirm Dialog ────────────────────────────────────────────────────────────
+// بدأ تاريخ الاستلام (startDate فات)
+function isStarted(startDate: string) {
+  return new Date() > new Date(startDate);
+}
 
-function ConfirmDialog({
+// ── Confirm Dialog (Accept) ───────────────────────────────────────────────────
+
+function ConfirmAcceptDialog({
   rental,
   onConfirm,
   onCancel,
@@ -105,7 +130,6 @@ function ConfirmDialog({
   isPending: boolean;
 }) {
   const days = getDays(rental.startDate, rental.endDate);
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onCancel} />
@@ -120,7 +144,6 @@ function ConfirmDialog({
           سيتم إخطار {rental.renter?.fullName ?? "المستأجر"} وسيتم تأكيد عملية
           الإيجار
         </p>
-
         <div className="border border-border-default rounded-xl p-3 space-y-2 text-body-sm">
           <div className="flex justify-between">
             <span className="text-text-secondary">فترة الإيجار</span>
@@ -140,7 +163,6 @@ function ConfirmDialog({
             </span>
           </div>
         </div>
-
         <div className="flex gap-2">
           <button
             onClick={onCancel}
@@ -161,6 +183,99 @@ function ConfirmDialog({
   );
 }
 
+// ── Confirm Dialog (Reject) ───────────────────────────────────────────────────
+
+function ConfirmRejectDialog({
+  rental,
+  onConfirm,
+  onCancel,
+  isPending,
+}: {
+  rental: Rental;
+  onConfirm: () => void;
+  onCancel: () => void;
+  isPending: boolean;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40" onClick={onCancel} />
+      <div
+        dir="rtl"
+        className="relative bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl space-y-4"
+      >
+        {/* أيقونة تحذير */}
+        <div className="flex justify-center">
+          <div className="size-12 rounded-full bg-[#FCEBEB] flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="#A32D2D"
+              className="size-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <h3 className="text-h3 font-medium text-text-primary text-center">
+          هل تريد رفض هذا الطلب؟
+        </h3>
+        <p className="text-caption text-text-secondary text-center">
+          سيتم إخطار{" "}
+          <span className="font-medium text-text-primary">
+            {rental.renter?.fullName ?? "المستأجر"}
+          </span>{" "}
+          برفض طلبه ولن تتمكن من التراجع
+        </p>
+
+        <div className="border border-border-default rounded-xl p-3 space-y-2 text-body-sm">
+          <div className="flex justify-between">
+            <span className="text-text-secondary">المنتج</span>
+            <span className="text-text-primary font-medium">
+              {rental.product?.title ??
+                `طلب #${rental._id.slice(-6).toUpperCase()}`}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-text-secondary">تاريخ الاستلام</span>
+            <span className="text-text-primary font-medium">
+              {formatDate(rental.startDate)}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-text-secondary">الإجمالي</span>
+            <span className="text-text-primary font-medium">
+              {rental.totalAmount.toLocaleString("ar-EG")} ج.م
+            </span>
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={onCancel}
+            className="flex-1 border border-border-default text-text-secondary rounded-xl py-2.5 text-body-sm hover:border-brand-primary transition-colors"
+          >
+            إلغاء
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isPending}
+            className="flex-1 bg-[#A32D2D] text-white rounded-xl py-2.5 text-body-sm font-medium hover:bg-[#8a2424] disabled:opacity-50 transition-colors"
+          >
+            {isPending ? "جاري..." : "تأكيد الرفض"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Rental Card ───────────────────────────────────────────────────────────────
 
 function RentalCard({
@@ -172,27 +287,55 @@ function RentalCard({
   rental: Rental;
   isOwner: boolean;
   onAccept: (r: Rental) => void;
-  onReject: (id: string) => void;
+  onReject: (r: Rental) => void;
 }) {
   const days = getDays(rental.startDate, rental.endDate);
   const subPage = STATUS_PAGE[rental.status] ?? "request-sent";
   const person = isOwner ? rental.renter : rental.owner;
   const expired = isExpired(rental.endDate);
+  const started = isStarted(rental.startDate);
 
-  // الستاتوس المعروض: لو المستأجر وانتهى التاريخ والطلب لسه pending → مرفوض
+  // المستأجر: لو startDate فات والطلب لسه pending → يظهر مرفوض
   const displayStatus: Rental["status"] =
-    !isOwner && expired && rental.status === "pending"
+    !isOwner && started && rental.status === "pending"
       ? "rejected"
       : rental.status;
 
   return (
     <div
-      dir="ltr"
+      dir="rtl"
       className="bg-white border border-border-default rounded-2xl overflow-hidden hover:shadow-sm transition-all duration-200"
     >
-      <div className="flex items-stretch min-h-[160px]">
-        {/* Col 1: Status badge */}
-        <div className="flex items-start pt-5 px-4 shrink-0">
+      <div className="flex flex-col sm:flex-row items-stretch">
+        {/* Mobile: top bar with status + person */}
+        <div className="flex sm:hidden items-center justify-between px-4 pt-4">
+          <span
+            className={`text-[11px] font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${STATUS_STYLE[displayStatus]}`}
+          >
+            {STATUS_LABEL[displayStatus]}
+          </span>
+          {person && (
+            <div className="flex items-center gap-2">
+              <span className="text-caption font-medium text-text-primary">
+                {person.fullName}
+              </span>
+              <div className="relative size-8 rounded-full overflow-hidden bg-surface-secondary shrink-0">
+                <Image
+                  src={
+                    person.profileImage?.url ??
+                    "https://placehold.net/avatar-4.png"
+                  }
+                  alt={person.fullName}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Col 1: Status badge */}
+        <div className="hidden sm:flex items-start pt-5 px-4 shrink-0">
           <span
             className={`text-[11px] font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${STATUS_STYLE[displayStatus]}`}
           >
@@ -201,23 +344,20 @@ function RentalCard({
         </div>
 
         {/* Col 2: Content */}
-        <div className="flex-1 py-5 flex flex-col justify-between gap-3">
-          {/* Product name + category */}
-          <div className="flex items-start justify-between">
+        <div className="flex-1 p-4 sm:py-5 sm:px-0 flex flex-col justify-between gap-3">
+          {/* Product title */}
+          <div className="flex items-start justify-between gap-2">
             <span className="text-[11px] text-text-secondary bg-surface-tertiary px-2 py-0.5 rounded-full">
-              {rental.product?.title}
+              {rental.product?.name}
             </span>
-            <h3 className="text-h3 font-medium text-text-primary">
+            <h3 className="text-h3 font-medium text-text-primary text-right">
               {rental.product?.title ??
                 `طلب #${rental._id.slice(-6).toUpperCase()}`}
             </h3>
           </div>
-          <p className="text-caption text-text-secondary mt-0.5 text-right">
-            الالكترونيات • {rental.rentalFee.toLocaleString("ar-EG")} ج.م / يوم
-          </p>
 
-          {/* 4-column meta */}
-          <div className="grid grid-cols-4 gap-2 text-right">
+          {/* 4-column meta — 2 cols on mobile */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-right">
             {[
               { label: "تاريخ الاستلام", value: formatDate(rental.startDate) },
               { label: "تاريخ التسليم", value: formatDate(rental.endDate) },
@@ -231,9 +371,7 @@ function RentalCard({
               <div key={label}>
                 <p className="text-[11px] text-text-tertiary">{label}</p>
                 <p
-                  className={`text-body-sm font-medium mt-0.5 ${
-                    green ? "text-brand-primary" : "text-text-primary"
-                  }`}
+                  className={`text-body-sm font-medium mt-0.5 ${green ? "text-brand-primary" : "text-text-primary"}`}
                 >
                   {value}
                 </p>
@@ -242,54 +380,51 @@ function RentalCard({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-2" dir="rtl">
-            {/* ① المالك + pending + مش منتهي → قبول/رفض */}
-            {isOwner && rental.status === "pending" && !expired ? (
-              <>
-                <button
-                  onClick={() => onReject(rental._id)}
-                  className="px-6 border border-border-default text-text-secondary rounded-xl py-2 text-body-sm hover:border-danger hover:text-danger transition-colors"
-                >
-                  رفض
-                </button>
-                <button
-                  onClick={() => onAccept(rental)}
-                  className="px-8 bg-brand-primary text-white rounded-xl py-2 text-body-sm font-medium hover:bg-brand-dark transition-colors"
-                >
-                  قبول
-                </button>
-              </>
-            ) : /* ② المستأجر + pending → مفيش زرار (في انتظار المالك) */
-            !isOwner &&
-              rental.status ===
-                "pending" ? null /* ③ التاريخ عدى → مفيش زرار */ : expired ? null /* ④ باقي الحالات → عرض التفاصيل */ : (
+          <div className="flex gap-2">
+            {isOwner ? (
+              rental.status === "pending" && !started ? (
+                <>
+                  <button
+                    onClick={() => onReject(rental)}
+                    className="px-6 border border-border-default text-text-secondary rounded-xl py-2 text-body-sm hover:border-danger hover:text-danger transition-colors"
+                  >
+                    رفض
+                  </button>
+                  <button
+                    onClick={() => onAccept(rental)}
+                    className="px-8 bg-brand-primary text-white rounded-xl py-2 text-body-sm font-medium hover:bg-brand-dark transition-colors"
+                  >
+                    قبول
+                  </button>
+                </>
+              ) : null
+            ) : !expired &&
+              [
+                "pending",
+                "accepted",
+                "waiting_for_deposit",
+                "confirmed",
+                "active",
+              ].includes(rental.status) &&
+              !(started && rental.status === "pending") ? (
               <Link
                 href={`/products/orders/${rental._id}/${subPage}`}
                 className="px-6 text-center border border-border-default text-text-secondary rounded-xl py-2 text-body-sm hover:border-brand-primary hover:text-brand-primary transition-colors"
               >
                 عرض التفاصيل
               </Link>
-            )}
+            ) : null}
           </div>
         </div>
 
-        {/* Col 3: صورة + person */}
-        <div className="flex flex-col items-end shrink-0 p-4 gap-3">
-          {/* Person info */}
+        {/* Col 3: صورة + person (desktop only) */}
+        <div className="hidden sm:flex flex-col items-end shrink-0 p-4 gap-3">
           {person && (
             <div className="flex items-center gap-2">
               <div className="text-right">
-                <div className="flex items-center justify-end gap-1">
-                  <span className="text-caption font-medium text-text-primary">
-                    {person.fullName}
-                  </span>
-                  <span className="text-caption text-accent-default font-medium">
-                    ★ 4.7
-                  </span>
-                </div>
-                <p className="text-[11px] text-text-tertiary">
-                  12 عملية تأجير ناجحة
-                </p>
+                <span className="text-caption font-medium text-text-primary">
+                  {person.fullName}
+                </span>
               </div>
               <div className="relative size-9 rounded-full overflow-hidden bg-surface-secondary shrink-0">
                 <Image
@@ -304,8 +439,6 @@ function RentalCard({
               </div>
             </div>
           )}
-
-          {/* Product image */}
           <div className="relative w-[120px] h-[110px] rounded-xl overflow-hidden bg-surface-secondary">
             {rental.product?.coverImage?.url ? (
               <Image
@@ -334,6 +467,18 @@ function RentalCard({
             )}
           </div>
         </div>
+
+        {/* Mobile: product image full width */}
+        {rental.product?.coverImage?.url && (
+          <div className="sm:hidden mx-4 mb-4 relative h-[140px] rounded-xl overflow-hidden bg-surface-secondary">
+            <Image
+              src={rental.product.coverImage.url}
+              alt={rental.product.title ?? "منتج"}
+              fill
+              className="object-cover"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -345,7 +490,8 @@ export default function OrdersClient({ initialOrders, currentUserId }: Props) {
   const [orders, setOrders] = useState<Rental[]>(initialOrders);
   const [roleTab, setRoleTab] = useState<"renter" | "owner">("renter");
   const [statusTab, setStatusTab] = useState("all");
-  const [confirmRental, setConfirmRental] = useState<Rental | null>(null);
+  const [confirmAccept, setConfirmAccept] = useState<Rental | null>(null);
+  const [confirmReject, setConfirmReject] = useState<Rental | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const roleFiltered = orders.filter((o) =>
@@ -365,48 +511,52 @@ export default function OrdersClient({ initialOrders, currentUserId }: Props) {
       : roleFiltered.filter((o) => o.status === status).length;
 
   const handleAcceptConfirm = () => {
-    if (!confirmRental) return;
+    if (!confirmAccept) return;
     startTransition(async () => {
       try {
-        const res = await acceptRentalAction(confirmRental._id);
+        const res = await acceptRentalAction(confirmAccept._id);
         if (!res.success) throw new Error(res.error);
         setOrders((prev) =>
           prev
             .map((o) =>
-              o._id === confirmRental._id
+              o._id === confirmAccept._id
                 ? { ...o, status: "accepted" as const }
                 : o,
             )
-            // شيل كل الطلبات الـ pending على نفس المنتج غير اللي اتقبل
             .filter(
               (o) =>
                 !(
-                  o.productId === confirmRental.productId &&
+                  o.productId === confirmAccept.productId &&
                   o.status === "pending" &&
-                  o._id !== confirmRental._id
+                  o._id !== confirmAccept._id
                 ),
             ),
         );
       } catch (err) {
         console.error(err);
       } finally {
-        setConfirmRental(null);
+        setConfirmAccept(null);
       }
     });
   };
 
-  const handleReject = (id: string) => {
+  const handleRejectConfirm = () => {
+    if (!confirmReject) return;
     startTransition(async () => {
       try {
-        const res = await rejectRentalAction(id);
+        const res = await rejectRentalAction(confirmReject._id);
         if (!res.success) throw new Error(res.error);
         setOrders((prev) =>
           prev.map((o) =>
-            o._id === id ? { ...o, status: "rejected" as const } : o,
+            o._id === confirmReject._id
+              ? { ...o, status: "rejected" as const }
+              : o,
           ),
         );
       } catch (err) {
         console.error(err);
+      } finally {
+        setConfirmReject(null);
       }
     });
   };
@@ -419,9 +569,9 @@ export default function OrdersClient({ initialOrders, currentUserId }: Props) {
           className="mb-6 min-h-30 py-10 px-3"
           style={{
             backgroundImage: `
-          linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px)
-        `,
+              linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px)
+            `,
             backgroundSize: "40px 40px",
           }}
         >
@@ -512,19 +662,28 @@ export default function OrdersClient({ initialOrders, currentUserId }: Props) {
                 key={order._id}
                 rental={order}
                 isOwner={roleTab === "owner"}
-                onAccept={setConfirmRental}
-                onReject={handleReject}
+                onAccept={setConfirmAccept}
+                onReject={setConfirmReject}
               />
             ))}
           </div>
         )}
       </div>
 
-      {confirmRental && (
-        <ConfirmDialog
-          rental={confirmRental}
+      {confirmAccept && (
+        <ConfirmAcceptDialog
+          rental={confirmAccept}
           onConfirm={handleAcceptConfirm}
-          onCancel={() => setConfirmRental(null)}
+          onCancel={() => setConfirmAccept(null)}
+          isPending={isPending}
+        />
+      )}
+
+      {confirmReject && (
+        <ConfirmRejectDialog
+          rental={confirmReject}
+          onConfirm={handleRejectConfirm}
+          onCancel={() => setConfirmReject(null)}
           isPending={isPending}
         />
       )}

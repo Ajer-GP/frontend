@@ -9,7 +9,8 @@ const icons = {
       height="18"
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg">
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <rect
         x="3"
         y="3"
@@ -47,7 +48,8 @@ const icons = {
       strokeWidth={1.5}
       stroke="currentColor"
       width="18"
-      height="18">
+      height="18"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -65,7 +67,8 @@ const icons = {
       stroke="currentColor"
       strokeWidth={2}
       strokeLinecap="round"
-      strokeLinejoin="round">
+      strokeLinejoin="round"
+    >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" />
       <path d="M12 12l8 -4.5" />
@@ -82,7 +85,8 @@ const icons = {
       strokeWidth={1.5}
       stroke="currentColor"
       width="18"
-      height="18">
+      height="18"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -101,7 +105,8 @@ const icons = {
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="scale-x-[-1]">
+      className="scale-x-[-1]"
+    >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M19.933 13.041a8 8 0 1 1 -9.925 -8.788c3.899 -1 7.935 1.007 9.425 4.747" />
       <path d="M20 4v5h-5" />
@@ -115,7 +120,8 @@ const icons = {
       strokeWidth={1.5}
       stroke="currentColor"
       width="18"
-      height="18">
+      height="18"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -163,7 +169,20 @@ const navItemsFull = [
   { label: "الفحوصات", href: "/inspections", icon: "inspections" },
 ];
 
-export default function DashboardSidebar() {
+interface DeliveryData {
+  fullName: string;
+  email: string;
+  vehicleType: string;
+  isOnline: boolean;
+}
+
+interface DashboardSidebarProps {
+  deliveryData: DeliveryData | null;
+}
+
+export default function DashboardSidebar({
+  deliveryData,
+}: DashboardSidebarProps) {
   const pathname = usePathname();
   const activeHref = pathname ?? "/dashboard";
 
@@ -172,7 +191,8 @@ export default function DashboardSidebar() {
       {/* ── Desktop sidebar ── */}
       <aside
         className="hidden md:flex fixed top-0 right-0 h-screen w-64 bg-white border-l border-border-default flex-col z-40"
-        dir="rtl">
+        dir="rtl"
+      >
         {/* Logo */}
         <div className="flex items-center gap-3 px-6 py-5 border-b border-border-default">
           <div className="w-9 h-9 rounded-xl bg-brand-primary flex items-center justify-center">
@@ -197,7 +217,8 @@ export default function DashboardSidebar() {
                       isActive
                         ? "bg-brand-light text-brand-primary font-medium"
                         : "text-text-secondary hover:bg-surface-secondary hover:text-text-primary"
-                    }`}>
+                    }`}
+                  >
                     <span className="w-5 h-5 flex items-center justify-center flex-shrink-0 text-brand-primary">
                       {icons[item.icon as keyof typeof icons]}
                     </span>
@@ -210,16 +231,24 @@ export default function DashboardSidebar() {
         </nav>
 
         {/* Footer */}
+        {/* Footer */}
         <div className="px-6 py-4 border-t border-border-default">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-brand-primary text-caption font-medium">
-              أح
+              {deliveryData?.fullName?.slice(0, 2) ?? "؟"}
             </div>
             <div>
               <p className="text-caption text-text-primary font-medium">
-                أحمد ماهر
+                {deliveryData?.fullName ?? "غير معروف"}
               </p>
-              <p className="text-overline text-text-tertiary">مندوب توصيل</p>
+              <p className="text-overline text-text-tertiary flex items-center gap-1">
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    deliveryData?.isOnline ? "bg-success" : "bg-text-tertiary"
+                  }`}
+                />
+                {deliveryData?.isOnline ? "متصل" : "غير متصل"}
+              </p>
             </div>
           </div>
         </div>
@@ -228,7 +257,8 @@ export default function DashboardSidebar() {
       {/* ── Mobile bottom tab bar ── */}
       <nav
         className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-border-default z-40 safe-area-inset-bottom"
-        dir="rtl">
+        dir="rtl"
+      >
         <ul className="flex items-center justify-around px-2 py-2">
           {navItems.map((item, i) => {
             const isActive = activeHref === item.href;
@@ -240,9 +270,11 @@ export default function DashboardSidebar() {
                     isActive
                       ? "text-brand-primary"
                       : "text-text-tertiary hover:text-text-secondary"
-                  }`}>
+                  }`}
+                >
                   <span
-                    className={`w-5 h-5 flex items-center justify-center ${isActive ? "text-brand-primary" : ""}`}>
+                    className={`w-5 h-5 flex items-center justify-center ${isActive ? "text-brand-primary" : ""}`}
+                  >
                     {icons[item.icon as keyof typeof icons]}
                   </span>
                   <span className="text-[10px] leading-tight text-center">

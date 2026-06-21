@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import { getOrderByIdAction } from "@/Modules/User/Features/Rent/services/Rent.actions";
+import { getTokenOrRefresh } from "@/Modules/User/lib/getTokenOrRefresh";
 interface Props {
   params: Promise<{ id: string }>;
 }
@@ -8,8 +9,8 @@ export default async function OrderRedirectPage({ params }: Props) {
   const { id } = await params;
 
   const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
-  if (!token) redirect("/auth/login");
+  // const token = cookieStore.get("access_token")?.value;
+  const token = await getTokenOrRefresh();
 
   const userCookie = cookieStore.get("user")?.value;
   console.log(userCookie);

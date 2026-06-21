@@ -2,6 +2,7 @@
 
 import Footer from "@/app/_components/Landing/Footer";
 import Navbar from "@/app/_components/Landing/Navbar";
+import { Toaster } from "sonner";
 
 export default async function MainLayout({
   children,
@@ -13,7 +14,10 @@ export default async function MainLayout({
       <nav>
         <Navbar />
       </nav>
-      <main>{children}</main>
+      <main>
+        <Toaster position="top-center" />
+        {children}
+      </main>
       <footer>
         <Footer />
       </footer>

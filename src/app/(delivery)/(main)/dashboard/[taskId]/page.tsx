@@ -5,7 +5,9 @@ import {
   diffInDaysAndHours,
   formatEgyptArabicDate,
 } from "@/utils/RentingHandle";
-import InspectionButton from "@/app/_components/delivery/InspectionButton";
+// import InspectionButton from "@/app/_components/delivery/InspectionButton";
+import { redirect } from "next/navigation";
+import InspectionButton from "@/Modules/Delivery/components/InspectionButton";
 export default async function page({
   params,
 }: {
@@ -13,7 +15,12 @@ export default async function page({
 }) {
   const { taskId } = await params;
   const result = await getDeliveryById(taskId);
-  console.log(result);
+  // console.log(result, "rgtrhrhhhhhhhhhhhhhhhhh");
+  const task = result.delivery;
+  console.log(result.delivery, "rgtrhrhhhhhhhhhhhhhhhhh");
+
+  const isOwnerToRenter = task.type === "from_owner_to_renter";
+
   const { days, hours } = diffInDaysAndHours(
     result.delivery.endDate,
     result.delivery.startDate,
@@ -46,7 +53,8 @@ export default async function page({
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-10 sm:size-12">
+              className="size-10 sm:size-12"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -61,27 +69,39 @@ export default async function page({
             </p>
             <p>تفاصيل المهمة</p>
 
-            {result.delivery.type === "from_owner_to_renter" ? (
-              <p className="break-words">
-                {" "}
-                أنت حالياً في طريقك إلى المالك لاستلام المنتج. تأكد من فحصه قبل
-                التوقيع على الاستلام.
-              </p>
-            ) : (
-              <p className="break-words">
-                {" "}
-                أنت حالياً في طريقك إلى المستأجر لاستلام المنتج. تأكد من فحصه
-                قبل التوقيع على الاستلام.
-              </p>
-            )}
+            {(() => {
+              const s = task.status;
+              const isO2R = task.type === "from_owner_to_renter";
+              if (s === "assigned")
+                return <p>المهمة معيّنة لك — ابدأها من لوحة التحكم</p>;
+              if (s === "on_the_way")
+                return (
+                  <p>
+                    {isO2R
+                      ? "في الطريق إلى المالك لاستلام المنتج"
+                      : "في الطريق إلى المستأجر لاستلام المنتج"}
+                  </p>
+                );
+              if (s === "picked_up")
+                return (
+                  <p>
+                    {isO2R
+                      ? "تم استلام المنتج — توجّه للمستأجر وأدخل الـ OTP"
+                      : "تم استلام المنتج — توجّه للمالك وأدخل الـ OTP"}
+                  </p>
+                );
+              return null;
+            })()}
           </div>
         </div>
 
         <div className="w-full sm:w-auto shrink-0">
-          {result.delivery.status === "assigned" ? (
-            <InspectionButton type={result.delivery.type} />
-          ) : (
-            <></>
+          {task.status !== "delivered" && (
+            <InspectionButton
+              type={task.type}
+              status={task.status}
+              taskId={taskId}
+            />
           )}
         </div>
       </div>
@@ -179,7 +199,8 @@ export default async function page({
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-6 inline mx-1">
+                  className="size-6 inline mx-1"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -200,7 +221,8 @@ export default async function page({
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-5 inline mx-1">
+                  className="size-5 inline mx-1"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -223,7 +245,8 @@ export default async function page({
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-5 inline mx-1">
+                  className="size-5 inline mx-1"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -246,7 +269,8 @@ export default async function page({
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-5 mx-1 inline">
+                  className="size-5 mx-1 inline"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -266,7 +290,8 @@ export default async function page({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-6 mx-1 inline">
+                className="size-6 mx-1 inline"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -278,10 +303,11 @@ export default async function page({
             <div>
               {result.delivery.checklist ? (
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {result.delivery.checklist.map((c, i) => (
+                  {result.delivery.checklist.map((c: any, i: any) => (
                     <div
                       key={i}
-                      className="badge text-[#AC7825] bg-[#FDF6EA] rounded-2xl">
+                      className="badge text-[#AC7825] bg-[#FDF6EA] rounded-2xl"
+                    >
                       {c}
                     </div>
                   ))}
@@ -314,7 +340,8 @@ export default async function page({
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-6">
+                  className="size-6"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -361,7 +388,8 @@ export default async function page({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-8 bg-brand-light text-brand-primary rounded-full py-1 inline mx-1">
+                className="size-8 bg-brand-light text-brand-primary rounded-full py-1 inline mx-1"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -406,7 +434,8 @@ export default async function page({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-4 inline">
+                className="size-4 inline"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -425,7 +454,8 @@ export default async function page({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-4 inline">
+                className="size-4 inline"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -448,14 +478,16 @@ export default async function page({
           </div>
           <a
             href={`tel:${result.delivery.ownerPhoneNumber}`}
-            className="btn bg-white py-2 my-2 ">
+            className="btn bg-white py-2 my-2 "
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-4 inline">
+              className="size-4 inline"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -475,7 +507,8 @@ export default async function page({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-8 bg-brand-light text-brand-primary rounded-full py-1 inline mx-1">
+                className="size-8 bg-brand-light text-brand-primary rounded-full py-1 inline mx-1"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -521,7 +554,8 @@ export default async function page({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-4 inline">
+                className="size-4 inline"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -540,7 +574,8 @@ export default async function page({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-4 inline">
+                className="size-4 inline"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -563,14 +598,16 @@ export default async function page({
           </div>
           <a
             href={`tel:${result.delivery.renterPhoneNumber}`}
-            className="btn bg-white py-2 my-1">
+            className="btn bg-white py-2 my-1"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-4 inline">
+              className="size-4 inline"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

@@ -55,7 +55,7 @@ export async function getAllDeliveries() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      next: { revalidate: 60 },
+      cache: "no-store",
     });
     if (!res.ok) {
       return { success: false, error: `HTTP error: ${res.status}` };
@@ -78,7 +78,7 @@ export async function getDeliveryById(id: string) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      next: { revalidate: 60 },
+      cache: "no-store",
     });
     if (!res.ok) {
       return { success: false, error: `HTTP error: ${res.status}` };
@@ -91,9 +91,109 @@ export async function getDeliveryById(id: string) {
   }
 }
 
+export async function startDelivery(deliveryId: string) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("delivery_token")?.value;
+  console.log("deliveryId", deliveryId);
+  const res = await fetch(
+    `${process.env.API_BASE_URL}/delivery/pick-up/on-the-way/${deliveryId}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    },
+  );
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.error.message ?? "فشل تحديث حالة التوصيل");
+  }
+
+  return await res.json();
+}
+
+export async function submitPickupForm(formData: FormData) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("delivery_token")?.value;
+  console.log(formData);
+
+  const id = formData.get("deliveryId") as string;
+
+  // ابني الـ form data اللي هتتبعت للـ API
+  const body = new FormData();
+
+  const notes = formData.get("deliveryRepNotes");
+  if (notes) body.append("deliveryRepNotes", notes as string);
+
+  // كل الصور بـ key اسمه "images"
+  const images = formData.getAll("images") as File[];
+  for (const img of images) {
+    body.append("images", img);
+  }
+  console.log(body);
+
+  const res = await fetch(
+    `${process.env.API_BASE_URL}/delivery/owner-pick-up-form/${id}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // مش بنحط Content-Type — fetch بيحطها لوحده مع boundary لما في FormData
+      },
+      body,
+      cache: "no-store",
+    },
+  );
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.error.message ?? "فشل إرسال نموذج الاستلام");
+  }
+
+  return await res.json();
+}
+export async function submitReturnPickupForm(formData: FormData) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("delivery_token")?.value;
+
+  const id = formData.get("deliveryId") as string;
+
+  const body = new FormData();
+
+  const notes = formData.get("deliveryRepNotes");
+  if (notes) body.append("deliveryRepNotes", notes as string);
+
+  const checkedItems = formData.get("checkedItems");
+  if (checkedItems) body.append("checkedItems", checkedItems as string);
+
+  const images = formData.getAll("images") as File[];
+  for (const img of images) {
+    body.append("images", img);
+  }
+
+  const res = await fetch(
+    `${process.env.API_BASE_URL}/delivery/renter-pick-up-form/${id}`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body,
+      cache: "no-store",
+    },
+  );
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error?.error.message ?? "فشل إرسال نموذج الاستلام");
+  }
+
+  return await res.json();
+}
 export async function confirmOTPRenter(OTP: number, id: string) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("delivery_token")?.value;
+  console.log("confirmOTPRenter");
 
   try {
     const res = await fetch(
@@ -104,7 +204,7 @@ export async function confirmOTPRenter(OTP: number, id: string) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ otpCode: OTP }),
+        body: JSON.stringify({ otpCode: `${OTP}` }),
       },
     );
 
@@ -112,7 +212,7 @@ export async function confirmOTPRenter(OTP: number, id: string) {
       const errData = await res.json().catch(() => null);
       return {
         success: false,
-        error: errData?.message || `HTTP error: ${res.status}`,
+        error: errData?.error.message || `HTTP error: ${res.status}`,
       };
     }
 
@@ -139,7 +239,7 @@ export async function confirmOTPOwner(OTP: number, id: string) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ otpCode: OTP }),
+        body: JSON.stringify({ otpCode: `${OTP}` }),
       },
     );
 
@@ -147,7 +247,7 @@ export async function confirmOTPOwner(OTP: number, id: string) {
       const errData = await res.json().catch(() => null);
       return {
         success: false,
-        error: errData?.message || `HTTP error: ${res.status}`,
+        error: errData?.error.message || `HTTP error: ${res.status}`,
       };
     }
 
@@ -159,4 +259,36 @@ export async function confirmOTPOwner(OTP: number, id: string) {
       error: err instanceof Error ? err.message : "حدث خطأ غير متوقع",
     };
   }
+}
+export async function setDeliveryRepOnline(state: boolean) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("delivery_token")?.value;
+  const delivery = cookieStore.get("delivery")?.value;
+
+  const res = await fetch(`${process.env.API_BASE_URL}/delivery-reps/online`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ state }),
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error?.error?.message ?? "فشل تغيير الحالة");
+  }
+
+  // ← حدّثي الـ cookie بعد النجاح
+  if (delivery) {
+    const deliveryData = JSON.parse(decodeURIComponent(delivery));
+    deliveryData.isOnline = state;
+    cookieStore.set(
+      "delivery",
+      encodeURIComponent(JSON.stringify(deliveryData)),
+    );
+  }
+
+  return await res.json();
 }

@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { getDeliveryById } from "@/Modules/Delivery/Features/services/delivery.actions";
 import OTPInputs from "@/app/_components/delivery/OTPInputs";
+import { redirect } from "next/navigation";
 
 export default async function page({
   params,
@@ -9,9 +10,14 @@ export default async function page({
   params: Promise<{ taskId: string }>;
 }) {
   const { taskId } = await params;
-  const result = await getDeliveryById("6a307da2964a2a7f702aec71");
+  const result = await getDeliveryById(taskId);
   const task = result.delivery;
+  console.log(task.status, "task.status ");
 
+  // guard — لو مش في الـ status الصح
+  if (task.status !== "picked_up") {
+    redirect(`/dashboard/${taskId}`);
+  }
   const totalFees =
     task.insuranceAmount + task.remainingAmount + task.commissionFee;
 
@@ -37,7 +43,8 @@ export default async function page({
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-10 sm:size-12">
+              className="size-10 sm:size-12"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -65,7 +72,8 @@ export default async function page({
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-6">
+              className="size-6"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -81,7 +89,7 @@ export default async function page({
         {/* OTP card */}
         <div className="border border-gray-300 rounded-2xl px-4 py-4">
           <h1 className="font-black text-xl my-3">التحقق من رمز التسليم</h1>
-          <OTPInputs taskId={taskId} />
+          <OTPInputs taskId={taskId} otpType="renter" />
         </div>
 
         {/* Financial summary card */}

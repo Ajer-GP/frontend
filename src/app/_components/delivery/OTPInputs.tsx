@@ -2,10 +2,20 @@
 
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import {
+  confirmOTPOwner,
+  confirmOTPRenter,
+} from "@/Modules/Delivery/Features/services/delivery.actions";
 
 type OtpState = "idle" | "loading" | "success" | "failed";
 
-export default function OTPInputs({ taskId }: { taskId: string }) {
+export default function OTPInputs({
+  taskId,
+  otpType,
+}: {
+  taskId: string;
+  otpType: "renter" | "owner";
+}) {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -44,6 +54,23 @@ export default function OTPInputs({ taskId }: { taskId: string }) {
     inputRefs.current[Math.min(pasted.length, 5)]?.focus();
   };
 
+  // const handleSubmit = async () => {
+  //   const otpValue = otp.join("");
+
+  //   if (otpValue.length < 6) {
+  //     setServerError("من فضلك أدخل الرمز كاملاً");
+  //     return;
+  //   }
+
+  //   setOtpState("loading");
+  //   setServerError(null);
+
+  //   //api
+  //   setOtpState("success");
+
+  //   // redirect
+  //   router.push("YOUR_REDIRECT_PATH_HERE");
+  // };
   const handleSubmit = async () => {
     const otpValue = otp.join("");
 
@@ -55,13 +82,20 @@ export default function OTPInputs({ taskId }: { taskId: string }) {
     setOtpState("loading");
     setServerError(null);
 
-    //api
-    setOtpState("success");
+    const result =
+      otpType === "renter"
+        ? await confirmOTPRenter(Number(otpValue), taskId)
+        : await confirmOTPOwner(Number(otpValue), taskId);
 
-    // redirect
-    router.push("YOUR_REDIRECT_PATH_HERE");
+    if (result.success) {
+      setOtpState("success");
+      // بعد نجاح الـ OTP كلهم بيروحوا الـ dashboard
+      router.push("/dashboard");
+    } else {
+      setOtpState("failed");
+      setServerError(result.error ?? "رمز غير صحيح، حاول مرة أخرى");
+    }
   };
-
   const handleReset = () => {
     setOtp(Array(6).fill(""));
     setOtpState("idle");
@@ -122,7 +156,8 @@ export default function OTPInputs({ taskId }: { taskId: string }) {
         disabled={
           !isComplete || otpState === "loading" || otpState === "success"
         }
-        className="w-full btn bg-[#1A6B4A] text-white rounded-xl hover:bg-[#155a3c] disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+        className="w-full btn bg-[#1A6B4A] text-white rounded-xl hover:bg-[#155a3c] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+      >
         {otpState === "loading" ? (
           <span className="loading loading-spinner loading-sm" />
         ) : (
@@ -134,7 +169,8 @@ export default function OTPInputs({ taskId }: { taskId: string }) {
       {otpState === "failed" && (
         <button
           onClick={handleReset}
-          className="text-sm text-gray-500 underline hover:text-gray-700">
+          className="text-sm text-gray-500 underline hover:text-gray-700"
+        >
           إعادة المحاولة
         </button>
       )}

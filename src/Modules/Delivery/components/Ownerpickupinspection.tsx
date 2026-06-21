@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { submitPickupForm } from "@/Modules/Delivery/Features/services/delivery.actions";
+import { useRouter } from "next/navigation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -13,11 +15,9 @@ const REQUIRED_PHOTOS = 4;
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-/** البانر الأخضر العلوي مع avatar المالك */
 function StatusBanner({ orderId }: { orderId: string }) {
   return (
     <div className="rounded-2xl bg-[var(--brand-primary)] px-5 py-4 flex items-center justify-between gap-3 flex-row-reverse">
-      {/* Text */}
       <div className="text-right flex-1">
         <div className="flex items-center gap-2 justify-end mb-0.5">
           <span className="text-white/60 text-caption">{orderId}</span>
@@ -31,10 +31,8 @@ function StatusBanner({ orderId }: { orderId: string }) {
         </p>
       </div>
 
-      {/* Owner avatar */}
       <div className="relative shrink-0">
         <div className="w-12 h-12 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center overflow-hidden">
-          {/* placeholder avatar */}
           <svg
             className="w-7 h-7 text-white/80"
             fill="currentColor"
@@ -51,11 +49,12 @@ function StatusBanner({ orderId }: { orderId: string }) {
   );
 }
 
-/** قسم صور الفحص مع counter وتفعيل الزر */
 function PhotoUploadSection({
   onCountChange,
+  onFilesChange,
 }: {
   onCountChange: (count: number) => void;
+  onFilesChange: (files: (File | null)[]) => void;
 }) {
   const [slots, setSlots] = useState<UploadSlot[]>(
     Array.from({ length: REQUIRED_PHOTOS }, () => ({
@@ -81,12 +80,11 @@ function PhotoUploadSection({
 
     setSlots((prev) => {
       const next = prev.map((s, i) => (i === idx ? { file, preview } : s));
-      const count = next.filter((s) => s.preview !== null).length;
-      onCountChange(count);
+      onCountChange(next.filter((s) => s.preview !== null).length);
+      onFilesChange(next.map((s) => s.file));
       return next;
     });
 
-    // reset input so same file can be re-selected
     e.target.value = "";
   };
 
@@ -96,16 +94,15 @@ function PhotoUploadSection({
         i === idx ? { file: null, preview: null } : s,
       );
       onCountChange(next.filter((s) => s.preview !== null).length);
+      onFilesChange(next.map((s) => s.file));
       return next;
     });
   };
 
   return (
     <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-primary)] p-5">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4 flex-row-reverse">
         <h2 className="text-h2 text-[var(--text-primary)]">صور الفحص</h2>
-        {/* Counter badge */}
         <span
           className={`text-caption font-medium px-2.5 py-1 rounded-full transition-colors
             ${
@@ -118,7 +115,6 @@ function PhotoUploadSection({
         </span>
       </div>
 
-      {/* Hidden file input */}
       <input
         ref={inputRef}
         type="file"
@@ -127,20 +123,17 @@ function PhotoUploadSection({
         onChange={handleFile}
       />
 
-      {/* 4 upload slots */}
       <div className="grid grid-cols-4 gap-3">
         {slots.map((slot, idx) => (
           <div key={idx} className="relative aspect-square">
             {slot.preview ? (
               <>
-                {/* Preview image */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={slot.preview}
                   alt={`صورة ${idx + 1}`}
                   className="w-full h-full object-cover rounded-xl border-2 border-[var(--brand-primary)]"
                 />
-                {/* Remove button */}
                 <button
                   type="button"
                   onClick={() => removeSlot(idx)}
@@ -170,7 +163,6 @@ function PhotoUploadSection({
                            bg-[var(--surface-secondary)] flex flex-col items-center justify-center gap-1
                            hover:border-[var(--brand-mid)] hover:bg-[var(--brand-light)] transition-colors"
               >
-                {/* Upload icon */}
                 <div className="w-8 h-8 rounded-full bg-[var(--brand-primary)] flex items-center justify-center">
                   <svg
                     className="w-4 h-4 text-white"
@@ -198,7 +190,6 @@ function PhotoUploadSection({
         ))}
       </div>
 
-      {/* Progress hint */}
       {uploadedCount < REQUIRED_PHOTOS && (
         <p className="mt-3 text-caption text-[var(--text-tertiary)] text-right">
           يجب رفع {REQUIRED_PHOTOS} صور لتفعيل زر التأكيد{" "}
@@ -211,10 +202,13 @@ function PhotoUploadSection({
   );
 }
 
-/** ملاحظات اختيارية */
-function OptionalNotes() {
-  const [note, setNote] = useState("");
-
+function OptionalNotes({
+  note,
+  onChange,
+}: {
+  note: string;
+  onChange: (v: string) => void;
+}) {
   return (
     <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-primary)] p-5">
       <h2 className="text-h2 text-[var(--text-primary)] mb-3 text-right">
@@ -225,7 +219,7 @@ function OptionalNotes() {
       </h2>
       <textarea
         value={note}
-        onChange={(e) => setNote(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         placeholder="أضف أي ملاحظات مهمة عن حالة المنتج..."
         dir="rtl"
         rows={3}
@@ -238,18 +232,39 @@ function OptionalNotes() {
   );
 }
 
-/** زر التأكيد — معطّل لحد ما يتحمل 4 صور */
-function ConfirmButton({ isActive }: { isActive: boolean }) {
+function ConfirmButton({
+  isActive,
+  deliveryId,
+  files,
+  note,
+}: {
+  isActive: boolean;
+  deliveryId: string;
+  files: (File | null)[];
+  note: string;
+}) {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
-
+  const router = useRouter();
   const handleConfirm = async () => {
     if (!isActive || loading || done) return;
     setLoading(true);
-    // استبدلي ده بالـ server action بتاعتك
-    await new Promise((r) => setTimeout(r, 1500));
-    setLoading(false);
-    setDone(true);
+    try {
+      const formData = new FormData();
+      formData.append("deliveryId", deliveryId);
+      if (note) formData.append("deliveryRepNotes", note);
+      for (const file of files) {
+        if (file) formData.append("images", file);
+      }
+
+      await submitPickupForm(formData);
+      setDone(true);
+      router.push(`/dashboard/${deliveryId}/otp-renter`);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -285,7 +300,7 @@ function ConfirmButton({ isActive }: { isActive: boolean }) {
                 d="M5 13l4 4L19 7"
               />
             </svg>
-            تم التأكيد بنجاح
+            تم التأكيد بنجاح جار التحويل ...
           </>
         ) : (
           <>
@@ -309,7 +324,6 @@ function ConfirmButton({ isActive }: { isActive: boolean }) {
         )}
       </button>
 
-      {/* Lock hint */}
       {!isActive && !done && (
         <p className="text-caption text-[var(--text-tertiary)] text-center">
           ارفع 4 صور للفحص لتفعيل هذا الزر
@@ -327,6 +341,11 @@ export default function OwnerPickupInspectionPage({
   orderId: string;
 }) {
   const [uploadedCount, setUploadedCount] = useState(0);
+  const [files, setFiles] = useState<(File | null)[]>(
+    Array(REQUIRED_PHOTOS).fill(null),
+  );
+  const [note, setNote] = useState("");
+
   const isReady = uploadedCount >= REQUIRED_PHOTOS;
 
   return (
@@ -334,11 +353,8 @@ export default function OwnerPickupInspectionPage({
       dir="rtl"
       className="min-h-screen bg-[var(--surface-secondary)] pb-10"
     >
-      {/* ── Sidebar + Content layout ── */}
       <div className="flex flex-row-reverse">
-        {/* Main content */}
         <div className="flex-1 px-4 py-4 max-w-full mx-auto w-full">
-          {/* Breadcrumb */}
           <div className="flex items-center gap-1.5 text-caption text-[var(--text-tertiary)] mb-3">
             <span>الرئيسية</span>
             <span>/</span>
@@ -348,17 +364,18 @@ export default function OwnerPickupInspectionPage({
           </div>
 
           <div className="flex flex-col gap-4">
-            {/* Banner */}
             <StatusBanner orderId={orderId} />
-
-            {/* Photos — Client Component (needs state) */}
-            <PhotoUploadSection onCountChange={setUploadedCount} />
-
-            {/* Notes — Client Component (needs state) */}
-            <OptionalNotes />
-
-            {/* Confirm button — locked until 4 photos */}
-            <ConfirmButton isActive={isReady} />
+            <PhotoUploadSection
+              onCountChange={setUploadedCount}
+              onFilesChange={setFiles}
+            />
+            <OptionalNotes note={note} onChange={setNote} />
+            <ConfirmButton
+              isActive={isReady}
+              deliveryId={orderId}
+              files={files}
+              note={note}
+            />
           </div>
         </div>
       </div>
