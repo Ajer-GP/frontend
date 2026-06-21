@@ -3,7 +3,7 @@
 import { useFormContext, useWatch } from "react-hook-form";
 import { FullFormData } from "@/app/_schemas/addProduct.schema";
 import Image from "next/image";
-import { conditionMap } from "../productPreviewLabels";
+import { CATEGORY_LABELS, conditionMap } from "../productPreviewLabels";
 
 type Props = {
   coverPreview: string | null;
@@ -103,7 +103,7 @@ export default function Step3Review({ coverPreview, galleryPreviews }: Props) {
           </p>
           <h1>
             <div className="badge text-gray-500 bg-gray-300 rounded-2xl">
-              {category}
+              {CATEGORY_LABELS[category] ?? category}
             </div>
             <div className="badge text-accent-default bg-[#FDF6E9] rounded-2xl">
               {conditionMap[condition] ?? condition}

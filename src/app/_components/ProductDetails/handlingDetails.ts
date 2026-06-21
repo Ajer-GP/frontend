@@ -10,3 +10,18 @@ export const CONDITION_STYLES: Record<
   good: { label: "جيد", text: "text-warning", bg: "bg-accent-light" },
   fair: { label: "مقبول", text: "text-gray-600", bg: "bg-gray-200" },
 };
+
+export const CATEGORY_LABELS: Record<string, string> = {
+  cameras: "كاميرات",
+  laptops: "لابتوب",
+  tablets: "تابلت",
+  gaming: "بلايستيشن",
+  audio: "سماعات",
+  electronics: "الكترونيات",
+  clothes: "ملابس",
+  books: "كتب",
+  drones: "درون",
+  lighting: "إضاءة",
+  "party tools": "أدوات حفلات",
+  other: "أخرى",
+};
