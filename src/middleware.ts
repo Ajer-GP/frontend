@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const protectedRoutes = ["/products/add"];
+const protectedRoutes = ["/products/add", "/products/orders"];
 const authRoutes = ["/auth/login", "/auth/register"];
 
 // Delivery routes
@@ -61,14 +61,12 @@ export async function middleware(request: NextRequest) {
     const deliveryToken = request.cookies.get("delivery_token")?.value;
     const isDeliveryAuthenticated = !!deliveryToken;
 
-    // زائر يحاول يدخل /delivery/* → روّحه على /delivery/login
     if (isDeliveryProtected && !isDeliveryAuthenticated) {
       const loginUrl = new URL("/auth/DeliveryLogin", request.url);
       loginUrl.searchParams.set("next", pathname);
       return NextResponse.redirect(loginUrl);
     }
 
-    // logged-in delivery agent يحاول يدخل /delivery/login → روّحه على /delivery
     if (isDeliveryAuthRoute && isDeliveryAuthenticated) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
