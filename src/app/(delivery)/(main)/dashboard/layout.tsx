@@ -19,7 +19,7 @@ export default async function MainLayout({
 
       <div className="md:mr-64 pb-20 md:pb-0 flex flex-col min-h-screen">
         <Navbar />
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 ">{children}</main>
       </div>
     </div>
   );

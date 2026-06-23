@@ -326,10 +326,14 @@ export default async function page({
             <div className="text-white bg-linear-to-r to-brand-mid from-brand-primary rounded-t-2xl px-4 py-2 mb-3">
               <p>الإجراء المطلوب الآن</p>
               <p className="font-black my-1 break-words">
-                استلام المنتج من المالك
+                {isOwnerToRenter
+                  ? "استلام المنتج من المالك"
+                  : "استلام المنتج من المستأجر"}
               </p>
               <p className="break-words">
-                توجّه إلى عنوان المالك واستلم المنتج بعد فحصه
+                {isOwnerToRenter
+                  ? "توجّه إلى عنوان المالك واستلم المنتج بعد فحصه"
+                  : "توجّه إلى عنوان المستأجر واستلم المنتج بعد فحصه"}
               </p>
             </div>
             <div className="flex gap-4 px-4 py-2">
@@ -350,8 +354,16 @@ export default async function page({
                 </svg>
               </div>
               <div className="min-w-0">
-                <p>موعد الاستلام المجدول</p>
-                <p className="font-black break-words">{startDate}</p>
+                <p>
+                  {isOwnerToRenter
+                    ? "موعد الاستلام المجدول"
+                    : "موعد الإرجاع المجدول"}
+                </p>
+                <p className="font-black break-words">
+                  {isOwnerToRenter
+                    ? startDate
+                    : formatEgyptArabicDate(result.delivery.endDate)}
+                </p>
               </div>
             </div>
           </div>

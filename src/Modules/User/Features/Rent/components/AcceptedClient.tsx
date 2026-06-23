@@ -4,6 +4,8 @@ import OrderStepper from "@/app/_components/orders/OrderStepper";
 import OrderSummaryCard from "@/app/_components/orders/OrderSummaryCard";
 import PaymentPage from "@/app/_components/orders/Payment";
 import Image from "next/image";
+import HowItWorks from "@/app/_components/ProductDetails/How-it-works";
+import CancelRentalButton from "./CancelRentalButton";
 
 interface Props {
   orderId: string;
@@ -165,7 +167,22 @@ export default function AcceptedClient({
       {/* Payment */}
       {status === "waiting_for_deposit" ? (
         <div className="border border-[#E8A020] bg-[#FFFDFA] rounded-xl p-6 text-center space-y-2">
-          <p className="text-2xl">⏳</p>
+          <p className="text-2xl">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+              />
+            </svg>
+          </p>
           <p className="text-body-sm font-medium text-text-primary">
             في انتظار تأكيد الدفع
           </p>
@@ -176,6 +193,10 @@ export default function AcceptedClient({
       ) : (
         <PaymentPage orderId={orderId} amount={depositTotal} />
       )}
+      <div className="flex justify-center pt-2">
+        <CancelRentalButton rentalId={orderId} />
+      </div>
+      <HowItWorks currentStep={3} />
     </div>
   );
 }

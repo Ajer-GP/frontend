@@ -8,6 +8,7 @@ import { getPaymentStatus } from "@/app/_actions/getPaymentStatus.action";
 import ImportantInfo from "@/app/_components/ImportantInfo";
 import ReturnRefundPolicy from "@/app/_components/ProductDetails/ReturnRefundPolicy";
 import { confirmDeliveryArrival } from "@/app/_actions/confirmDeliveryArrival.action";
+import { redirect } from "next/navigation";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -25,14 +26,17 @@ export default async function ConfirmedPage({ params, searchParams }: Props) {
 
   // لو جاي من Stripe redirect، نادي confirmDeliveryArrival
   // ConfirmedPage
+
   if (payment_intent) {
-    await sleep(2000); // ✅ استنى الـ webhook يوصل
+    await sleep(2000);
     try {
       const data = await confirmDeliveryArrival(id);
-      console.log("confirmDeliveryArrival CCCCCCCCCCCCCC", data);
+      console.log("confirmDeliveryArrival", data);
     } catch (err) {
       console.error("confirm delivery error:", err);
     }
+    // ✅ redirect بدون payment_intent في الـ URL
+    redirect(`/products/orders/${id}/confirmed`);
   }
   const paymentStatus = await getPaymentStatus(id);
   console.log(paymentStatus, "paymentStatus");
@@ -110,17 +114,19 @@ export default async function ConfirmedPage({ params, searchParams }: Props) {
       {isPaid ? (
         <div
           dir="rtl"
-          className="border border-border-default rounded-xl p-6 text-center space-y-2">
+          className="border border-border-default rounded-xl p-6 text-center space-y-2"
+        >
           <p className="text-2xl">✅</p>
           <p className="text-h3 font-semibold">تم الدفع</p>
           <p className="text-body-sm text-text-secondary">
-            تم إرسال OTP للديليفري للتأكيد عند الاستلام
+            تم ارسال OTP يتم تسليمه لدليفري لاستلام المنتج
           </p>
         </div>
       ) : isPendingVerification ? (
         <div
           dir="rtl"
-          className="border border-border-default rounded-xl p-6 text-center space-y-2">
+          className="border border-border-default rounded-xl p-6 text-center space-y-2"
+        >
           <p className="text-2xl">⏳</p>
           <p className="text-h3 font-semibold">بانتظار التحقق من الدفع</p>
           <p className="text-body-sm text-text-secondary">
@@ -131,7 +137,7 @@ export default async function ConfirmedPage({ params, searchParams }: Props) {
         <PaymentWrapper orderId={rental._id} amount={amount} />
       )}
 
-      <HowItWorks />
+      <HowItWorks currentStep={3} />
 
       <ImportantInfo />
       <ReturnRefundPolicy />

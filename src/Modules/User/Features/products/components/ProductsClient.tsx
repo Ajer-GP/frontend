@@ -33,9 +33,9 @@ const CATEGORIES = [
 ];
 
 const CONDITIONS: { value: ProductCondition; label: string }[] = [
-  { value: "excellent", label: "جديد" },
-  { value: "good", label: "كالجديد" },
-  { value: "fair", label: "ممتاز" },
+  { value: "excellent", label: "ممتاز" },
+  { value: "good", label: "جديد" },
+  { value: "fair", label: "جيد" },
 ];
 
 const PERIODS = [
@@ -483,7 +483,7 @@ export default function ProductsClient({
             {/* Category tabs + search row */}
             <div className="flex flex-col gap-3 mb-5">
               {/* Search */}
-              <div className="flex items-center gap-2 border border-border-default rounded-xl px-3 py-2 bg-white hover:border-brand-primary transition-colors">
+              <div className="flex items-center gap-2 border border-border-default rounded-xl px-3 py-2 bg-white hover:border-brand-primary transition-colors w-full min-w-0">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -504,11 +504,11 @@ export default function ProductsClient({
                   onChange={(e) => setSearchInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   placeholder="كاميرا، لابتوب، سماعة..."
-                  className="flex-1 bg-transparent outline-none text-body-sm text-text-primary placeholder:text-text-tertiary"
+                  className="flex-1 min-w-0 bg-transparent outline-none text-body-sm text-text-primary placeholder:text-text-tertiary"
                 />
                 <button
                   onClick={handleSearch}
-                  className="bg-brand-primary text-white text-body-sm px-4 py-1.5 rounded-lg hover:bg-brand-dark transition-colors"
+                  className="bg-brand-primary text-white text-[11px] sm:text-body-sm px-2 sm:px-4 py-1.5 rounded-lg hover:bg-brand-dark transition-colors shrink-0 whitespace-nowrap"
                 >
                   ابحث
                 </button>
@@ -579,7 +579,7 @@ export default function ProductsClient({
                 توصيات ذكية بالذكاء الاصطناعي مختارة لك
               </span>
               <div className="flex gap-1.5 mr-auto">
-                <button className="size-6 rounded-full border border-accent-default/30 flex items-center justify-center text-accent-default hover:bg-accent-default/10">
+                {/* <button className="size-6 rounded-full border border-accent-default/30 flex items-center justify-center text-accent-default hover:bg-accent-default/10">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -610,7 +610,7 @@ export default function ProductsClient({
                       d="m8.25 4.5 7.5 7.5-7.5 7.5"
                     />
                   </svg>
-                </button>
+                </button> */}
               </div>
             </div>
 
