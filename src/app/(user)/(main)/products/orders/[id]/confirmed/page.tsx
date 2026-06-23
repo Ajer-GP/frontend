@@ -31,7 +31,6 @@ export default async function ConfirmedPage({ params, searchParams }: Props) {
     await sleep(2000);
     try {
       const data = await confirmDeliveryArrival(id);
-      console.log("confirmDeliveryArrival", data);
     } catch (err) {
       console.error("confirm delivery error:", err);
     }
@@ -39,13 +38,10 @@ export default async function ConfirmedPage({ params, searchParams }: Props) {
     redirect(`/products/orders/${id}/confirmed`);
   }
   const paymentStatus = await getPaymentStatus(id);
-  console.log(paymentStatus, "paymentStatus");
   const paymentStatusValue = paymentStatus?.data?.remaining?.status;
 
   const isPaid = paymentStatusValue === "paid";
   const isPendingVerification = paymentStatusValue === "pending_verification";
-  console.log(rental, "rrrrrrrrrrrrr");
-  console.log("orderId:", rental._id);
 
   const product = {
     name: rental.product.title,
@@ -79,7 +75,6 @@ export default async function ConfirmedPage({ params, searchParams }: Props) {
     Number(pricing.insurance ?? 0) +
     Number(pricing.platformFee ?? 0) +
     Number(pricing.rentalPrice ?? 0);
-  console.log(pricing, "pricing");
 
   return (
     <div dir="rtl" className="mx-auto w max-w-7xl p-4 space-y-6">
@@ -114,8 +109,7 @@ export default async function ConfirmedPage({ params, searchParams }: Props) {
       {isPaid ? (
         <div
           dir="rtl"
-          className="border border-border-default rounded-xl p-6 text-center space-y-2"
-        >
+          className="border border-border-default rounded-xl p-6 text-center space-y-2">
           <p className="text-2xl">✅</p>
           <p className="text-h3 font-semibold">تم الدفع</p>
           <p className="text-body-sm text-text-secondary">
@@ -125,8 +119,7 @@ export default async function ConfirmedPage({ params, searchParams }: Props) {
       ) : isPendingVerification ? (
         <div
           dir="rtl"
-          className="border border-border-default rounded-xl p-6 text-center space-y-2"
-        >
+          className="border border-border-default rounded-xl p-6 text-center space-y-2">
           <p className="text-2xl">⏳</p>
           <p className="text-h3 font-semibold">بانتظار التحقق من الدفع</p>
           <p className="text-body-sm text-text-secondary">

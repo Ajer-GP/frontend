@@ -187,8 +187,7 @@ export default function ProductsClient({
     const term = searchInput.trim().toLowerCase();
     return products.filter((p) => p.title.toLowerCase().includes(term));
   }, [products, searchInput]);
-  // console.log(products, "ioihoih");
-  // console.log(result, "uuuuuuuuu");
+
 
   const hasError = !result.success;
   const errorMsg = !result.success ? result.error : "";

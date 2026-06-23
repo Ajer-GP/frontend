@@ -113,160 +113,6 @@ export default function PaymentSection({
     </div>
   );
 }
-// export default function PaymentSection({
-//   orderId,
-//   amount,
-// }: {
-//   orderId: string;
-//   amount: number;
-// }) {
-//   const [tab, setTab] = useState<Tab>("instapay");
-//   const [clientSecret, setClientSecret] = useState<string | null>(null);
-//   const [loadingStripe, setLoadingStripe] = useState(false);
-//   const [addressConfirmed, setAddressConfirmed] = useState(false); // ← جديد
-
-//   const handleStripeConfirmAddress = async (address: Address) => {
-//     // لو عندنا secret خلاص — متعملش intent جديد
-//     if (clientSecret) {
-//       setAddressConfirmed(true);
-//       return;
-//     }
-
-//     setLoadingStripe(true);
-//     try {
-//       const secret = await createStripeIntent(orderId, address);
-//       setClientSecret(secret);
-//       setAddressConfirmed(true);
-//     } catch (err) {
-//       console.error("stripe intent error:", err);
-//     } finally {
-//       setLoadingStripe(false);
-//     }
-//   };
-
-//   return (
-//     <div dir="rtl" className="space-y-4">
-//       {/* Tabs ... */}
-
-//       {tab === "card" && (
-//         <>
-//           {loadingStripe && (
-//             <p className="text-center text-body-sm text-text-secondary py-4">
-//               جاري التحضير...
-//             </p>
-//           )}
-
-//           {!addressConfirmed && !loadingStripe && (
-//             <StripeAddressStep onConfirm={handleStripeConfirmAddress} />
-//           )}
-
-//           {addressConfirmed && clientSecret && (
-//             <Elements
-//               stripe={stripePromise}
-//               options={{ clientSecret, locale: "ar" }}
-//             >
-//               <StripeForm
-//                 amount={amount}
-//                 orderId={orderId}
-//                 onEditAddress={() => setAddressConfirmed(false)} // ← بس كده
-//               />
-//             </Elements>
-//           )}
-//         </>
-//       )}
-//     </div>
-//   );
-// }
-// export default function PaymentSection({
-//   orderId,
-//   amount,
-// }: {
-//   orderId: string;
-//   amount: number;
-// }) {
-//   const [tab, setTab] = useState<Tab>("instapay");
-//   const [clientSecret, setClientSecret] = useState<string | null>(null);
-//   const [loadingStripe, setLoadingStripe] = useState(false);
-//   const [stripeAddress, setStripeAddress] = useState<Address>(EMPTY_ADDRESS); // ← هنا
-
-//   // بيتنادى لما يدوس "متابعة" في step العنوان
-//   const handleStripeConfirmAddress = async (address: Address) => {
-//     setStripeAddress(address);
-//     setLoadingStripe(true);
-//     try {
-//       const secret = await createStripeIntent(orderId, address); // ← بيبعت العنوان
-//       setClientSecret(secret);
-//     } catch (err) {
-//       console.error("stripe intent error:", err);
-//     } finally {
-//       setLoadingStripe(false);
-//     }
-//   };
-
-//   const handleTabChange = (t: Tab) => {
-//     setTab(t);
-//     // مش بتنادي createStripeIntent هنا خالص
-//   };
-
-//   return (
-//     <div dir="rtl" className="space-y-4">
-//       <h2 className="text-h2">اختر طريقة الدفع</h2>
-
-//       {/* Tabs */}
-//       <div className="flex rounded-xl border border-border-default overflow-hidden">
-//         {(["instapay", "card"] as Tab[]).map((t) => (
-//           <button
-//             key={t}
-//             type="button"
-//             onClick={() => handleTabChange(t)}
-//             className={`flex-1 py-3 text-body-sm font-medium transition-colors ${
-//               tab === t
-//                 ? "bg-brand-primary text-white"
-//                 : "bg-surface-primary text-text-secondary"
-//             }`}
-//           >
-//             {t === "card" ? "بطاقة ائتمان / خصم" : "انستا باي"}
-//           </button>
-//         ))}
-//       </div>
-
-//       {tab === "instapay" && <InstapayForm orderId={orderId} amount={amount} />}
-
-//       {tab === "card" && (
-//         <>
-//           {loadingStripe && (
-//             <p className="text-center text-body-sm text-text-secondary py-4">
-//               جاري التحضير...
-//             </p>
-//           )}
-//           {/* لو لسه مفيش secret → اعرض step العنوان */}
-//           {!clientSecret && !loadingStripe && (
-//             <StripeAddressStep onConfirm={handleStripeConfirmAddress} />
-//           )}
-//           {/* لو جاب secret → اعرض PaymentElement */}
-//           {clientSecret && (
-//             <Elements
-//               stripe={stripePromise}
-//               options={{ clientSecret, locale: "ar" }}
-//             >
-//               <StripeForm
-//                 amount={amount}
-//                 orderId={orderId}
-//                 onEditAddress={() => {
-//                   // لو عايزة ترجعي للعنوان
-//                   setClientSecret(null);
-//                   setStripeAddress(EMPTY_ADDRESS);
-//                 }}
-//               />
-//             </Elements>
-//           )}
-//         </>
-//       )}
-//     </div>
-//   );
-// }
-// ── Instapay ───────────────────────────────────────────────────────────────────
-
 function InstapayForm({
   orderId,
   amount,
@@ -306,20 +152,7 @@ function InstapayForm({
         fd.append("payment_method", "instapay");
         fd.append("screenshot", file);
 
-        // const result = await payDepositInstapay(orderId, fd, address);
-        // const fd = new FormData();
-        // fd.append("payment_method", "instapay");
-        // fd.append("screenshot", file);
-        // // ← أضف العنوان
-        // fd.append("street", address.street);
-        // fd.append("floor", address.floor);
-        // fd.append("apartment", address.apartment);
-        // fd.append("landmark", address.landmark);
-        // fd.append("building", address.building);
-        // formData.append("location", JSON.stringify(address));
-        // const result = await payDepositInstapay(orderId, fd, address);
         const result = await payDepositInstapay(orderId, fd, address);
-        console.log("result كامل:", JSON.stringify(result));
         const status = result?.payment?.status ?? result?.status;
         if (status === "paid" || status === "deposit_paid") {
           window.location.href = `/products/orders/${orderId}/confirmed`;
@@ -411,7 +244,7 @@ function InstapayForm({
 
 // ── Stripe ─────────────────────────────────────────────────────────────────────
 
-type StripeStep = "address" | "payment";
+// type StripeStep = "address" | "payment";
 
 function StripeForm({
   amount,

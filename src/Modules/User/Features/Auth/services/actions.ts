@@ -82,7 +82,6 @@ export async function logoutAction() {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    console.log(res);
   } catch (err) {
     console.error("Logout API call failed:", err);
   }
@@ -164,7 +163,6 @@ export async function forgotPassword(
     );
 
     const result = await res.json();
-    // console.log(result);
 
     if (!res.ok) {
       return {

@@ -32,10 +32,8 @@ export default async function page({
     return <div>حدث خطأ في تحميل المنتج , {result.error}</div>;
 
   const data = result.data.product;
-  console.log(data);
   const currentUser = await getCurrentUser();
   const isOwner = currentUser?._id === data.owner._id;
-  console.log(currentUser?._id, isOwner);
   return (
     <div dir="rtl" className="">
       <div className="breadcrumbs text-sm max-w-7xl mx-8 my-4 px-4 py-2.5 text-[#676767]">

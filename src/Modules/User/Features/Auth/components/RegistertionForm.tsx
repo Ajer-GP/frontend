@@ -25,7 +25,6 @@ export default function RegistrationForm() {
 
   const onSubmit = async (data: SignupFormData) => {
     if (!termsAccepted) return;
-    // console.log(data);
     //  call server action.:
     const res = await registerAction(data);
     if (res?.success === false) {
@@ -46,29 +45,25 @@ export default function RegistrationForm() {
       <form
         className="flex flex-col gap-4"
         noValidate
-        onSubmit={handleSubmit(onSubmit)}
-      >
+        onSubmit={handleSubmit(onSubmit)}>
         {/* الاسم الكامل */}
         <div>
           <label
             htmlFor="fullName"
-            className="text-base font-medium text-[#515151] mb-1.5 block"
-          >
+            className="text-base font-medium text-[#515151] mb-1.5 block">
             الاسم الكامل
           </label>
           <label
             className={`input input-bordered outline-0 bg-white  border border-gray-300 rounded-xl  flex items-center gap-2 w-full ${
               errors.fullName ? "input-error" : ""
-            }  hover:border-black `}
-          >
+            }  hover:border-black `}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className=" size-5 shrink-0"
-            >
+              className=" size-5 shrink-0">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -95,23 +90,20 @@ export default function RegistrationForm() {
         <div>
           <label
             htmlFor="email"
-            className="text-base font-medium text-text-secondary mb-1.5 block"
-          >
+            className="text-base font-medium text-text-secondary mb-1.5 block">
             البريد الإلكتروني
           </label>
           <label
             className={`input input-bordered  hover:border-black  border border-gray-300 rounded-xl bg-white  outline-0 flex items-center gap-2 w-full ${
               errors.email ? "input-error" : ""
-            }`}
-          >
+            }`}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className=" size-5 shrink-0"
-            >
+              className=" size-5 shrink-0">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -139,23 +131,20 @@ export default function RegistrationForm() {
         <div>
           <label
             htmlFor="phoneNumber"
-            className="text-base font-medium text-text-secondary mb-1.5 block"
-          >
+            className="text-base font-medium text-text-secondary mb-1.5 block">
             رقم الهاتف
           </label>
           <label
             className={`input input-bordered hover:border-black  border border-gray-300 rounded-xl bg-white  outline-0 flex items-center gap-2 w-full ${
               errors.phoneNumber ? "input-error" : ""
-            }`}
-          >
+            }`}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className=" size-5 shrink-0"
-            >
+              className=" size-5 shrink-0">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -186,23 +175,20 @@ export default function RegistrationForm() {
         <div>
           <label
             htmlFor="password"
-            className="text-base font-medium text-text-secondary mb-1.5 block"
-          >
+            className="text-base font-medium text-text-secondary mb-1.5 block">
             كلمة السر
           </label>
           <label
             className={`input input-bordered hover:border-black  border border-gray-300 rounded-xl bg-white  outline-0 flex items-center gap-2 w-full ${
               errors.password ? "input-error" : ""
-            }`}
-          >
+            }`}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className=" size-5 shrink-0"
-            >
+              className=" size-5 shrink-0">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -222,8 +208,7 @@ export default function RegistrationForm() {
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
               className="text-text-tertiary shrink-0"
-              tabIndex={-1}
-            >
+              tabIndex={-1}>
               {showPassword ? (
                 // Eye-off icon
                 <svg
@@ -232,8 +217,7 @@ export default function RegistrationForm() {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-4 h-4"
-                >
+                  className="w-4 h-4">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -248,8 +232,7 @@ export default function RegistrationForm() {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-4 h-4"
-                >
+                  className="w-4 h-4">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -286,8 +269,7 @@ export default function RegistrationForm() {
           />
           <label
             htmlFor="terms"
-            className="text-base font-medium text-text-secondary cursor-pointer"
-          >
+            className="text-base font-medium text-text-secondary cursor-pointer">
             أوافق على{" "}
             <Link href="/terms" className="text-brand-primary hover:underline">
               شروط الخدمة
@@ -295,8 +277,7 @@ export default function RegistrationForm() {
             و{" "}
             <Link
               href="/privacy"
-              className="text-brand-primary hover:underline"
-            >
+              className="text-brand-primary hover:underline">
               سياسة الخصوصية
             </Link>
           </label>
@@ -306,8 +287,7 @@ export default function RegistrationForm() {
         <button
           type="submit"
           disabled={isSubmitting || !termsAccepted}
-          className="btn w-full bg-brand-primary hover:bg-brand-dark text-white border-none rounded-lg text-body font-medium mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+          className="btn w-full bg-brand-primary hover:bg-brand-dark text-white border-none rounded-lg text-body font-medium mt-1 disabled:opacity-50 disabled:cursor-not-allowed">
           {isSubmitting ? (
             <span className="loading loading-spinner loading-sm" />
           ) : (
@@ -324,22 +304,19 @@ export default function RegistrationForm() {
         <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
-            className="btn btn-outline border-border-default text-text-secondary hover:bg-surface-secondary hover:border-border-default hover:text-text-primary rounded-lg gap-2"
-          >
+            className="btn btn-outline border-border-default text-text-secondary hover:bg-surface-secondary hover:border-border-default hover:text-text-primary rounded-lg gap-2">
             <svg
               className="w-4 h-4"
               viewBox="0 0 24 24"
               fill="#1877F2"
-              aria-hidden="true"
-            >
+              aria-hidden="true">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
             </svg>
             فيسبوك
           </button>
           <button
             type="button"
-            className="btn btn-outline border-border-default text-text-secondary hover:bg-surface-secondary hover:border-border-default hover:text-text-primary rounded-lg gap-2"
-          >
+            className="btn btn-outline border-border-default text-text-secondary hover:bg-surface-secondary hover:border-border-default hover:text-text-primary rounded-lg gap-2">
             <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 fill="#4285F4"
@@ -371,8 +348,7 @@ export default function RegistrationForm() {
               className="w-5 h-5 shrink-0"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+              stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

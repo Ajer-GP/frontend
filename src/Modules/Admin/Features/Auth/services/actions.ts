@@ -207,7 +207,6 @@ export async function InsuranceDecision(id: string, decision: object) {
     );
 
     const data = await res.json();
-    console.log(data, res.status);
     if (!res.ok) return { error: data.error?.message };
     return data;
   } catch (err) {

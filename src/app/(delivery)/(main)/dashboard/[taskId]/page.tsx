@@ -15,9 +15,7 @@ export default async function page({
 }) {
   const { taskId } = await params;
   const result = await getDeliveryById(taskId);
-  // console.log(result, "rgtrhrhhhhhhhhhhhhhhhhh");
   const task = result.delivery;
-  // console.log(result.delivery, "rgtrhrhhhhhhhhhhhhhhhhh");
 
   const isOwnerToRenter = task.type === "from_owner_to_renter";
 

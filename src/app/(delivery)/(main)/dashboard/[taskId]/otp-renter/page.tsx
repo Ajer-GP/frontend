@@ -12,7 +12,6 @@ export default async function page({
   const { taskId } = await params;
   const result = await getDeliveryById(taskId);
   const task = result.delivery;
-  console.log(task.status, "task.status ");
 
   // guard — لو مش في الـ status الصح
   if (task.status !== "picked_up") {
@@ -43,8 +42,7 @@ export default async function page({
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-10 sm:size-12"
-            >
+              className="size-10 sm:size-12">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -72,8 +70,7 @@ export default async function page({
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-6"
-            >
+              className="size-6">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

@@ -27,8 +27,6 @@ export async function CreateRentRequest(
       totalAmount: totalAmount,
     };
 
-    console.log("CreateRentRequest -> sending", { url, payload });
-
     const res = await fetch(url, {
       method: "POST",
       credentials: "include",
@@ -58,10 +56,7 @@ export async function CreateRentRequest(
     }
 
     const rentalRequest = await res.json();
-    console.log(
-      "CreateRentRequest -> success",
-      rentalRequest.rentalRequest.rentalRequest,
-    );
+
     return { success: true, rentalRequest };
   } catch {
     return { success: false, error: "تعذر الاتصال بالخادم، حاول مجدداً" };
@@ -155,7 +150,6 @@ export async function rejectRentalAction(id: string) {
 export async function cancelRental(rentalId: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value;
-  console.log(rentalId);
 
   if (!token) {
     return { success: false, message: "غير مصرح لك" };
@@ -175,7 +169,6 @@ export async function cancelRental(rentalId: string) {
 
     const data = await res.json();
     // const text = await res.text();
-    console.log("API response:", data);
     if (!res.ok) {
       return {
         success: false,

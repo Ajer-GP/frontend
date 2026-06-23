@@ -13,22 +13,16 @@ export default async function OrderRedirectPage({ params }: Props) {
   const token = await getTokenOrRefresh();
 
   const userCookie = cookieStore.get("user")?.value;
-  console.log(userCookie);
 
   const user = userCookie ? JSON.parse(decodeURIComponent(userCookie)) : null;
   if (!user) redirect("/auth/login");
 
   const result = await getOrderByIdAction(id);
-  console.log(result);
 
   if (!result.success) notFound();
 
   const rental = result.rental;
-  console.log(rental.renterId);
-  console.log(rental.ownerId);
-  console.log(user._id);
-  // console.log("rental.status:", rental.status);
-  // console.log("expectedStatus:", expectedStatus);
+
   if (rental.renterId !== user._id && rental.ownerId !== user._id) {
     redirect("/unauthorized");
   }

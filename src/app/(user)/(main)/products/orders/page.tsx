@@ -15,8 +15,7 @@ export default async function OrdersPage() {
   });
   const data = res.ok ? await res.json() : { rentals: [] };
   const rentals: { _id: string }[] = data.rentals ?? [];
-  // console.log("rentals:", JSON.stringify(rentals, null, 2));
-  // 2. جيبي تفاصيل كل واحدة بالتوازي (populated)
+
   const detailed = await Promise.all(
     rentals.map((r) =>
       fetch(`${process.env.API_BASE_URL}/requests/${r._id}`, {
@@ -26,10 +25,8 @@ export default async function OrdersPage() {
     ),
   );
 
-  // console.log("detailed[0]:", JSON.stringify(detailed[0], null, 2)); // ← شوفي الشكل
   const fullRentals = detailed
     .filter((d) => d.status === "success")
     .map((d) => d.rental);
-  console.log("Full rentals:", fullRentals);
   return <OrdersClient initialOrders={fullRentals} currentUserId={user?._id} />;
 }

@@ -61,8 +61,7 @@ export default function Paymentremanining({
               tab === t
                 ? "bg-brand-primary text-white"
                 : "bg-surface-primary text-text-secondary"
-            }`}
-          >
+            }`}>
             {t === "card" ? "بطاقة ائتمان / خصم" : "انستا باي"}
           </button>
         ))}
@@ -81,8 +80,7 @@ export default function Paymentremanining({
           {clientSecret && (
             <Elements
               stripe={stripePromise}
-              options={{ clientSecret, locale: "ar" }}
-            >
+              options={{ clientSecret, locale: "ar" }}>
               <StripeForm amount={amount} orderId={orderId} />
             </Elements>
           )}
@@ -110,7 +108,6 @@ function InstapayForm({
   const [error, setError] = useState("");
   const [waitingAdmin, setWaitingAdmin] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  console.log("orderId:", orderId);
   const handleFile = (f: File) => {
     setFile(f);
     setPreview(URL.createObjectURL(f));
@@ -130,7 +127,6 @@ function InstapayForm({
         fd.append("screenshotUrl", file);
 
         const result = await payRemaining(orderId, fd);
-        console.log("result remaning", result);
 
         const status = result?.rental?.status ?? result?.status;
         if (
@@ -181,8 +177,7 @@ function InstapayForm({
         }}
         onDragOver={(e) => e.preventDefault()}
         onClick={() => inputRef.current?.click()}
-        className="border-2 border-dashed border-border-default rounded-xl p-8 flex flex-col items-center gap-3 cursor-pointer hover:border-brand-primary transition-colors"
-      >
+        className="border-2 border-dashed border-border-default rounded-xl p-8 flex flex-col items-center gap-3 cursor-pointer hover:border-brand-primary transition-colors">
         {preview ? (
           <Image
             width={160}
@@ -199,8 +194,7 @@ function InstapayForm({
         )}
         <button
           type="button"
-          className="bg-brand-primary text-white rounded-lg px-4 py-2 text-caption"
-        >
+          className="bg-brand-primary text-white rounded-lg px-4 py-2 text-caption">
           تصفح ملفات الجهاز
         </button>
         <input
@@ -221,8 +215,7 @@ function InstapayForm({
         type="button"
         onClick={handleSubmit}
         disabled={isPending || !file}
-        className="w-full bg-brand-primary text-white rounded-lg py-3 text-body-sm font-medium disabled:opacity-50"
-      >
+        className="w-full bg-brand-primary text-white rounded-lg py-3 text-body-sm font-medium disabled:opacity-50">
         {isPending ? "جاري الإرسال..." : `تأكيد الدفع ${amount} ج.م`}
       </button>
     </div>
@@ -236,7 +229,6 @@ function StripeForm({ amount, orderId }: { amount: number; orderId: string }) {
   const elements = useElements();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
-  console.log("orderId:", orderId);
 
   const handlePay = () => {
     if (!stripe || !elements) return;
@@ -274,8 +266,7 @@ function StripeForm({ amount, orderId }: { amount: number; orderId: string }) {
         type="button"
         onClick={handlePay}
         disabled={isPending || !stripe}
-        className="w-full bg-brand-primary text-white rounded-lg py-3 text-body-sm font-medium disabled:opacity-50"
-      >
+        className="w-full bg-brand-primary text-white rounded-lg py-3 text-body-sm font-medium disabled:opacity-50">
         {isPending ? "جاري الدفع..." : `ادفع ${amount} ج.م`}
       </button>
     </div>

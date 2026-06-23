@@ -95,7 +95,6 @@ export async function getDeliveryById(id: string) {
 export async function startDelivery(deliveryId: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("delivery_token")?.value;
-  console.log("deliveryId", deliveryId);
   const res = await fetch(
     `${process.env.API_BASE_URL}/delivery/pick-up/on-the-way/${deliveryId}`,
     {
@@ -118,7 +117,6 @@ export async function startDelivery(deliveryId: string) {
 export async function submitPickupForm(formData: FormData) {
   const cookieStore = await cookies();
   const token = cookieStore.get("delivery_token")?.value;
-  console.log(formData);
 
   const id = formData.get("deliveryId") as string;
 
@@ -133,7 +131,6 @@ export async function submitPickupForm(formData: FormData) {
   for (const img of images) {
     body.append("images", img);
   }
-  console.log(body);
 
   const res = await fetch(
     `${process.env.API_BASE_URL}/delivery/owner-pick-up-form/${id}`,
@@ -194,7 +191,6 @@ export async function submitReturnPickupForm(formData: FormData) {
 export async function confirmOTPRenter(OTP: number, id: string) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("delivery_token")?.value;
-  console.log("confirmOTPRenter");
 
   try {
     const res = await fetch(

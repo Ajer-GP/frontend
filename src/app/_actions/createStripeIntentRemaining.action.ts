@@ -20,7 +20,6 @@ export async function createStripeIntentRemaining(orderId: string) {
   );
 
   const data = await res.json();
-  console.log(data, "stripeIntent");
 
   return data.clientSecret as string;
 }

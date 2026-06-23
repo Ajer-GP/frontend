@@ -1,12 +1,6 @@
-// src/app/(user)/(main)/dashboard/page.tsx
-// Server Component — fetches data, no "use client"
-import Link from "next/link";
-import DashboardStats from "@/app/_components/delivery/DashboardStats";
-import RightPanel from "@/app/_components/delivery/RightPanel";
 import TaskCard from "@/app/_components/delivery/TaskCard";
 import { getAllDeliveries } from "@/Modules/Delivery/Features/services/delivery.actions";
 import { cookies } from "next/headers";
-import OnlineToggle from "@/Modules/Delivery/components/OnlineToggle";
 import StatsCard from "@/Modules/Delivery/components/StatsCard";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -22,103 +16,6 @@ interface Task {
   deliveryTime: string;
   address: string;
   city: string;
-}
-
-interface DashboardData {
-  driverName: string;
-  currentTasks: number;
-  completedToday: number;
-  totalTasks: number;
-  tasks: Task[];
-  activeOrder: {
-    pickupDate: string;
-    pickupTime: string;
-    returnDate: string;
-    returnTime: string;
-  };
-  financial: {
-    insurance: number;
-    balance: number;
-    platformFee: number;
-    platformFeePercent: number;
-    total: number;
-  };
-}
-
-// ─── Data Fetcher ─────────────────────────────────────────────────────────────
-
-async function getDashboardData(): Promise<DashboardData> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("delivery_token")?.value;
-  const delivery = cookieStore.get("delivery")?.value;
-  const deliveryData = delivery
-    ? JSON.parse(decodeURIComponent(delivery))
-    : null;
-  console.log(deliveryData, "feffedf");
-
-  // TODO: Replace with real API call
-  // const res = await fetch(`${process.env.API_BASE_URL}/delivery/dashboard`, {
-  //   headers: { Authorization: `Bearer ${token}` },
-  //   cache: "no-store",
-  // });
-  // if (!res.ok) throw new Error("Failed to fetch dashboard data");
-  // return res.json();
-
-  // Mock data matching the Figma design
-  return {
-    driverName: "أحمد",
-    currentTasks: 6,
-    completedToday: 12,
-    totalTasks: 18,
-    tasks: [
-      {
-        id: "task-001",
-        productName: "كاميرا Canon EOS R6",
-        ownerName: "خالد محمود",
-        renterName: "ريا مالك",
-        status: "في الطريق إلى المالك",
-        scheduledTime: "10:00 صباحاً",
-        deliveryTime: "10:00 صباحاً",
-        address: "المنصورة، المنصورة",
-        city: "المحافظة",
-      },
-      {
-        id: "task-002",
-        productName: "كاميرا Canon EOS R6",
-        ownerName: "خالد محمود",
-        renterName: "ريا مالك",
-        status: "استلام المنتج",
-        scheduledTime: "10:00 صباحاً",
-        deliveryTime: "10:00 صباحاً",
-        address: "المنصورة، المنصورة",
-        city: "المحافظة",
-      },
-      {
-        id: "task-003",
-        productName: "كاميرا Canon EOS R6",
-        ownerName: "خالد محمود",
-        renterName: "ريا مالك",
-        status: "عاجل",
-        scheduledTime: "11:00 صباحاً",
-        deliveryTime: "12:00 ظهراً",
-        address: "المنصورة، المنصورة",
-        city: "المحافظة",
-      },
-    ],
-    activeOrder: {
-      pickupDate: "14 يونيو 2026",
-      pickupTime: "04:30",
-      returnDate: "14 يونيو 2026",
-      returnTime: "06:30",
-    },
-    financial: {
-      insurance: 300,
-      balance: 300,
-      platformFee: 100,
-      platformFeePercent: 7.5,
-      total: 400,
-    },
-  };
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
