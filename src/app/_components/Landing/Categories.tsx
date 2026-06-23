@@ -34,7 +34,7 @@ export default function Categories() {
             </figure>
             <div className="card-body items-center text-center">
               <h2 className="card-title text-brand-primary">{cat.label}</h2>
-              <p className="text-gray-500 font-black">+150 عنصر</p>
+              {/* <p className="text-gray-500 font-black">+150 عنصر</p> */}
             </div>
           </div>
         ))}
