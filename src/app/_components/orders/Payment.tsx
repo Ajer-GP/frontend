@@ -7,25 +7,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import { payDepositInstapay } from "@/app/_actions/payDeposit.action";
-import { createStripeIntent } from "@/app/_actions/createStripeIntent.action";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY!);
-
-type Tab = "card" | "instapay";
-
-// PaymentSection — parent
-("use client");
-import { useState, useRef, useTransition } from "react";
-import { loadStripe } from "@stripe/stripe-js";
-import {
-  Elements,
-  PaymentElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
 import { payDepositInstapay } from "@/app/_actions/payDeposit.action";
 import { createStripeIntent } from "@/app/_actions/createStripeIntent.action";
 import { useRouter } from "next/navigation";
@@ -97,8 +79,7 @@ export default function PaymentSection({
               tab === t
                 ? "bg-brand-primary text-white"
                 : "bg-surface-primary text-text-secondary"
-            }`}
-          >
+            }`}>
             {t === "card" ? "بطاقة ائتمان / خصم" : "انستا باي"}
           </button>
         ))}
@@ -119,8 +100,7 @@ export default function PaymentSection({
           {addressConfirmed && clientSecret && (
             <Elements
               stripe={stripePromise}
-              options={{ clientSecret, locale: "ar" }}
-            >
+              options={{ clientSecret, locale: "ar" }}>
               <StripeForm
                 amount={amount}
                 orderId={orderId}
@@ -381,8 +361,7 @@ function InstapayForm({
         }}
         onDragOver={(e) => e.preventDefault()}
         onClick={() => inputRef.current?.click()}
-        className="border-2 border-dashed border-border-default rounded-xl p-8 flex flex-col items-center gap-3 cursor-pointer hover:border-brand-primary transition-colors"
-      >
+        className="border-2 border-dashed border-border-default rounded-xl p-8 flex flex-col items-center gap-3 cursor-pointer hover:border-brand-primary transition-colors">
         {preview ? (
           <Image
             width={160}
@@ -399,8 +378,7 @@ function InstapayForm({
         )}
         <button
           type="button"
-          className="bg-brand-primary text-white rounded-lg px-4 py-2 text-caption"
-        >
+          className="bg-brand-primary text-white rounded-lg px-4 py-2 text-caption">
           تصفح ملفات الجهاز
         </button>
         <input
@@ -424,8 +402,7 @@ function InstapayForm({
         type="button"
         onClick={handleSubmit}
         disabled={isPending || !file}
-        className="w-full bg-brand-primary text-white rounded-lg py-3 text-body-sm font-medium disabled:opacity-50"
-      >
+        className="w-full bg-brand-primary text-white rounded-lg py-3 text-body-sm font-medium disabled:opacity-50">
         {isPending ? "جاري الإرسال..." : `تأكيد الدفع ${amount} ج.م`}
       </button>
     </div>
@@ -469,8 +446,7 @@ function StripeForm({
       <button
         type="button"
         onClick={onEditAddress}
-        className="text-caption text-text-secondary underline"
-      >
+        className="text-caption text-text-secondary underline">
         ← تعديل العنوان
       </button>
 
@@ -482,31 +458,12 @@ function StripeForm({
         type="button"
         onClick={handlePay}
         disabled={isPending || !stripe}
-        className="w-full bg-brand-primary text-white rounded-lg py-3 text-body-sm font-medium disabled:opacity-50"
-      >
+        className="w-full bg-brand-primary text-white rounded-lg py-3 text-body-sm font-medium disabled:opacity-50">
         {isPending ? "جاري الدفع..." : `ادفع ${amount} ج.م`}
       </button>
     </div>
   );
 }
-// PaymentSection.tsx  — الجزء المتغير بس
-
-// ── نوع العنوان ────────────────────────────────────────────────────────────────
-type Address = {
-  street: string;
-  floor: string;
-  apartment: string;
-  landmark: string;
-  building: string;
-};
-
-const EMPTY_ADDRESS: Address = {
-  street: "",
-  floor: "",
-  apartment: "",
-  landmark: "",
-  building: "",
-};
 
 // ── مكوّن حقول العنوان (مشترك بين Instapay وStripe) ───────────────────────────
 function AddressFields({
@@ -571,8 +528,7 @@ function StripeAddressStep({
       <button
         type="button"
         onClick={handleContinue}
-        className="w-full bg-brand-primary text-white rounded-lg py-3 text-body-sm font-medium"
-      >
+        className="w-full bg-brand-primary text-white rounded-lg py-3 text-body-sm font-medium">
         متابعة للدفع
       </button>
     </div>
