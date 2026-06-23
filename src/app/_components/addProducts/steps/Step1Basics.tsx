@@ -207,8 +207,6 @@ export default function Step1Basics({
             </p>
           )}
         </div>
-
-        {/* Specs */}
         <div className="border border-brand-primary rounded-2xl p-4">
           <div className="flex justify-between my-2">
             <div>
@@ -220,21 +218,25 @@ export default function Step1Basics({
             <span className="text-caption text-brand-primary">اختياري</span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 mb-1">
-            <label className="text-sm font-black py-2">عنوان</label>
-            <label className="text-sm font-black py-2">القيمة</label>
-            <div className="flex justify-end items-start">
+          {/* Header */}
+          <div className="grid grid-cols-3 gap-2 mb-2 items-center">
+            <label className="text-sm font-black">عنوان</label>
+            <label className="text-sm font-black">القيمة</label>
+            <div className="flex justify-end">
               <button
                 type="button"
                 onClick={() => appendSpec({ title: "", value: "" })}
-                className="text-body-sm text-white bg-brand-primary px-2 py-2 w-20 rounded-xl text-center font-medium flex items-center gap-1">
+                className="text-body-sm text-white bg-brand-primary px-2 py-2 w-20 rounded-xl font-medium">
                 + أضف
               </button>
             </div>
           </div>
 
+          {/* Rows */}
           {specFields.map((field, i) => (
-            <div key={field.id} className="grid grid-cols-2 gap-2 mb-2">
+            <div
+              key={field.id}
+              className="grid grid-cols-3 gap-2 mb-2 items-center">
               <input
                 {...register(`specs.${i}.title`)}
                 placeholder="مثال الماركة"
@@ -246,6 +248,7 @@ export default function Step1Basics({
                   }
                 }}
               />
+
               <input
                 {...register(`specs.${i}.value`)}
                 placeholder="مثال سوني"
@@ -257,8 +260,11 @@ export default function Step1Basics({
                   }
                 }}
               />
+
+              <div />
             </div>
           ))}
+
           <p className="text-caption text-text-tertiary mt-2">
             يمكنك الضغط على زر Enter للإضافة
           </p>

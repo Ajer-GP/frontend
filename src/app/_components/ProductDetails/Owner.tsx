@@ -99,11 +99,11 @@ export default async function Owner(data: any) {
         </div>
 
         {/* Full-width button */}
-        <Link
+        {/* <Link
           href="/user/profile"
           className="btn bg-brand-primary rounded-3xl w-full text-white text-center text-sm sm:text-base">
           شاهد الحساب
-        </Link>
+        </Link> */}
       </div>
     </div>
   );
