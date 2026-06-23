@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { loginSchema } from "../Auth/schemas/delivery.validation";
+import { redirect } from "next/navigation";
 export async function DeliveryLogin(prevState: any, formData: FormData) {
   const parsed = loginSchema.safeParse({
     email: formData.get("email"),
@@ -291,4 +292,10 @@ export async function setDeliveryRepOnline(state: boolean) {
   }
 
   return await res.json();
+}
+export async function logout() {
+  const cookieStore = await cookies();
+  cookieStore.delete("delivery_token");
+  cookieStore.delete("delivery");
+  redirect("/auth/DeliveryLogin");
 }

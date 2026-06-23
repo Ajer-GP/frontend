@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
+import { logout } from "@/Modules/Delivery/Features/services/delivery.actions";
 
 const icons = {
   home: (
@@ -139,18 +141,15 @@ const icons = {
 const navItems = [
   { label: "الرئيسية", href: "/dashboard", icon: "home" },
   { label: "جميع المهام", href: "/tasks", icon: "tasks" },
-
   { label: "الاستلام", href: "/pickup", icon: "pickup" },
   { label: "التسليم", href: "/delivery", icon: "delivery" },
   { label: "المرتجعات", href: "/returns", icon: "returns" },
   { label: "الفحوصات", href: "/inspections", icon: "inspections" },
 ];
 
-// Full labels for the desktop sidebar
 const navItemsFull = [
   { label: "الرئيسية", href: "/dashboard", icon: "home" },
   { label: "جميع المهام", href: "/tasks", icon: "tasks" },
-
   {
     label: "عمليات الاستلام من المالكين",
     href: "/pickup",
@@ -180,11 +179,25 @@ interface DashboardSidebarProps {
   deliveryData: DeliveryData | null;
 }
 
+// ── Helper: clears all auth cookies and redirects to delivery login ──
+function clearCookies() {
+  const cookieNames = ["delivery_token", "delivery"];
+  cookieNames.forEach((name) => {
+    document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
+  });
+}
+
 export default function DashboardSidebar({
   deliveryData,
 }: DashboardSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const activeHref = pathname ?? "/dashboard";
+
+  // const handleLogout = () => {
+  //   clearCookies();
+  //   router.push("/auth/DeliveryLogin");
+  // };
 
   return (
     <>
@@ -231,8 +244,8 @@ export default function DashboardSidebar({
         </nav>
 
         {/* Footer */}
-        {/* Footer */}
-        <div className="px-6 py-4 border-t border-border-default">
+        <div className="px-4 py-4 border-t border-border-default space-y-3">
+          {/* User info */}
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-brand-primary text-caption font-medium">
               {deliveryData?.fullName?.slice(0, 2) ?? "؟"}
@@ -251,6 +264,30 @@ export default function DashboardSidebar({
               </p>
             </div>
           </div>
+
+          {/* Logout button */}
+          <button
+            onClick={() => logout()}
+            className="btn btn-ghost btn-sm w-full justify-start gap-2 text-error hover:bg-error/10 px-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              className="w-4 h-4 flex-shrink-0"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              width="18"
+              height="18"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"
+              />
+            </svg>
+            <span className="text-caption">تسجيل الخروج</span>
+          </button>
         </div>
       </aside>
 
@@ -284,6 +321,37 @@ export default function DashboardSidebar({
               </li>
             );
           })}
+
+          {/* Mobile logout tab */}
+          <li>
+            <button
+                         onClick={() => logout()}
+
+              className="flex flex-col items-center gap-1 px-2 py-1.5 rounded-lg transition-colors min-w-[52px] text-error hover:text-error/70"
+            >
+              <span className="w-5 h-5 flex items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  className="w-[18px] h-[18px]"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  width="18"
+                  height="18"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"
+                  />
+                </svg>
+              </span>
+              <span className="text-[10px] leading-tight text-center">
+                خروج
+              </span>
+            </button>
+          </li>
         </ul>
       </nav>
     </>

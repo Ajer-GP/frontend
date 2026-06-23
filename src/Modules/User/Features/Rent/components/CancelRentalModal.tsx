@@ -26,8 +26,12 @@ export default function CancelRentalModal({
       const result = await cancelRental(rentalId);
 
       if (result.success) {
+        toast.success("تم إلغاء الطلب بنجاح", {
+          description: "يمكنك متابعة طلباتك الأخرى من هنا",
+          duration: 4000,
+        });
         onClose();
-        window.location.href = `/renter/orders/${rentalId}/cancelled`;
+        router.push("/products/orders");
       } else {
         toast.error(result.message || "فشل الإلغاء");
       }

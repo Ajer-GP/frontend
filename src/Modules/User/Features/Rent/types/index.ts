@@ -4,12 +4,16 @@ export interface Rental {
   ownerId: string;
   status:
     | "pending"
-    | "waiting_for_deposit"
     | "accepted"
+    | "waiting_for_deposit"
     | "confirmed"
+    | "rejected"
+    | "cancelled"
+    | "delivering_to_renter"
     | "active"
-    | "returned"
-    | "rejected";
+    | "returning_to_owner"
+    | "suspended"
+    | "completed";
   productId: string;
   startDate: string;
   endDate: string;

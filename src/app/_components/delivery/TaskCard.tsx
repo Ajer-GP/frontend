@@ -66,7 +66,7 @@ function getTaskRoute(task: DeliveryTask): string {
     case "on_the_way":
       return isOwnerToRenter
         ? `${base}/ownerpickupinspection`
-        : `${base}/return-pickup`;
+        : `${base}/returnpickupInspection`;
     case "picked_up":
       return isOwnerToRenter ? `${base}/otp-renter` : `${base}/otp-owner`;
     default:
@@ -189,7 +189,8 @@ export default function TaskCard({
 
         {/* متابعة المهمة — موجودة دايماً */}
         <Link
-          href={getTaskRoute(task)}
+          // href={getTaskRoute(task)}
+          href={`/dashboard/${task._id}`}
           className="px-4 py-2 rounded-lg bg-brand-primary text-white text-caption font-medium hover:bg-brand-dark transition-colors text-center"
         >
           متابعة المهمة

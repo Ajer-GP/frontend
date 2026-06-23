@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { submitReturnPickupForm } from "@/Modules/Delivery/Features/services/delivery.actions";
 import { useRouter } from "next/navigation";
@@ -33,45 +33,53 @@ const INITIAL_CHECKLIST: ChecklistItem[] = [
 function StatusBanner({ orderId, type }: { orderId: string; type: string }) {
   const isReturn = type === "from_renter_to_owner";
   return (
-    <div className="rounded-2xl bg-[var(--brand-primary)] px-5 py-4 flex items-center justify-between flex-row-reverse">
-      <div className="text-right">
-        <div className="flex items-center gap-2 justify-end mb-0.5">
-          <span className="text-white/60 text-caption">{orderId}</span>
-          <span className="text-white/60 text-caption">:رقم المهمة</span>
+    <div className="rounded-2xl bg-[var(--brand-primary)] px-4 sm:px-5 py-4 flex flex-col gap-3 sm:flex-row-reverse sm:items-center sm:justify-between">
+      {/* Badge — على موبايل فوق، على sm جنب */}
+      <span className="self-end sm:self-auto bg-white/20 text-white text-caption sm:text-body-sm font-medium px-3 py-1.5 rounded-xl whitespace-nowrap shrink-0">
+        {isReturn ? "تأكيد الاستلام المرتجع" : "تأكيد التوصيل"}
+      </span>
+
+      {/* النص */}
+      <div className="text-right min-w-0">
+        <div className="flex items-center gap-2 justify-end mb-0.5 flex-wrap">
+          <span className="text-white/60 text-caption break-all">
+            {orderId}
+          </span>
+          <span className="text-white/60 text-caption shrink-0">
+            :رقم المهمة
+          </span>
         </div>
-        <h1 className="text-white text-h1 mt-0.5">
+        <h1 className="text-white text-h1 leading-snug">
           {isReturn ? "استلام المرتجع من المستأجر" : "توصيل المنتج للمستأجر"}
         </h1>
         <p className="text-white text-caption opacity-70 mt-1">
           تأكد من فحص المنتج قبل إتمام الاستلام
         </p>
       </div>
-      <span className="bg-white/20 text-white text-body-sm font-medium px-3 py-1.5 rounded-xl whitespace-nowrap">
-        {isReturn ? "تأكيد الاستلام المرتجع" : "تأكيد التوصيل"}
-      </span>
     </div>
   );
 }
 
-// ─── OrderSummary ─────────────────────────────────────────────────────────────
-
 function OrderSummary({ task }: { task: TaskDetails }) {
   const startDate = task.startDate.split("T")[0];
   const endDate = task.endDate.split("T")[0];
-
-  const start = new Date(task.startDate);
-  const end = new Date(task.endDate);
-  const diffMs = Math.abs(end.getTime() - start.getTime());
-  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const days = Math.floor(
+    Math.abs(
+      new Date(task.endDate).getTime() - new Date(task.startDate).getTime(),
+    ) /
+      (1000 * 60 * 60 * 24),
+  );
 
   return (
-    <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-primary)] p-5">
-      <h2 className="text-h2 text-[var(--text-primary)] mb-4 text-right">
+    <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-primary)] p-3 sm:p-5">
+      <h2 className="text-h2 text-[var(--text-primary)] mb-3 text-right">
         ملخص الطلب
       </h2>
 
-      <div className="flex items-start gap-4 flex-row-reverse">
-        <div className="relative w-[88px] h-[88px] shrink-0 rounded-xl overflow-hidden border border-[var(--border-default)] bg-[var(--surface-tertiary)]">
+      {/* صورة فوق على موبايل صغير، جنب على sm+ */}
+      <div className="flex flex-col xs:flex-row-reverse gap-3">
+        {/* الصورة */}
+        <div className="relative w-full xs:w-[80px] xs:h-[80px] h-[140px] shrink-0 rounded-xl overflow-hidden border border-[var(--border-default)] bg-[var(--surface-tertiary)]">
           <Image
             src={task.productCoverImage}
             alt={task.productTitle}
@@ -79,38 +87,41 @@ function OrderSummary({ task }: { task: TaskDetails }) {
             className="object-cover"
           />
         </div>
-        <div className="flex-1 text-right">
-          <span className="inline-block bg-[var(--surface-tertiary)] text-[var(--text-secondary)] text-caption px-2 py-0.5 rounded-full mb-1">
+
+        {/* المعلومات */}
+        <div className="flex-1 text-right min-w-0">
+          <span className="inline-block bg-[var(--surface-tertiary)] text-[var(--text-secondary)] text-caption px-2 py-0.5 rounded-full mb-1 max-w-full truncate">
             {task.productName}
           </span>
-          <h3 className="text-h3 text-[var(--text-primary)] leading-snug">
+          <h3 className="text-h3 text-[var(--text-primary)] leading-snug line-clamp-2">
             {task.productTitle}
           </h3>
-          <div className="flex items-center gap-1.5 justify-end mt-1">
-            <span className="text-caption text-[var(--text-secondary)]">
+          <div className="flex items-center gap-1 justify-end mt-1">
+            <span className="text-caption text-[var(--text-secondary)] shrink-0">
               المالك
             </span>
-            <span className="text-caption text-[var(--text-primary)] font-medium">
+            <span className="text-caption text-[var(--text-primary)] font-medium truncate">
               {task.ownerName}
             </span>
           </div>
         </div>
       </div>
 
-      <hr className="my-4 border-[var(--border-default)]" />
+      <hr className="my-3 border-[var(--border-default)]" />
 
-      <div className="grid grid-cols-4 gap-3 text-right">
+      {/* Stats — دايماً 2 cols */}
+      <div className="grid grid-cols-2 gap-x-2 gap-y-3 text-right">
         {[
           { label: "تاريخ البداية", value: startDate },
           { label: "تاريخ التسليم", value: endDate },
           { label: "المدة", value: `${days} أيام` },
-          { label: "الحساب اليومي", value: `${task.pricePerDay} ج.م` },
+          { label: "اليومي", value: `${task.pricePerDay} ج.م` },
         ].map((stat) => (
-          <div key={stat.label} className="flex flex-col gap-0.5">
-            <span className="text-caption text-[var(--text-tertiary)]">
+          <div key={stat.label} className="flex flex-col gap-0.5 min-w-0">
+            <span className="text-caption text-[var(--text-tertiary)] truncate text-[10px]">
               {stat.label}
             </span>
-            <span className="text-h3 text-[var(--text-primary)]">
+            <span className="text-body-sm font-semibold text-[var(--text-primary)] truncate">
               {stat.value}
             </span>
           </div>
@@ -119,7 +130,6 @@ function OrderSummary({ task }: { task: TaskDetails }) {
     </section>
   );
 }
-
 // ─── InspectionChecklist ──────────────────────────────────────────────────────
 
 function InspectionChecklist({
@@ -141,7 +151,7 @@ function InspectionChecklist({
     );
 
   return (
-    <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-primary)] p-5">
+    <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-primary)] p-4 sm:p-5">
       <h2 className="text-h2 text-[var(--text-primary)] mb-4 text-right">
         قائمة الفحص
       </h2>
@@ -226,6 +236,13 @@ function InspectionPhotos({
 
   const uploadedCount = slots.filter((s) => s.preview !== null).length;
 
+  // ✅ FIX: notify parent AFTER render via useEffect, not inside setState setter
+  useEffect(() => {
+    onCountChange(uploadedCount);
+    onFilesChange(slots.map((s) => s.file));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slots]);
+
   const openPicker = (idx: number) => {
     targetSlotRef.current = idx;
     inputRef.current?.click();
@@ -237,28 +254,18 @@ function InspectionPhotos({
     const preview = URL.createObjectURL(file);
     const idx = targetSlotRef.current;
 
-    setSlots((prev) => {
-      const next = prev.map((s, i) => (i === idx ? { file, preview } : s));
-      onCountChange(next.filter((s) => s.preview !== null).length);
-      onFilesChange(next.map((s) => s.file));
-      return next;
-    });
+    setSlots((prev) => prev.map((s, i) => (i === idx ? { file, preview } : s)));
     e.target.value = "";
   };
 
   const removeSlot = (idx: number) => {
-    setSlots((prev) => {
-      const next = prev.map((s, i) =>
-        i === idx ? { file: null, preview: null } : s,
-      );
-      onCountChange(next.filter((s) => s.preview !== null).length);
-      onFilesChange(next.map((s) => s.file));
-      return next;
-    });
+    setSlots((prev) =>
+      prev.map((s, i) => (i === idx ? { file: null, preview: null } : s)),
+    );
   };
 
   return (
-    <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-primary)] p-5">
+    <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-primary)] p-4 sm:p-5">
       <div className="flex items-center justify-between mb-4 flex-row-reverse">
         <h2 className="text-h2 text-[var(--text-primary)]">صور الفحص</h2>
         <span
@@ -281,7 +288,8 @@ function InspectionPhotos({
         onChange={handleFile}
       />
 
-      <div className="grid grid-cols-4 gap-3">
+      {/* Responsive grid: 2 cols on mobile, 4 cols on sm+ */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {slots.map((slot, idx) => (
           <div key={idx} className="relative aspect-square">
             {slot.preview ? (
@@ -320,9 +328,9 @@ function InspectionPhotos({
                            bg-[var(--surface-secondary)] flex flex-col items-center justify-center gap-1
                            hover:border-[var(--brand-mid)] hover:bg-[var(--brand-light)] transition-colors"
               >
-                <div className="w-8 h-8 rounded-full bg-[var(--brand-primary)] flex items-center justify-center">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[var(--brand-primary)] flex items-center justify-center">
                   <svg
-                    className="w-4 h-4 text-white"
+                    className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -335,10 +343,10 @@ function InspectionPhotos({
                     />
                   </svg>
                 </div>
-                <span className="text-[10px] text-[var(--text-secondary)] text-center leading-tight px-1">
+                <span className="text-[9px] sm:text-[10px] text-[var(--text-secondary)] text-center leading-tight px-1">
                   اسحب وأفلت صورك هنا
                 </span>
-                <span className="text-[9px] text-[var(--text-tertiary)]">
+                <span className="hidden sm:block text-[9px] text-[var(--text-tertiary)]">
                   أو اضغط للرفع
                 </span>
               </button>
@@ -386,7 +394,6 @@ function ConfirmButton({
       formData.append("deliveryId", deliveryId);
       if (note) formData.append("deliveryRepNotes", note);
 
-      // بنبعت الـ ids بس للـ checked items
       const checkedIds = checkedItems.filter((i) => i.checked).map((i) => i.id);
       formData.append("checkedItems", JSON.stringify(checkedIds));
 
@@ -472,10 +479,6 @@ function ConfirmButton({
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
-interface ReturnPickupInspectionPageProps {
-  orderId: string;
-}
-
 export default function ReturnPickupInspectionPage({
   orderId,
   taskDeatils,
@@ -494,11 +497,9 @@ export default function ReturnPickupInspectionPage({
   const isReady = uploadedCount >= REQUIRED_PHOTOS;
 
   return (
-    <main
-      dir="rtl"
-      className="min-h-screen bg-[var(--surface-secondary)] pb-10"
-    >
-      <div className="px-4 py-3 flex items-center gap-1.5 text-caption text-[var(--text-tertiary)]">
+    <main dir="rtl" className="min-h-screen pb-10 w-full">
+      {/* Breadcrumb */}
+      <div className="px-4 py-3 flex items-center gap-1.5 text-caption text-[var(--text-tertiary)] flex-wrap">
         <span>الرئيسية</span>
         <span>/</span>
         <span>جميع المهام</span>
@@ -508,7 +509,8 @@ export default function ReturnPickupInspectionPage({
         </span>
       </div>
 
-      <div className="px-4 flex flex-col gap-4 max-w-full mx-auto">
+      {/* Content: centered with max-width on large screens */}
+      <div className="px-4 flex flex-col gap-4 w-full max-w-full mx-auto">
         <StatusBanner orderId={orderId} type={taskDeatils.type} />
         <OrderSummary task={taskDeatils} />
 

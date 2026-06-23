@@ -4,10 +4,13 @@ import { notFound, redirect } from "next/navigation";
 const STATUS_PAGE: Record<string, string> = {
   pending: "request-sent",
   accepted: "accepted",
+  waiting_for_deposit: "accepted",
   confirmed: "confirmed",
-  waiting_for_deposit: "accepted?status=waiting_for_deposit",
+  delivering_to_renter: "confirmed",
   active: "active",
-  returned: "returned",
+  returning_to_owner: "completed",
+  completed: "completed",
+  cancelled: "cancelled",
 };
 export async function getAndGuardRental(
   id: string,

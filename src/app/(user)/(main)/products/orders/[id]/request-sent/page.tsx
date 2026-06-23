@@ -150,7 +150,7 @@ export default async function RequestSentPage({ params }: Props) {
               </button>
             </Link>
             <Link href="/products/orders">
-              <button className="w-full cursor-pointer border border-border-default text-text-secondary rounded-lg py-2.5 text-body-sm">
+              <button className="w-full cursor-pointer border mb-1 border-border-default text-text-secondary rounded-lg py-2.5 text-body-sm">
                 شاهد طلبات إيجارك
               </button>
             </Link>
@@ -158,7 +158,7 @@ export default async function RequestSentPage({ params }: Props) {
           </div>
         </div>
       </div>
-      <HowItWorks />
+      <HowItWorks currentStep={2} />
       <ReturnRefundPolicy />
     </div>
   );

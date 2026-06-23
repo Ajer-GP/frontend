@@ -16,9 +16,9 @@ export const CATEGORY_LABELS: Record<string, string> = {
 };
 
 export const CONDITION_LABELS: Record<string, string> = {
-  excellent: "جديد",
-  good: "كالجديد",
-  fair: "ممتاز",
+  excellent: "ممتاز",
+  good: "جديد",
+  fair: "جيد",
 };
 
 export const conditionMap: Record<string, string> = {

@@ -17,31 +17,35 @@ const REQUIRED_PHOTOS = 4;
 
 function StatusBanner({ orderId }: { orderId: string }) {
   return (
-    <div className="rounded-2xl bg-[var(--brand-primary)] px-5 py-4 flex items-center justify-between gap-3 flex-row-reverse">
-      <div className="text-right flex-1">
-        <div className="flex items-center gap-2 justify-end mb-0.5">
-          <span className="text-white/60 text-caption">{orderId}</span>
-          <span className="text-white/60 text-caption">:رقم المهمة</span>
+    <div className="rounded-2xl bg-[var(--brand-primary)] px-3 sm:px-5 py-3 sm:py-4 flex items-center justify-between gap-2 flex-row-reverse">
+      <div className="text-right flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 justify-end mb-0.5 flex-wrap">
+          <span className="text-white/60 text-[10px] sm:text-caption truncate max-w-[120px] sm:max-w-none">
+            {orderId}
+          </span>
+          <span className="text-white/60 text-[10px] sm:text-caption shrink-0">
+            :رقم المهمة
+          </span>
         </div>
-        <h1 className="text-white text-h1 leading-snug">
+        <h1 className="text-white text-[18px] sm:text-h1 leading-snug">
           استلام المنتج من المالك
         </h1>
-        <p className="text-white/70 text-caption mt-1">
+        <p className="text-white/70 text-[11px] sm:text-caption mt-1">
           أنت حالياً يجب أن تفحص المنتج وتستلمه من المالك
         </p>
       </div>
 
       <div className="relative shrink-0">
-        <div className="w-12 h-12 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center overflow-hidden">
+        <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center overflow-hidden">
           <svg
-            className="w-7 h-7 text-white/80"
+            className="w-5 h-5 sm:w-7 sm:h-7 text-white/80"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
             <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
           </svg>
         </div>
-        <span className="absolute -bottom-0.5 -left-0.5 bg-[var(--accent-default)] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+        <span className="absolute -bottom-0.5 -left-0.5 bg-[var(--accent-default)] text-white text-[9px] sm:text-[10px] font-bold px-1 sm:px-1.5 py-0.5 rounded-full">
           قادم
         </span>
       </div>
@@ -100,11 +104,13 @@ function PhotoUploadSection({
   };
 
   return (
-    <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-primary)] p-5">
+    <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-primary)] p-3 sm:p-5">
       <div className="flex items-center justify-between mb-4 flex-row-reverse">
-        <h2 className="text-h2 text-[var(--text-primary)]">صور الفحص</h2>
+        <h2 className="text-[15px] sm:text-h2 text-[var(--text-primary)]">
+          صور الفحص
+        </h2>
         <span
-          className={`text-caption font-medium px-2.5 py-1 rounded-full transition-colors
+          className={`text-[11px] sm:text-caption font-medium px-2 sm:px-2.5 py-1 rounded-full transition-colors
             ${
               uploadedCount === REQUIRED_PHOTOS
                 ? "bg-[var(--semantic-success-bg)] text-[var(--semantic-success)]"
@@ -123,7 +129,7 @@ function PhotoUploadSection({
         onChange={handleFile}
       />
 
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 xs:grid-cols-4 gap-2 sm:gap-3">
         {slots.map((slot, idx) => (
           <div key={idx} className="relative aspect-square">
             {slot.preview ? (
@@ -163,9 +169,9 @@ function PhotoUploadSection({
                            bg-[var(--surface-secondary)] flex flex-col items-center justify-center gap-1
                            hover:border-[var(--brand-mid)] hover:bg-[var(--brand-light)] transition-colors"
               >
-                <div className="w-8 h-8 rounded-full bg-[var(--brand-primary)] flex items-center justify-center">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-[var(--brand-primary)] flex items-center justify-center">
                   <svg
-                    className="w-4 h-4 text-white"
+                    className="w-3 h-3 sm:w-4 sm:h-4 text-white"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -178,10 +184,10 @@ function PhotoUploadSection({
                     />
                   </svg>
                 </div>
-                <span className="text-[10px] text-[var(--text-secondary)] text-center leading-tight px-1">
+                <span className="text-[9px] sm:text-[10px] text-[var(--text-secondary)] text-center leading-tight px-1">
                   اسحب وأفلت صورك هنا
                 </span>
-                <span className="text-[9px] text-[var(--text-tertiary)]">
+                <span className="text-[8px] sm:text-[9px] text-[var(--text-tertiary)]">
                   أو اضغط للرفع
                 </span>
               </button>
@@ -191,7 +197,7 @@ function PhotoUploadSection({
       </div>
 
       {uploadedCount < REQUIRED_PHOTOS && (
-        <p className="mt-3 text-caption text-[var(--text-tertiary)] text-right">
+        <p className="mt-3 text-[11px] sm:text-caption text-[var(--text-tertiary)] text-right">
           يجب رفع {REQUIRED_PHOTOS} صور لتفعيل زر التأكيد{" "}
           <span className="text-[var(--semantic-warning)] font-medium">
             (تبقى {REQUIRED_PHOTOS - uploadedCount})
@@ -210,10 +216,10 @@ function OptionalNotes({
   onChange: (v: string) => void;
 }) {
   return (
-    <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-primary)] p-5">
-      <h2 className="text-h2 text-[var(--text-primary)] mb-3 text-right">
+    <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--surface-primary)] p-3 sm:p-5">
+      <h2 className="text-[15px] sm:text-h2 text-[var(--text-primary)] mb-3 text-right">
         ملاحظات إضافية{" "}
-        <span className="text-[var(--text-tertiary)] text-body-sm font-normal">
+        <span className="text-[var(--text-tertiary)] text-[12px] sm:text-body-sm font-normal">
           (اختياري)
         </span>
       </h2>
@@ -224,7 +230,7 @@ function OptionalNotes({
         dir="rtl"
         rows={3}
         className="w-full resize-none rounded-xl border border-[var(--border-default)]
-                   bg-[var(--surface-secondary)] px-3 py-2.5 text-body-sm
+                   bg-[var(--surface-secondary)] px-3 py-2.5 text-[13px] sm:text-body-sm
                    text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]
                    focus:outline-none focus:border-[var(--brand-primary)] transition-colors"
       />
@@ -246,6 +252,7 @@ function ConfirmButton({
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const router = useRouter();
+
   const handleConfirm = async () => {
     if (!isActive || loading || done) return;
     setLoading(true);
@@ -273,7 +280,7 @@ function ConfirmButton({
         type="button"
         onClick={handleConfirm}
         disabled={!isActive || loading || done}
-        className={`w-full text-h3 font-medium py-3.5 rounded-2xl
+        className={`w-full text-[14px] sm:text-h3 font-medium py-3 sm:py-3.5 rounded-2xl
                     flex items-center justify-center gap-2 transition-all
                     ${
                       isActive && !done
@@ -306,7 +313,7 @@ function ConfirmButton({
           <>
             {!isActive && (
               <svg
-                className="w-5 h-5"
+                className="w-4 h-4 sm:w-5 sm:h-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -325,7 +332,7 @@ function ConfirmButton({
       </button>
 
       {!isActive && !done && (
-        <p className="text-caption text-[var(--text-tertiary)] text-center">
+        <p className="text-[11px] sm:text-caption text-[var(--text-tertiary)] text-center">
           ارفع 4 صور للفحص لتفعيل هذا الزر
         </p>
       )}
@@ -354,16 +361,18 @@ export default function OwnerPickupInspectionPage({
       className="min-h-screen bg-[var(--surface-secondary)] pb-10"
     >
       <div className="flex flex-row-reverse">
-        <div className="flex-1 px-4 py-4 max-w-full mx-auto w-full">
-          <div className="flex items-center gap-1.5 text-caption text-[var(--text-tertiary)] mb-3">
+        <div className="flex-1 px-2 sm:px-4 py-4 max-w-full mx-auto w-full">
+          <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-caption text-[var(--text-tertiary)] mb-3 flex-wrap">
             <span>الرئيسية</span>
             <span>/</span>
             <span>المهام الحالية</span>
             <span>/</span>
-            <span className="text-[var(--text-primary)]">{orderId}</span>
+            <span className="text-[var(--text-primary)] truncate max-w-[100px] sm:max-w-none">
+              {orderId}
+            </span>
           </div>
 
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
             <StatusBanner orderId={orderId} />
             <PhotoUploadSection
               onCountChange={setUploadedCount}

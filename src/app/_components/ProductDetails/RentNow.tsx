@@ -3,6 +3,7 @@ import React, { useMemo, useState } from "react";
 import { calculateRentalFee, MIN_HOURS_FROM_NOW } from "@/utils/RentingHandle";
 import { CreateRentRequest } from "@/Modules/User/Features/Rent/services/Rent.actions";
 import { redirect } from "next/navigation";
+
 export default function RentNow(data) {
   const product = data.data;
   const day = new Date().toISOString().split("T")[0];
@@ -14,6 +15,8 @@ export default function RentNow(data) {
   const [startVal, setStartVal] = useState("am");
   const [rentError, setRentError] = useState("");
   const [rentSuccess, setRentSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleStartHourChange = (e) => {
     const val = parseInt(e.target.value);
     if (e.target.value === "" || (val >= 1 && val <= 12)) {
@@ -39,12 +42,12 @@ export default function RentNow(data) {
   const handleStartVal = (e) => {
     setStartVal(e.target.value);
   };
+
   const buildDateTime = (date, hour, period) => {
     if (!date || !hour || !period) return null;
 
     let h = parseInt(hour);
 
-    // Convert to 24h
     if (period === "pm" && h !== 12) h += 12;
     if (period === "am" && h === 12) h = 0;
 
@@ -93,7 +96,7 @@ export default function RentNow(data) {
     const totalHours = Math.floor(diffMs / (1000 * 60 * 60));
     const totalfee = calculateRentalFee(totalHours, product);
     const days = Math.floor(totalHours / 24);
-    const hours = totalHours % 24; // remaining hours after full days
+    const hours = totalHours % 24;
 
     return {
       days,
@@ -123,23 +126,28 @@ export default function RentNow(data) {
     }
     setRentError("");
     setRentSuccess("");
-    const res = await CreateRentRequest(
-      productId,
-      rentStart?.toISOString(),
-      rentEnd?.toISOString(),
-      rental.totalfee?.fees.totalAmount,
-    );
-    if (res.status === 400) {
-      setRentError(JSON.parse(res.error).error.message);
-    } else if (!res.success) {
-      setRentError(res.error);
-    } else {
-      setRentError("");
-      setRentSuccess("تم إرسال طلب الإيجار بنجاح! جاري معالجة طلبك...");
-      setTimeout(() => setRentSuccess(""), 5000);
-      redirect(
-        `/products/orders/${res.rentalRequest.rentalRequest.rentalRequest._id}/request-sent`,
+    setIsLoading(true);
+    try {
+      const res = await CreateRentRequest(
+        productId,
+        rentStart?.toISOString(),
+        rentEnd?.toISOString(),
+        rental.totalfee?.fees.totalAmount,
       );
+      if (res.status === 400) {
+        setRentError(JSON.parse(res.error).error.message);
+      } else if (!res.success) {
+        setRentError(res.error);
+      } else {
+        setRentError("");
+        setRentSuccess("تم إرسال طلب الإيجار بنجاح! جاري معالجة طلبك...");
+        setTimeout(() => setRentSuccess(""), 5000);
+        redirect(
+          `/products/orders/${res.rentalRequest.rentalRequest.rentalRequest._id}/request-sent`,
+        );
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -186,7 +194,8 @@ export default function RentNow(data) {
                     onChange={handleStartVal}
                     name="startPeriod"
                     id="startPeriod"
-                    className="select w-20 rounded-2xl">
+                    className="select w-20 rounded-2xl"
+                  >
                     <option value="am">AM</option>
                     <option value="pm">PM</option>
                   </select>
@@ -231,7 +240,8 @@ export default function RentNow(data) {
                     onChange={handleReturnVal}
                     name="returnPeriod"
                     id="returnPeriod"
-                    className="select w-20 rounded-2xl">
+                    className="select w-20 rounded-2xl"
+                  >
                     <option value="am">AM</option>
                     <option value="pm">PM</option>
                   </select>
@@ -250,6 +260,7 @@ export default function RentNow(data) {
                 </div>
               </div>
             </div>
+
             <div>
               {rental.error ? (
                 <p className="text-danger">{rental.error}</p>
@@ -257,16 +268,18 @@ export default function RentNow(data) {
                 <p></p>
               )}
             </div>
+
             {/* Duration badge */}
             <div className="flex justify-between border border-brand-primary rounded-xl px-3 py-3 mt-1">
-              <div className="flex gap-1 items-center ">
+              <div className="flex gap-1 items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-5 text-brand-primary shrink-0">
+                  className="size-5 text-brand-primary shrink-0"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -277,8 +290,8 @@ export default function RentNow(data) {
               </div>
 
               <div className="flex gap-2 text-brand-primary font-black">
-                <p> {rental.hours} ساعة </p>
-                <p> {rental.days} أيام</p>{" "}
+                <p>{rental.hours?.toLocaleString("ar-EG")} ساعة</p>
+                <p>{rental.days.toLocaleString("ar-EG")} أيام</p>
               </div>
             </div>
           </div>
@@ -294,40 +307,78 @@ export default function RentNow(data) {
             <div className="flex flex-col gap-2">
               <div className="flex justify-between text-sm sm:text-base">
                 <span className="text-gray-400">
-                  سعر الايجار ({rental.hours} ساعة {rental.days} أيام){" "}
+                  سعر الايجار ({rental.hours.toLocaleString("ar-EG")} ساعة{" "}
+                  {rental.days.toLocaleString("ar-EG")} أيام){" "}
                 </span>
-                <span>{rental.totalfee?.fees.rentalFee ?? 0}</span>
+                <span>
+                  {rental.totalfee?.fees.rentalFee.toLocaleString("ar-EG", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }) ?? 0}
+                </span>
               </div>
               <div className="flex justify-between text-sm sm:text-base">
                 <span className="text-gray-400">سعر التأمين</span>
-                <span>{product.insuranceAmount ?? 0}</span>
+                <span>
+                  {product.insuranceAmount.toLocaleString("ar-EG", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }) ?? 0}
+                </span>
               </div>
               <div className="flex justify-between text-sm sm:text-base">
                 <span className="text-gray-400">سعر التوصيل</span>
-                <span>{rental.totalfee?.fees?.deliveryFee ?? 0}</span>
+                <span>
+                  {rental.totalfee?.fees?.deliveryFee.toLocaleString("ar-EG", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }) ?? 0}
+                </span>
               </div>
               <div className="flex justify-between text-sm sm:text-base">
                 <span className="text-gray-400">نسبة المنصة (5%)</span>
-                <span>{rental.totalfee?.fees.commission ?? 0}</span>
+                <span>
+                  {rental.totalfee?.fees.commission.toLocaleString("ar-EG", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }) ?? 0}
+                </span>
               </div>
               <div className="flex justify-between text-sm sm:text-base">
                 <span className="text-gray-400">نسبة العربون (1%)</span>
-                <span>{rental.totalfee?.fees.deposit ?? 0}</span>
+                <span>
+                  {rental.totalfee?.fees.deposit.toLocaleString("ar-EG", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }) ?? 0}
+                </span>
               </div>
               <div className="flex justify-between bg-gray-100 rounded-3xl px-4 py-2 mt-1">
                 <span className="text-brand-primary font-medium">الاجمالي</span>
                 <span className="text-brand-primary font-black">
-                  {rental.totalfee?.fees.totalAmount ?? 0}
+                  {rental.totalfee?.fees.totalAmount.toLocaleString("ar-EG", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }) ?? 0}
                 </span>
               </div>
             </div>
 
             <button
               onClick={createRequest}
-              disabled={!product.isActive}
-              className="btn bg-brand-primary rounded-3xl text-white w-full mt-auto">
-              أجر الآن
+              disabled={!product.isActive || isLoading}
+              className="btn bg-brand-primary rounded-3xl text-white w-full mt-auto disabled:opacity-70"
+            >
+              {isLoading ? (
+                <>
+                  <span className="loading loading-spinner loading-sm" />
+                  جاري الإرسال...
+                </>
+              ) : (
+                "أجر الآن"
+              )}
             </button>
+
             {rentSuccess && (
               <span className="text-success my-2 font-medium">
                 {rentSuccess}
