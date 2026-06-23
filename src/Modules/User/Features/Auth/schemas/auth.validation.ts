@@ -40,11 +40,24 @@ export const verifyOtpSchema = z.object({
   otp: z.string().regex(/^\d{6}$/, "رمز التحقق يجب أن يكون 6 أرقام فقط"),
 });
 
+// export const loginSchema = z.object({
+//   email: z.string().trim().email("البريد الإلكتروني غير صحيح").toLowerCase(),
+//   password: z.string().trim().min(8, "كلمة المرور يجب ألا تقل عن 8 أحرف"),
+// });
 export const loginSchema = z.object({
-  email: z.string().trim().email("البريد الإلكتروني غير صحيح").toLowerCase(),
-  password: z.string().trim().min(8, "كلمة المرور يجب ألا تقل عن 8 أحرف"),
-});
+  email: z
+    .string()
+    .trim()
+    .min(1, "البريد الإلكتروني مطلوب")
+    .email("يرجى إدخال بريد إلكتروني صحيح")
+    .toLowerCase(),
 
+  password: z
+    .string()
+    .trim()
+    .min(1, "كلمة المرور مطلوبة")
+    .min(8, "كلمة المرور يجب ألا تقل عن 8 أحرف"),
+});
 export const forgotPasswordSchema = z.object({
   email: z.string().email("البريد الإلكتروني غير صحيح").toLowerCase(),
 });
