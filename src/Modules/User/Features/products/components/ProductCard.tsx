@@ -44,8 +44,6 @@ interface Props {
 }
 
 export default function ProductCard({ product, period = "day" }: Props) {
-  // console.log(product, "sfefegpppppppp");
-
   const conditionLabel =
     CONDITION_LABELS[product.condition] ?? product.condition;
   const conditionStyle =

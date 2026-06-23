@@ -5,8 +5,8 @@ export default async function DashboardStatistics() {
   const stats = statistics.data;
 
   return (
-    <div className=" flex gap-4">
-      <div className="card w-100 border border-gray-300 bg-white rounded-xl px-3 py-3">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="card border border-gray-300 bg-white rounded-xl px-3 py-3">
         <div className="bg-brand-light w-10 px-1 py-1 rounded-xl my-3">
           <span>
             <svg
@@ -27,13 +27,14 @@ export default async function DashboardStatistics() {
             </svg>
           </span>
         </div>
-        <p>اجمالي التأمينات المدفوعه</p>
-        <h1 className="font-medium text-2xl my-1">
+        <p className="text-sm text-gray-600">اجمالي التأمينات المدفوعه</p>
+        <h1 className="font-medium text-xl sm:text-2xl my-1">
           {stats?.totalInsuranceCollected}
         </h1>
       </div>
-      <div className="card w-100 border border-gray-300 bg-white rounded-xl px-3 py-3">
-        <div className="bg-[#FDF6E9] w-10 px-1 py-1 rounded-xl my-3 ">
+
+      <div className="card border border-gray-300 bg-white rounded-xl px-3 py-3">
+        <div className="bg-[#FDF6E9] w-10 px-1 py-1 rounded-xl my-3">
           <span>
             <svg
               className="size-6 text-[#EAAB39] m-auto my-1"
@@ -51,13 +52,14 @@ export default async function DashboardStatistics() {
             </svg>
           </span>
         </div>
-        <p> تأمينات تحتاج لمراجعة</p>
-        <h1 className="font-medium text-2xl my-1">
+        <p className="text-sm text-gray-600">تأمينات تحتاج لمراجعة</p>
+        <h1 className="font-medium text-xl sm:text-2xl my-1">
           {stats?.pendingInsuranceReview}
         </h1>
       </div>
-      <div className="card w-100 border border-gray-300 bg-white rounded-xl px-3 py-3">
-        <div className="bg-brand-light w-10 px-1 py-1 rounded-xl my-3 ">
+
+      <div className="card border border-gray-300 bg-white rounded-xl px-3 py-3">
+        <div className="bg-brand-light w-10 px-1 py-1 rounded-xl my-3">
           <span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -75,12 +77,13 @@ export default async function DashboardStatistics() {
             </svg>
           </span>
         </div>
-        <p> تأمينات قابلة للاسترداد</p>
-        <h1 className="font-medium text-2xl my-1">
+        <p className="text-sm text-gray-600">تأمينات قابلة للاسترداد</p>
+        <h1 className="font-medium text-xl sm:text-2xl my-1">
           {stats?.refundedInsurance} ج.م
         </h1>
       </div>
-      <div className="card w-100 border border-gray-300 bg-white rounded-xl px-3 py-3">
+
+      <div className="card border border-gray-300 bg-white rounded-xl px-3 py-3">
         <div className="bg-[#FDF6E9] w-10 px-1 py-1 rounded-xl my-3">
           <span>
             <svg
@@ -98,9 +101,9 @@ export default async function DashboardStatistics() {
             </svg>
           </span>
         </div>
-        <p> اجمالي الخصومات الجزئية</p>
-        <h1 className="font-medium text-2xl my-1">
-          {stats?.partialDeductions} ج.م{" "}
+        <p className="text-sm text-gray-600">اجمالي الخصومات الجزئية</p>
+        <h1 className="font-medium text-xl sm:text-2xl my-1">
+          {stats?.partialDeductions} ج.م
         </h1>
       </div>
     </div>
