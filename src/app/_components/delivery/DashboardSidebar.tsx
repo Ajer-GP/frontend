@@ -140,7 +140,7 @@ const icons = {
 
 const navItems = [
   { label: "الرئيسية", href: "/dashboard", icon: "home" },
-  { label: "جميع المهام", href: "/tasks", icon: "tasks" },
+  { label: "جميع المهام", href: "/dashboard", icon: "tasks" },
   { label: "الاستلام", href: "/pickup", icon: "pickup" },
   { label: "التسليم", href: "/delivery", icon: "delivery" },
   { label: "المرتجعات", href: "/returns", icon: "returns" },
@@ -325,8 +325,7 @@ export default function DashboardSidebar({
           {/* Mobile logout tab */}
           <li>
             <button
-                         onClick={() => logout()}
-
+              onClick={() => logout()}
               className="flex flex-col items-center gap-1 px-2 py-1.5 rounded-lg transition-colors min-w-[52px] text-error hover:text-error/70"
             >
               <span className="w-5 h-5 flex items-center justify-center">

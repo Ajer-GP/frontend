@@ -45,7 +45,7 @@ export default function StatsCard({
       {/* Top row */}
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h2 className="text-h2 font-medium">👋 مرحباً {driverName}</h2>
+          <h2 className="text-h2 font-medium"> مرحباً {driverName}</h2>
           <p className="text-caption text-white/70 mt-0.5">
             لديك {currentTasks} مهام توصيل نشطة اليوم
           </p>

@@ -42,7 +42,8 @@ export default async function page({
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-10 sm:size-12">
+              className="size-10 sm:size-12"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -70,7 +71,8 @@ export default async function page({
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-6">
+              className="size-6"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -103,7 +105,7 @@ export default async function page({
               <p className="font-black">{task.remainingAmount} </p>
             </div>
             <div className="flex justify-between gap-2">
-              <p className="text-gray-600">نسبة المنصة (5%)</p>
+              <p className="text-gray-600">نسبة المنصة (7.5%)</p>
               <p className="font-black">{task.commissionFee} </p>
             </div>
             <div className="flex justify-between gap-2 text-brand-primary bg-gray-50 rounded-xl px-3 py-2 mt-2">

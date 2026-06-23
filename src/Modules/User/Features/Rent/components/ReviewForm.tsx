@@ -1,6 +1,8 @@
 // ReviewForm.tsx  "use client"
 "use client";
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
+import { submitReviewAction } from "../services/Rent.actions";
 
 export default function ReviewForm({
   rentalId,
@@ -9,22 +11,29 @@ export default function ReviewForm({
   rentalId: string;
   productId: string;
 }) {
+  const handleSubmit = () => {
+    startTransition(async () => {
+      const res = await submitReviewAction({ productId, rating, comment });
+
+      if (!res.success) {
+        toast.error(res.error ?? "حدث خطأ أثناء الإرسال");
+        return;
+      }
+
+      toast.success("تم إرسال تقييمك بنجاح!");
+      setDone(true);
+    });
+  };
+
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [done, setDone] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const handleSubmit = () => {
-    startTransition(async () => {
-      // await submitReview({ rentalId, productId, rating, comment });
-      setDone(true);
-    });
-  };
-
   if (done) {
     return (
       <p className="text-brand-primary text-body-sm font-medium text-center py-4">
-        ✅ شكراً! تم إرسال تقييمك بنجاح.
+        شكراً! تم إرسال تقييمك بنجاح.
       </p>
     );
   }
