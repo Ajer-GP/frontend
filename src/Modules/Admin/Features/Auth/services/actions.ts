@@ -98,7 +98,7 @@ export async function getDashboard() {
   }
 }
 
-export async function getRentals(page: number = 1) {
+export async function getRentals(page: number = 1, status?: string) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("admin_access_token")?.value;
 
@@ -107,20 +107,20 @@ export async function getRentals(page: number = 1) {
   }
 
   try {
-    const res = await fetch(
-      `${process.env.API_BASE_URL}/admin/rentals?page=${page}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        cache: "no-store",
+    const url = new URL(`${process.env.API_BASE_URL}/admin/rentals`);
+    url.searchParams.set("page", String(page));
+    if (status && status !== "all") url.searchParams.set("status", status);
+
+    const res = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
       },
-    );
+      cache: "no-store",
+    });
 
     const data = await res.json();
-    console.log(page);
     if (!res.ok) return { message: data.error?.message || "فشل جلب البيانات" };
 
     return data;
@@ -161,6 +161,57 @@ export async function getInsuranceDetails(rentalId: string) {
     return data;
   } catch (err) {
     console.error("Failed to fetch insurance details:", err);
+    return null;
+  }
+}
+
+export async function getPayment(id: string) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("admin_access_token")?.value;
+  try {
+    const res = await fetch(
+      `${process.env.API_BASE_URL}/admin/payments/${id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) return { message: data.error?.message };
+    return data;
+  } catch (err) {
+    console.error("Failed to fetch:", err);
+    return null;
+  }
+}
+
+export async function InsuranceDecision(id: string, decision: object) {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("admin_access_token")?.value;
+  try {
+    const res = await fetch(
+      `${process.env.API_BASE_URL}/admin/rentals/${id}/insurance-return`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(decision),
+      },
+    );
+
+    const data = await res.json();
+    console.log(data, res.status);
+    if (!res.ok) return { error: data.error?.message };
+    return data;
+  } catch (err) {
+    console.error("Failed to fetch:", err);
     return null;
   }
 }

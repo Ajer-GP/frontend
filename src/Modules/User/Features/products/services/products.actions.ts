@@ -124,3 +124,31 @@ export async function AIPricingSuggetions(productInfo) {
     return { success: false, error: "تعذر الاتصال بالخادم، حاول مجدداً" };
   }
 }
+export async function AIProductRecommendation() {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
+  try {
+    const res = await fetch(
+      `${process.env.API_BASE_URL}/products/ai-recommendations`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return {
+        success: false,
+        error: err?.message || `HTTP error: ${res.status}`,
+      };
+    }
+
+    const data = await res.json();
+    return { data };
+  } catch {
+    return { success: false, error: "تعذر الاتصال بالخادم، حاول مجدداً" };
+  }
+}

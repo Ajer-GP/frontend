@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
 import { AuthProvider } from "./_context/AuthContext";
+import { Cairo } from "next/font/google";
+
+const cairo = Cairo({
+  subsets: ["arabic", "latin"],
+  variable: "--font-cairo",
+});
 
 const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic"],
@@ -28,7 +34,7 @@ export default function RootLayout({
     <html
       lang="ar"
       dir="rtl"
-      className={`${ibmPlexSansArabic.variable} ${inter.variable} h-full antialiased`}>
+      className={`${inter.variable}  ${ibmPlexSansArabic.variable} ${cairo.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <AuthProvider>{children}</AuthProvider>
       </body>

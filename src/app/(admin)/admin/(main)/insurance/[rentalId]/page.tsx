@@ -1,8 +1,13 @@
-import { getInsuranceDetails } from "@/Modules/Admin/Features/Auth/services/actions";
+import {
+  getInsuranceDetails,
+  getPayment,
+} from "@/Modules/Admin/Features/Auth/services/actions";
+import InstaPay from "@/Modules/Admin/components/InstaPay";
 import InsuranceDecisionPanel from "@/Modules/Admin/components/InsuranceDecisionPanel";
 import InspectionReview from "@/Modules/Admin/components/inspectionreview";
 import { CATEGORY_LABELS } from "@/Modules/Admin/types/rentals.types";
 import { formatRentalDuration, formatAddress } from "@/utils/Insurances";
+import Link from "next/link";
 
 export default async function InsurancePage({
   params,
@@ -11,8 +16,9 @@ export default async function InsurancePage({
 }) {
   const { rentalId } = await params;
   const data = await getInsuranceDetails(rentalId);
-  console.log(data.data);
   const { rentalRequest, owner, renter, product, deliveries } = data.data;
+  const instaPay = await getPayment(rentalId);
+
   const shortId = rentalRequest._id.slice(-6).toUpperCase();
 
   return (
@@ -20,13 +26,16 @@ export default async function InsurancePage({
       <main className="px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
         <div className="flex flex-col gap-4 sm:gap-6">
           {/* Breadcrumb */}
-          <nav className="flex flex-wrap items-center gap-1.5 text-xs text-gray-500">
-            <span>الرئيسية</span>
-            <span>&gt;</span>
-            <span>إدارة التأمينات</span>
-            <span>&gt;</span>
-            <span className="font-medium text-brand-primary">{shortId}</span>
-          </nav>
+          <div className="breadcrumbs text-sm">
+            <ul>
+              <li>
+                <Link href="/admin/dashboard">الرئيسية</Link>
+              </li>
+              <li>
+                <Link href="/insurance"> إدارة التأمينات</Link>
+              </li>
+            </ul>
+          </div>
 
           {/* Page title */}
           <h1 className="text-xl font-semibold  sm:text-2xl">
@@ -53,26 +62,24 @@ export default async function InsurancePage({
                     />
                   </svg>
                 </span>
-                <p className="text-xs font-semibold text-gray-500">
-                  معلومات المالك
-                </p>
+                <p className="text-xs font-semibold ">معلومات المالك</p>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <p className="shrink-0 text-[11px] text-gray-500">الاسم</p>
-                  <p className="text-sm text-gray-500 truncate">
+                  <p className="text-sm font-black ">
                     {owner?.fullName ?? "—"}
                   </p>
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <p className="shrink-0 text-[11px] text-gray-500">الهاتف</p>
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm font-black">
                     {owner?.phoneNumber ?? "—"}
                   </p>
                 </div>
                 <div className="flex items-start justify-between gap-2">
                   <p className="shrink-0 text-[11px] text-gray-500">العنوان</p>
-                  <p className="text-sm text-text-secondary text-left">
+                  <p className="text-sm font-black text-left">
                     {formatAddress(owner?.address)}
                   </p>
                 </div>
@@ -102,26 +109,24 @@ export default async function InsurancePage({
                     <path d="M9 21v-4a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v4" />
                   </svg>
                 </span>
-                <p className="text-xs font-semibold text-gray-500">
-                  معلومات المستأجر
-                </p>
+                <p className="text-xs font-semibold ">معلومات المستأجر</p>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <p className="shrink-0 text-[11px] text-gray-500">الاسم</p>
-                  <p className="text-sm text-gray-500 truncate">
+                  <p className="text-sm font-black">
                     {renter?.fullName ?? "—"}
                   </p>
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <p className="shrink-0 text-[11px] text-gray-500">الهاتف</p>
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm font-black">
                     {renter?.phoneNumber ?? "—"}
                   </p>
                 </div>
                 <div className="flex items-start justify-between gap-2">
                   <p className="shrink-0 text-[11px] text-gray-500">العنوان</p>
-                  <p className="text-sm text-text-secondary text-left">
+                  <p className="text-sm font-black">
                     {formatAddress(renter?.address)}
                   </p>
                 </div>
@@ -151,30 +156,24 @@ export default async function InsurancePage({
                     <path d="M16 5.25l-8 4.5" />
                   </svg>
                 </span>
-                <p className="text-xs font-semibold text-gray-500">
-                  معلومات المنتج
-                </p>
+                <p className="text-xs font-semibold ">معلومات المنتج</p>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <p className="shrink-0 text-[11px] text-gray-500">المنتج</p>
-                  <p className="text-sm text-gray-500 truncate">
-                    {product?.title ?? "—"}
-                  </p>
+                  <p className="text-sm font-black">{product?.title ?? "—"}</p>
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <p className="shrink-0 text-[11px] text-gray-500">الفئة</p>
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm font-black">
                     {product?.category
                       ? (CATEGORY_LABELS[product.category] ?? product.category)
                       : "—"}
                   </p>
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <p className="shrink-0 text-[11px] text-gray-500">
-                    مدة الإيجار
-                  </p>
-                  <p className="text-sm text-text-secondary">
+                  <p className="shrink-0 text-[11px] ">مدة الإيجار</p>
+                  <p className="text-sm font-black">
                     {formatRentalDuration(
                       rentalRequest.startDate,
                       rentalRequest.endDate,
@@ -204,14 +203,12 @@ export default async function InsurancePage({
                     <path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" />
                   </svg>
                 </span>
-                <p className="text-xs font-semibold text-gray-500">
-                  معلومات الدفع
-                </p>
+                <p className="text-xs font-semibold ">معلومات الدفع</p>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <p className="shrink-0 text-[11px] text-gray-500">اجمالي</p>
-                  <p className="text-sm text-gray-500 truncate">
+                  <p className="text-sm font-black">
                     {rentalRequest?.rentalFee} ج.م
                   </p>
                 </div>
@@ -219,7 +216,7 @@ export default async function InsurancePage({
                   <p className="shrink-0 text-[11px] text-gray-500">
                     مبلغ التأمين
                   </p>
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm font-black">
                     {rentalRequest?.insuranceAmount} ج.م
                   </p>
                 </div>
@@ -227,7 +224,7 @@ export default async function InsurancePage({
                   <p className="shrink-0 text-[11px] text-gray-500">
                     طريقة الدفع
                   </p>
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm font-black">
                     {rentalRequest?.paymentMethod === "instapay"
                       ? "انستا باي"
                       : "فيزا"}
@@ -236,15 +233,19 @@ export default async function InsurancePage({
               </div>
             </div>
           </div>
-
           {/* ── Row 2: مراجعة الفحص ── */}
           <InspectionReview
             outbound={deliveries.fromOwnerToRenter}
             inbound={deliveries.fromRenterToOwner}
           />
+          {rentalRequest?.paymentMethod === "instapay" ? (
+            <InstaPay instaPay={instaPay} />
+          ) : (
+            <></>
+          )}
 
           {/* ── Row 3: لوحة قرارات التأمين ── */}
-          <InsuranceDecisionPanel />
+          <InsuranceDecisionPanel rentalRequest={rentalRequest} />
         </div>
       </main>
     </div>

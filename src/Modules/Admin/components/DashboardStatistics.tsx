@@ -3,6 +3,7 @@ import { getDashboard } from "../Features/Auth/services/actions";
 export default async function DashboardStatistics() {
   const statistics = await getDashboard();
   const stats = statistics.data;
+
   return (
     <div className=" flex gap-4">
       <div className="card w-100 border border-gray-300 bg-white rounded-xl px-3 py-3">

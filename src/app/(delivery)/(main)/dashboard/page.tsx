@@ -139,7 +139,6 @@ export default async function DashboardPage({
   const deliveryData = delivery
     ? JSON.parse(decodeURIComponent(delivery))
     : null;
-  console.log(deliveryData, "feffedf");
   const sortedDeliveries = [...data.deliveryData.deliveries].sort((a, b) => {
     const priority = (s: string) => {
       if (s === "on_the_way" || s === "picked_up") return 0; // أعلى أولوية

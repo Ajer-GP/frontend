@@ -174,32 +174,6 @@ export const ARABIC_MONTHS = [
 ];
 export type InsuranceTab = "full-refund" | "refused" | "partial";
 
-export const TABS: Array<{
-  key: InsuranceTab;
-  label: string;
-  sublabel: string;
-  dotColor: string;
-}> = [
-  {
-    key: "full-refund",
-    label: "رد التأمين بالكامل",
-    sublabel: "إعادة كامل المبلغ للمستأجر",
-    dotColor: "bg-bran",
-  },
-  {
-    key: "refused",
-    label: "رفض الاسترداد",
-    sublabel: "لن يُعاد أي مبلغ للمستأجر",
-    dotColor: "bg-[color:var(--color-danger)]",
-  },
-  {
-    key: "partial",
-    label: "خصم جزء من التأمين",
-    sublabel: "خصم جزء مقابل تلف",
-    dotColor: "bg-[color:var(--color-accent-default)]",
-  },
-];
-
 export const validDecisions = [
   { value: "full_refund", label: "رد التأمين بالكامل" },
   { value: "partial_refund", label: "خصم جزء من التأمين" },
