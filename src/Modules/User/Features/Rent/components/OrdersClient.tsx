@@ -90,7 +90,12 @@ const STATUS_TABS = [
   { value: "accepted", label: "المقبولة" },
   { value: "rejected", label: "المرفوضة" },
 ];
-
+const categories = [
+  { id: "electronics", label: "الكترونيات" },
+  { id: "clothes", label: "ملابس" },
+  { id: "party tools", label: "معدات حفلات" },
+  { id: "books", label: "كتب" },
+];
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("ar-EG", {
     year: "numeric",
@@ -295,7 +300,6 @@ function RentalCard({
   const expired = isExpired(rental.endDate);
   const started = isStarted(rental.startDate);
 
-  // المستأجر: لو startDate فات والطلب لسه pending → يظهر مرفوض
   const displayStatus: Rental["status"] =
     !isOwner && started && rental.status === "pending"
       ? "rejected"
@@ -303,65 +307,79 @@ function RentalCard({
 
   return (
     <div
-      dir="rtl"
-      className="bg-white border border-border-default rounded-2xl overflow-hidden hover:shadow-sm transition-all duration-200"
+      dir="ltr"
+      className="bg-white border border-[#E9EDFF] rounded-2xl overflow-hidden hover:shadow-sm transition-all duration-200"
     >
-      <div className="flex flex-col sm:flex-row items-stretch">
-        {/* Mobile: top bar with status + person */}
-        <div className="flex sm:hidden items-center justify-between px-4 pt-4">
-          <span
-            className={`text-[11px] font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${STATUS_STYLE[displayStatus]}`}
-          >
-            {STATUS_LABEL[displayStatus]}
-          </span>
-          {person && (
-            <div className="flex items-center gap-2">
-              <span className="text-caption font-medium text-text-primary">
-                {person.fullName}
-              </span>
-              <div className="relative size-8 rounded-full overflow-hidden bg-surface-secondary shrink-0">
-                <Image
-                  src={
-                    person.profileImage?.url ??
-                    "https://placehold.net/avatar-4.png"
-                  }
-                  alt={person.fullName}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </div>
-          )}
+      {/* Person row — full width on top */}
+      {person && (
+        <div className="flex items-center justify-end gap-2.5 px-4 pt-4 pb-3">
+          <div className="text-right">
+            <p className="text-body-sm font-medium text-text-primary">
+              {person.fullName}
+            </p>
+            <p className="text-body-sm font-medium text-text-primary">
+              عملية تأجير ناجحة{" "}
+              {rental.successfulRentals?.toLocaleDateString("ar-EG") ?? 0}
+            </p>
+          </div>
+          <div className="relative size-9 rounded-full overflow-hidden bg-surface-secondary shrink-0">
+            <Image
+              src={
+                person.profileImage?.url ?? "https://placehold.net/avatar-4.png"
+              }
+              alt={person.fullName}
+              fill
+              className="object-cover"
+            />
+          </div>
         </div>
+      )}
 
-        {/* Desktop Col 1: Status badge */}
-        <div className="hidden sm:flex items-start pt-5 px-4 shrink-0">
-          <span
-            className={`text-[11px] font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${STATUS_STYLE[displayStatus]}`}
-          >
-            {STATUS_LABEL[displayStatus]}
-          </span>
-        </div>
-
-        {/* Col 2: Content */}
-        <div className="flex-1 p-4 sm:py-5 sm:px-0 flex flex-col justify-between gap-3">
-          {/* Product title */}
-          <div className="flex items-start justify-between gap-2">
-            <span className="text-[11px] text-text-secondary bg-surface-tertiary px-2 py-0.5 rounded-full">
-              {rental.product?.name}
+      {/* Main body: 1/3 image + 2/3 content */}
+      <div className="flex gap-0">
+        {/* 2/3 — content */}
+        <div className="flex-1 p-4 flex flex-col gap-3 min-w-0">
+          {/* Row 1: category + status */}
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <span
+              className={`text-[11px] font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${STATUS_STYLE[displayStatus]}`}
+            >
+              {STATUS_LABEL[displayStatus]}
             </span>
-            <h3 className="text-h3 font-medium text-text-primary text-right">
-              {rental.product?.title ??
-                `طلب #${rental._id.slice(-6).toUpperCase()}`}
-            </h3>
+            <span className="text-[11px] text-text-secondary bg-surface-tertiary px-2.5 py-1 rounded-full whitespace-nowrap">
+              {categories.find((cat) => cat.id === rental.product?.catigories)
+                ?.label ?? "—"}
+            </span>
           </div>
 
-          {/* 4-column meta — 2 cols on mobile */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-right">
+          {/* Row 2: product name */}
+          <h3
+            dir="rtl"
+            className="text-h3 font-semibold text-text-primary leading-snug"
+          >
+            {rental.product?.title ??
+              `طلب #${rental._id.slice(-6).toUpperCase()}`}
+          </h3>
+
+          {/* Row 3: total amount */}
+
+          <p
+            dir="rtl"
+            className="text-brand-primary font-black text-[20px] leading-none"
+          >
+            {rental.totalAmount.toLocaleString("ar-EG")}
+            <span className="text-body-sm font-medium mr-1">ج.م / يوم</span>
+          </p>
+
+          {/* Row 4: dates + duration */}
+          <div
+            dir="rtl"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-x-3 gap-y-2"
+          >
             {[
               { label: "تاريخ الاستلام", value: formatDate(rental.startDate) },
               { label: "تاريخ التسليم", value: formatDate(rental.endDate) },
-              { label: "المدة", value: `${days} يوم` },
+              { label: "المدة", value: `${days.toLocaleString("ar-EG")} يوم` },
               {
                 label: "الإجمالي",
                 value: `${rental.totalAmount.toLocaleString("ar-EG")} ج.م`,
@@ -379,22 +397,22 @@ function RentalCard({
             ))}
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-2">
+          {/* Row 5: actions */}
+          <div dir="rtl" className="flex gap-2 pt-1">
             {isOwner ? (
               rental.status === "pending" && !started ? (
                 <>
-                  <button
-                    onClick={() => onReject(rental)}
-                    className="px-6 border border-border-default text-text-secondary rounded-xl py-2 text-body-sm hover:border-danger hover:text-danger transition-colors"
-                  >
-                    رفض
-                  </button>
                   <button
                     onClick={() => onAccept(rental)}
                     className="px-8 bg-brand-primary text-white rounded-xl py-2 text-body-sm font-medium hover:bg-brand-dark transition-colors"
                   >
                     قبول
+                  </button>
+                  <button
+                    onClick={() => onReject(rental)}
+                    className="px-6 border border-border-default text-text-secondary rounded-xl py-2 text-body-sm hover:border-danger hover:text-danger transition-colors"
+                  >
+                    رفض
                   </button>
                 </>
               ) : null
@@ -417,29 +435,9 @@ function RentalCard({
           </div>
         </div>
 
-        {/* Col 3: صورة + person (desktop only) */}
-        <div className="hidden sm:flex flex-col items-end shrink-0 p-4 gap-3">
-          {person && (
-            <div className="flex items-center gap-2">
-              <div className="text-right">
-                <span className="text-caption font-medium text-text-primary">
-                  {person.fullName}
-                </span>
-              </div>
-              <div className="relative size-9 rounded-full overflow-hidden bg-surface-secondary shrink-0">
-                <Image
-                  src={
-                    person.profileImage?.url ??
-                    "https://placehold.net/avatar-4.png"
-                  }
-                  alt={person.fullName}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </div>
-          )}
-          <div className="relative w-[120px] h-[110px] rounded-xl overflow-hidden bg-surface-secondary">
+        {/* 1/3 — image */}
+        <div className="w-1/3 shrink-0 p-3 flex items-stretch">
+          <div className="relative w-full rounded-xl overflow-hidden bg-surface-secondary min-h-[180px]">
             {rental.product?.coverImage?.url ? (
               <Image
                 src={rental.product.coverImage.url}
@@ -467,18 +465,6 @@ function RentalCard({
             )}
           </div>
         </div>
-
-        {/* Mobile: product image full width */}
-        {rental.product?.coverImage?.url && (
-          <div className="sm:hidden mx-4 mb-4 relative h-[140px] rounded-xl overflow-hidden bg-surface-secondary">
-            <Image
-              src={rental.product.coverImage.url}
-              alt={rental.product.title ?? "منتج"}
-              fill
-              className="object-cover"
-            />
-          </div>
-        )}
       </div>
     </div>
   );

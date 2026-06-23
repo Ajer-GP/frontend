@@ -155,6 +155,7 @@ export async function rejectRentalAction(id: string) {
 export async function cancelRental(rentalId: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value;
+  console.log(rentalId);
 
   if (!token) {
     return { success: false, message: "غير مصرح لك" };
@@ -162,7 +163,7 @@ export async function cancelRental(rentalId: string) {
 
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/requests/${rentalId}/cancellation`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/requests/${rentalId}/cancel`,
       {
         method: "POST",
         headers: {
@@ -173,16 +174,18 @@ export async function cancelRental(rentalId: string) {
     );
 
     const data = await res.json();
-
+    // const text = await res.text();
+    console.log("API response:", data);
     if (!res.ok) {
       return {
         success: false,
-        message: data?.message || "فشل الإلغاء، حاول مرة أخرى",
+        message: data?.error.message || "فشل الإلغاء، حاول مرة أخرى",
       };
     }
 
     return { success: true };
-  } catch {
+  } catch (error) {
+    console.error("cancelRental error:", error);
     return { success: false, message: "خطأ في الاتصال بالسيرفر" };
   }
 }

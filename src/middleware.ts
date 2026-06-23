@@ -4,6 +4,10 @@ import type { NextRequest } from "next/server";
 const protectedRoutes = ["/products/add"];
 const authRoutes = ["/auth/login", "/auth/register"];
 
+// Delivery routes
+const deliveryProtectedRoutes = ["/dashboard"];
+const deliveryAuthRoutes = ["/auth/DeliveryLogin"];
+
 async function refreshAccessToken(
   refreshToken: string,
 ): Promise<{ token: string; newRefreshToken: string } | null> {
@@ -43,12 +47,40 @@ async function refreshAccessToken(
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const isProduction = process.env.NODE_ENV === "production";
 
+  // ─── Delivery Auth ───────────────────────────────────────────
+  const isDeliveryProtected = deliveryProtectedRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
+  const isDeliveryAuthRoute = deliveryAuthRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
+
+  if (isDeliveryProtected || isDeliveryAuthRoute) {
+    const deliveryToken = request.cookies.get("delivery_token")?.value;
+    const isDeliveryAuthenticated = !!deliveryToken;
+
+    // زائر يحاول يدخل /delivery/* → روّحه على /delivery/login
+    if (isDeliveryProtected && !isDeliveryAuthenticated) {
+      const loginUrl = new URL("/auth/DeliveryLogin", request.url);
+      loginUrl.searchParams.set("next", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // logged-in delivery agent يحاول يدخل /delivery/login → روّحه على /delivery
+    if (isDeliveryAuthRoute && isDeliveryAuthenticated) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
+    return NextResponse.next();
+  }
+
+  // ─── Main App Auth ────────────────────────────────────────────
   let accessToken = request.cookies.get("access_token")?.value;
   const refreshToken = request.cookies.get("refresh_token")?.value;
   const user = request.cookies.get("user")?.value;
 
-  const isProduction = process.env.NODE_ENV === "production";
   let refreshedTokens: { token: string; newRefreshToken: string } | null = null;
 
   if (!accessToken && refreshToken && user) {

@@ -139,7 +139,7 @@ export default function ProductCard({ product, period = "day" }: Props) {
         {/* Price */}
         <div className="flex items-baseline gap-1">
           <span className="text-h2 font-medium text-brand-primary">
-            {price?.toLocaleString()} ج.م
+            {price?.toLocaleString("ar-EG")} ج.م
           </span>
           <span className="text-caption text-text-tertiary">
             /{periodLabel}

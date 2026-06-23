@@ -42,6 +42,16 @@ export default async function OrderRedirectPage({ params }: Props) {
       redirect(`/products/orders/${id}/accepted`);
     case "confirmed":
       redirect(`/products/orders/${id}/confirmed`);
+    case "delivering_to_renter":
+      redirect(`/products/orders/${id}/confirmed`);
+    case "active":
+      redirect(`/products/orders/${id}/active`);
+    case "returning_to_owner":
+      redirect(`/products/orders/${id}/completed`);
+    case "cancelled":
+      redirect(`/products/orders/${id}/cancelled`);
+    case "completed":
+      redirect(`/products/orders/${id}/completed`);
     default:
       redirect("/products/orders");
   }
