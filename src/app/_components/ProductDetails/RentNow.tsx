@@ -336,7 +336,7 @@ export default function RentNow(data) {
                 </span>
               </div>
               <div className="flex justify-between text-sm sm:text-base">
-                <span className="text-gray-400">نسبة المنصة (5%)</span>
+                <span className="text-gray-400">نسبة المنصة (7.5%)</span>
                 <span>
                   {rental.totalfee?.fees.commission.toLocaleString("ar-EG", {
                     minimumFractionDigits: 2,

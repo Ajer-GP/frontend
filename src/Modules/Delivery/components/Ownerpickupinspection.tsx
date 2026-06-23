@@ -129,7 +129,7 @@ function PhotoUploadSection({
         onChange={handleFile}
       />
 
-      <div className="grid grid-cols-2 xs:grid-cols-4 gap-2 sm:gap-3">
+      <div className="grid grid-cols-4 gap-2 sm:gap-3">
         {slots.map((slot, idx) => (
           <div key={idx} className="relative aspect-square">
             {slot.preview ? (

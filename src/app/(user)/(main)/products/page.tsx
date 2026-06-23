@@ -1,7 +1,10 @@
 import Footer from "@/app/_components/Landing/Footer";
 import Navbar from "@/app/_components/Landing/Navbar";
 import ProductsClient from "@/Modules/User/Features/products/components/ProductsClient";
-import { getProductsAction } from "@/Modules/User/Features/products/services/products.actions";
+import {
+  AIProductRecommendation,
+  getProductsAction,
+} from "@/Modules/User/Features/products/services/products.actions";
 import { GetProductsParams } from "@/modules/user/features/products/types/products.typs";
 
 interface PageProps {
@@ -23,10 +26,17 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   };
 
   const result = await getProductsAction(params);
+  const resultAI = await AIProductRecommendation();
+  console.log(resultAI, "uuuu");
 
   return (
     <>
-      <ProductsClient initialResult={result} initialParams={params} />;
+      <ProductsClient
+        initialResult={result}
+        initialParams={params}
+        AiProducts={resultAI.recommendations}
+      />
+      ;
     </>
   );
 }

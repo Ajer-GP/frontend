@@ -182,3 +182,42 @@ export async function cancelRental(rentalId: string) {
     return { success: false, message: "خطأ في الاتصال بالسيرفر" };
   }
 }
+// reviews.actions.ts
+export async function submitReviewAction({
+  productId,
+  rating,
+  comment,
+}: {
+  productId: string;
+  rating: number;
+  comment?: string;
+}) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("access_token")?.value;
+
+  if (!token) {
+    return { success: false, error: "غير مصرح" };
+  }
+  const res = await fetch(
+    `${process.env.API_BASE_URL}/requests/${productId}/reviews`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        rating,
+        ...(comment?.trim() && { comment }),
+      }),
+    },
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    return { success: false, error: data.message ?? "حدث خطأ" };
+  }
+
+  return { success: true };
+}

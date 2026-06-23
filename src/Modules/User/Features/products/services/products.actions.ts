@@ -141,7 +141,7 @@ export async function AIProductRecommendation() {
       const err = await res.json().catch(() => ({}));
       return {
         success: false,
-        error: err?.message || `HTTP error: ${res.status}`,
+        error: err?.error.message || err?.error || `HTTP error: ${res.status}`,
       };
     }
 

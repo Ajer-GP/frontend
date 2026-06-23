@@ -13,7 +13,10 @@ interface Props {
 export default async function CompletedPage({ params }: Props) {
   const { id } = await params;
 
-  const rental = await getAndGuardRental(id, "completed");
+  const rental = await getAndGuardRental(id, [
+    "completed",
+    "returning_to_owner",
+  ]);
   const start = new Date(rental.startDate);
   const end = new Date(rental.endDate);
   const days = Math.ceil(
