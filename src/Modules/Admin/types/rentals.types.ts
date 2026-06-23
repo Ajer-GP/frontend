@@ -81,18 +81,18 @@ export interface InsuranceDetailsResponse {
   };
 }
 export const CATEGORY_LABELS: Record<string, string> = {
-  cameras: "كاميرات",
-  laptops: "لابتوبات",
-  tablets: "أجهزة لوحية",
-  gaming: "ألعاب",
-  audio: "صوتيات",
+  // cameras: "كاميرات",
+  // laptops: "لابتوبات",
+  // tablets: "أجهزة لوحية",
+  // gaming: "ألعاب",
+  // audio: "صوتيات",
   electronics: "الإلكترونيات",
   clothes: "ملابس",
   books: "كتب",
-  drones: "طائرات مسيّرة",
-  lighting: "إضاءة",
   "party tools": "أدوات حفلات",
-  other: "أخرى",
+  // drones: "طائرات مسيّرة",
+  // lighting: "إضاءة",
+  // other: "أخرى",
 };
 
 export const RentalStatus = [
