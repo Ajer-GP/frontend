@@ -15,7 +15,17 @@ const HANDLING_TIPS = [
   "قابل للكسر",
   "سهل الكسر",
   "الكترونيات حساسة",
-  "بحفظ بعيداً عن الرطوبة",
+  "يُحفظ بعيداً عن الرطوبة",
+  "يُحفظ في مكان جاف وآمن",
+  "يُتجنب الضغط أو السقوط",
+  "يُحفظ بعيداً عن الحرارة المباشرة",
+  "يُراعى عدم ثني أو طي المنتج",
+  "يُخزن بشكل منفصل عن المواد الثقيلة",
+  "يُراعى التغليف الجيد أثناء النقل",
+  "يُحفظ بعيداً عن السوائل",
+  " يُتجنب الطي أو الضغط الشديد للحفاظ على الشكل",
+  "معدات الحف: تُخزن بعيداً عن السوائل والتلف",
+  "تُحفظ بعيداً عن الرطوبة والتمزق",
 ];
 const STATES = [
   { value: "excellent", label: "ممتاز", icon: "/images/excellent.png" },
@@ -307,7 +317,7 @@ export default function Step1Basics({
         </div>
         <div>
           <label htmlFor="name" className="block mb-1 text-sm text-gray-600">
-            اسم المنتج{" "}
+            اسم المنتج <span className="text-brand-primary text-lg">*</span>
           </label>
           <input
             type="text"
@@ -325,6 +335,7 @@ export default function Step1Basics({
         <div>
           <label htmlFor="usage" className="block mb-1 text-sm text-gray-600">
             ظروف استخدام المنتج{" "}
+            <span className="text-brand-primary text-lg">*</span>
           </label>
           <input
             type="text"
@@ -380,7 +391,7 @@ export default function Step1Basics({
             </p>
           )}
           {/* Condition description inputs */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end my-3 gap-2">
+          {/* <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end my-3 gap-2">
             <div className="flex flex-col w-full sm:me-3">
               <label className="block mb-1 text-sm text-gray-600">
                 أضف وصف للحالة (اختياري)
@@ -408,14 +419,13 @@ export default function Step1Basics({
                 + أضف
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Handling Tips */}
         <div>
           <label className="block mb-1 text-sm text-gray-600">
             إرشادات التعامل{" "}
-            <span className="text-brand-primary text-lg">*</span>
           </label>
           <div className="flex flex-wrap gap-2">
             {HANDLING_TIPS.map((tip) => (
@@ -440,7 +450,7 @@ export default function Step1Basics({
           )}
 
           {/* Notes inputs */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end my-3 gap-2">
+          {/* <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end my-3 gap-2">
             <div className="flex flex-col w-full sm:me-3">
               <label className="block mb-1 text-sm text-gray-600">
                 أضف ملاحظة (اختياري)
@@ -468,7 +478,7 @@ export default function Step1Basics({
                 + أضف
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* location */}

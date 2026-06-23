@@ -78,6 +78,7 @@ function ProductCard({ product }: { product: any }) {
 }
 
 export default async function Best_products() {
+  let title = "";
   const cookieStore = await cookies();
   const isLoggedIn = !!(
     cookieStore.get("access_token")?.value ||
@@ -88,10 +89,11 @@ export default async function Best_products() {
   if (!result.success) return <div>حدث خطأ في تحميل المنتجات</div>;
 
   let products: any[] = [];
-
+  title = "اكتشف أحدث المنتجات المضافة";
   if (isLoggedIn) {
     const ai = await AIProductRecommendation();
     if (ai?.data?.recommendations?.length) {
+      title = "اكتشف منتجات تم اختيارها بناءً علي اهتماماتك";
       products = ai.data.recommendations
         .slice(0, 3)
         .map(({ product }: { product: any }) => product);
@@ -109,10 +111,7 @@ export default async function Best_products() {
         منتجات مختارة لك
       </div>
       <h1 className="text-2xl sm:text-3xl font-black mt-1 mb-4 text-center">
-        اكتشف منتجات تم{" "}
-        <strong className="text-brand-primary">اختيارها </strong> بناءً علي
-        &nbsp;
-        <strong className="text-brand-primary">اهتماماتك </strong>
+        {title}
       </h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
