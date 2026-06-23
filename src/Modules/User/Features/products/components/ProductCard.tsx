@@ -5,9 +5,9 @@ import { Product } from "../types/products.typs";
 import Image from "next/image";
 
 const CONDITION_LABELS: Record<string, string> = {
-  excellent: "جديد",
-  good: "كالجديد",
-  fair: "ممتاز",
+  excellent: "ممتاز",
+  good: "جديد",
+  fair: "جيد",
 };
 
 const CONDITION_STYLES: Record<string, string> = {
