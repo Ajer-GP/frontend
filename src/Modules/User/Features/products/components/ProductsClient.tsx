@@ -498,12 +498,7 @@ export default function ProductsClient({
                 />
                 <button
                   onClick={handleSearch}
-<<<<<<< HEAD
-                  className="bg-brand-primary text-white text-body-sm px-4 py-1.5 rounded-lg hover:bg-brand-dark transition-colors">
-=======
-                  className="bg-brand-primary text-white text-[11px] sm:text-body-sm px-2 sm:px-4 py-1.5 rounded-lg hover:bg-brand-dark transition-colors shrink-0 whitespace-nowrap"
-                >
->>>>>>> e3ae68c60c3a4d3d1d3afd1a653a57759707623b
+                  className="bg-brand-primary text-white text-[11px] sm:text-body-sm px-2 sm:px-4 py-1.5 rounded-lg hover:bg-brand-dark transition-colors shrink-0 whitespace-nowrap">
                   ابحث
                 </button>
               </div>
