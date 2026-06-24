@@ -207,8 +207,7 @@ export default function ProductsClient({
       <div className="border border-border-default rounded-2xl overflow-hidden">
         <button
           className="w-full flex items-center justify-between px-4 py-3 bg-surface-secondary"
-          onClick={() => {}}
-        >
+          onClick={() => {}}>
           <span className="text-h3 font-medium text-text-primary">
             سعر الإيجار
           </span>
@@ -218,8 +217,7 @@ export default function ProductsClient({
             viewBox="0 0 24 24"
             strokeWidth={2}
             stroke="currentColor"
-            className="size-4 text-text-secondary"
-          >
+            className="size-4 text-text-secondary">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -319,8 +317,7 @@ export default function ProductsClient({
             viewBox="0 0 24 24"
             strokeWidth={2}
             stroke="currentColor"
-            className="size-4 text-text-secondary"
-          >
+            className="size-4 text-text-secondary">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -337,8 +334,7 @@ export default function ProductsClient({
                 activePeriod === p.value
                   ? "bg-brand-primary text-white border-brand-primary"
                   : "bg-white text-text-secondary border-border-default hover:border-brand-primary"
-              }`}
-            >
+              }`}>
               {p.label}
             </button>
           ))}
@@ -355,8 +351,7 @@ export default function ProductsClient({
             viewBox="0 0 24 24"
             strokeWidth={2}
             stroke="currentColor"
-            className="size-4 text-text-secondary"
-          >
+            className="size-4 text-text-secondary">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -368,8 +363,7 @@ export default function ProductsClient({
           {CONDITIONS.map((c) => (
             <label
               key={c.value}
-              className="flex items-center justify-between cursor-pointer py-1"
-            >
+              className="flex items-center justify-between cursor-pointer py-1">
               <span className="text-body-sm text-text-primary">{c.label}</span>
               <input
                 type="checkbox"
@@ -385,7 +379,7 @@ export default function ProductsClient({
   );
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  if (!aiProducts?.length) return null;
+  // if (!aiProducts?.length) return null;
 
   const scroll = (dir: "left" | "right") => {
     const el = scrollRef.current;
@@ -404,8 +398,7 @@ export default function ProductsClient({
           linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px)
         `,
           backgroundSize: "80px 80px",
-        }}
-      >
+        }}>
         {/* Breadcrumb */}
 
         <div className="breadcrumbs text-sm max-w-7xl mx-auto px-4 py-2.5 text-[#676767]">
@@ -438,8 +431,7 @@ export default function ProductsClient({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-3.5"
-              >
+                className="size-3.5">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -483,8 +475,7 @@ export default function ProductsClient({
                   setFilters(next);
                   fetchProducts(next);
                 }}
-                className="text-caption text-text-tertiary hover:text-brand-primary transition-colors"
-              >
+                className="text-caption text-text-tertiary hover:text-brand-primary transition-colors">
                 مسح الكل
               </button>
             </div>
@@ -503,8 +494,7 @@ export default function ProductsClient({
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-4 text-text-tertiary shrink-0"
-                >
+                  className="size-4 text-text-tertiary shrink-0">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -521,8 +511,7 @@ export default function ProductsClient({
                 />
                 <button
                   onClick={handleSearch}
-                  className="bg-brand-primary text-white text-[11px] sm:text-body-sm px-2 sm:px-4 py-1.5 rounded-lg hover:bg-brand-dark transition-colors shrink-0 whitespace-nowrap"
-                >
+                  className="bg-brand-primary text-white text-[11px] sm:text-body-sm px-2 sm:px-4 py-1.5 rounded-lg hover:bg-brand-dark transition-colors shrink-0 whitespace-nowrap">
                   ابحث
                 </button>
               </div>
@@ -537,8 +526,7 @@ export default function ProductsClient({
                       activeCategory === cat.value
                         ? "bg-brand-primary text-white border-brand-primary"
                         : "bg-white text-text-secondary border-border-default hover:border-brand-primary hover:text-brand-primary"
-                    }`}
-                  >
+                    }`}>
                     {cat.label}
                   </button>
                 ))}
@@ -548,16 +536,14 @@ export default function ProductsClient({
               <div className="flex items-center justify-between lg:hidden">
                 <button
                   onClick={() => setSidebarOpen(true)}
-                  className="flex items-center gap-2 border border-border-default rounded-xl px-4 py-2 text-body-sm text-text-secondary hover:border-brand-primary"
-                >
+                  className="flex items-center gap-2 border border-border-default rounded-xl px-4 py-2 text-body-sm text-text-secondary hover:border-brand-primary">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="size-4"
-                  >
+                    className="size-4">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -584,8 +570,7 @@ export default function ProductsClient({
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke="currentColor"
-                      className="size-4 text-accent-default shrink-0"
-                    >
+                      className="size-4 text-accent-default shrink-0">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -605,16 +590,14 @@ export default function ProductsClient({
                       onClick={() => scroll("right")}
                       className="size-7 rounded-full border border-[var(--border-default)] flex items-center justify-center
                        text-[var(--text-secondary)] hover:border-accent-default hover:text-accent-default
-                       hover:bg-accent-light transition-colors"
-                    >
+                       hover:bg-accent-light transition-colors">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
                         strokeWidth={2}
                         stroke="currentColor"
-                        className="size-3.5"
-                      >
+                        className="size-3.5">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -628,16 +611,14 @@ export default function ProductsClient({
                       onClick={() => scroll("left")}
                       className="size-7 rounded-full border border-[var(--border-default)] flex items-center justify-center
                        text-[var(--text-secondary)] hover:border-accent-default hover:text-accent-default
-                       hover:bg-accent-light transition-colors"
-                    >
+                       hover:bg-accent-light transition-colors">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
                         strokeWidth={2}
                         stroke="currentColor"
-                        className="size-3.5"
-                      >
+                        className="size-3.5">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -653,13 +634,11 @@ export default function ProductsClient({
                   ref={scrollRef}
                   className="flex flex-row-reverse gap-3 overflow-x-auto pb-2
                    scroll-smooth snap-x snap-mandatory
-                   [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-                >
-                  {aiProducts.map((item) => (
+                   [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                  {aiProducts.map((item, i) => (
                     <div
-                      key={item._id}
-                      className="shrink-0 w-[200px] sm:w-[220px] snap-start"
-                    >
+                      key={i}
+                      className="shrink-0 w-[200px] sm:w-[220px] snap-start">
                       <ProductCard
                         product={item.product}
                         period={activePeriod}
@@ -692,8 +671,7 @@ export default function ProductsClient({
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="size-8 text-text-tertiary"
-                  >
+                    className="size-8 text-text-tertiary">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -729,16 +707,14 @@ export default function ProductsClient({
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage <= 1}
-                  className="size-9 rounded-xl border border-border-default flex items-center justify-center text-text-secondary hover:border-brand-primary hover:text-brand-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                >
+                  className="size-9 rounded-xl border border-border-default flex items-center justify-center text-text-secondary hover:border-brand-primary hover:text-brand-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth={2}
                     stroke="currentColor"
-                    className="size-4"
-                  >
+                    className="size-4">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -756,8 +732,7 @@ export default function ProductsClient({
                         page === currentPage
                           ? "bg-brand-primary text-white"
                           : "border border-border-default text-text-secondary hover:border-brand-primary hover:text-brand-primary"
-                      }`}
-                    >
+                      }`}>
                       {page}
                     </button>
                   );
@@ -765,16 +740,14 @@ export default function ProductsClient({
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage >= totalPages}
-                  className="size-9 rounded-xl border border-border-default flex items-center justify-center text-text-secondary hover:border-brand-primary hover:text-brand-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                >
+                  className="size-9 rounded-xl border border-border-default flex items-center justify-center text-text-secondary hover:border-brand-primary hover:text-brand-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth={2}
                     stroke="currentColor"
-                    className="size-4"
-                  >
+                    className="size-4">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -802,16 +775,14 @@ export default function ProductsClient({
               </span>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="size-8 rounded-full bg-surface-secondary flex items-center justify-center"
-              >
+                className="size-8 rounded-full bg-surface-secondary flex items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={2}
                   stroke="currentColor"
-                  className="size-4"
-                >
+                  className="size-4">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -823,8 +794,7 @@ export default function ProductsClient({
             {renderFilterSidebar()}{" "}
             <button
               onClick={() => setSidebarOpen(false)}
-              className="w-full mt-4 bg-brand-primary text-white py-3 rounded-xl font-medium hover:bg-brand-dark transition-colors"
-            >
+              className="w-full mt-4 bg-brand-primary text-white py-3 rounded-xl font-medium hover:bg-brand-dark transition-colors">
               عرض النتائج
             </button>
           </div>
