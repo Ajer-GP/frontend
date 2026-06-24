@@ -6,9 +6,7 @@ import { redirect } from "next/navigation";
 
 export default function RentNow(data) {
   const product = data.data;
-
   const day = new Date().toISOString().split("T")[0];
-
   const [returnHour, setReturnHour] = useState("");
   const [startHour, setStartHour] = useState("");
   const [returnDate, setReturnDate] = useState("");
@@ -196,7 +194,8 @@ export default function RentNow(data) {
                     onChange={handleStartVal}
                     name="startPeriod"
                     id="startPeriod"
-                    className="select w-20 rounded-2xl">
+                    className="select w-20 rounded-2xl"
+                  >
                     <option value="am">AM</option>
                     <option value="pm">PM</option>
                   </select>
@@ -241,7 +240,8 @@ export default function RentNow(data) {
                     onChange={handleReturnVal}
                     name="returnPeriod"
                     id="returnPeriod"
-                    className="select w-20 rounded-2xl">
+                    className="select w-20 rounded-2xl"
+                  >
                     <option value="am">AM</option>
                     <option value="pm">PM</option>
                   </select>
@@ -278,7 +278,8 @@ export default function RentNow(data) {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-5 text-brand-primary shrink-0">
+                  className="size-5 text-brand-primary shrink-0"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -335,7 +336,7 @@ export default function RentNow(data) {
                 </span>
               </div>
               <div className="flex justify-between text-sm sm:text-base">
-                <span className="text-gray-400">نسبة المنصة (7.5%)</span>
+                <span className="text-gray-400">نسبة المنصة (5%)</span>
                 <span>
                   {rental.totalfee?.fees.commission.toLocaleString("ar-EG", {
                     minimumFractionDigits: 2,
@@ -344,7 +345,7 @@ export default function RentNow(data) {
                 </span>
               </div>
               <div className="flex justify-between text-sm sm:text-base">
-                <span className="text-gray-400">نسبة العربون (1%)</span>
+                <span className="text-gray-400">نسبة العربون (10%)</span>
                 <span>
                   {rental.totalfee?.fees.deposit.toLocaleString("ar-EG", {
                     minimumFractionDigits: 2,
@@ -366,7 +367,8 @@ export default function RentNow(data) {
             <button
               onClick={createRequest}
               disabled={!product.isActive || isLoading}
-              className="btn bg-brand-primary rounded-3xl text-white w-full mt-auto disabled:opacity-70">
+              className="btn bg-brand-primary rounded-3xl text-white w-full mt-auto disabled:opacity-70"
+            >
               {isLoading ? (
                 <>
                   <span className="loading loading-spinner loading-sm" />

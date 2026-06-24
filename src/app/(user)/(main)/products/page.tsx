@@ -27,6 +27,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
 
   const result = await getProductsAction(params);
   const resultAI = await AIProductRecommendation();
+  // console.log(resultAI.data.recommendations, "uuuu");
   //console.log(resultAI, "uuuu");
 
   return (
@@ -36,7 +37,6 @@ export default async function ProductsPage({ searchParams }: PageProps) {
         initialParams={params}
         AiProducts={resultAI.data.recommendations}
       />
-      ;
     </>
   );
 }

@@ -194,7 +194,7 @@ export async function submitReviewAction({
 }) {
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value;
-  console.log(rating, comment, "f");
+  // console.log(rating, comment, "f");
 
   if (!token) {
     return { success: false, error: "غير مصرح" };

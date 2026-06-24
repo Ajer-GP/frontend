@@ -101,7 +101,7 @@ export default function ProductCard({ product, period = "day" }: Props) {
         <span
           className={`absolute top-2 left-2 text-caption font-medium px-2 py-0.5 rounded-lg ${conditionStyle}`}
         >
-          {conditionLabel === "كالجديد" ? (
+          {conditionLabel === "[جديد]" ? (
             <span className="flex items-center gap-1">
               <span className="size-1.5 rounded-full bg-current" />
               {conditionLabel}
