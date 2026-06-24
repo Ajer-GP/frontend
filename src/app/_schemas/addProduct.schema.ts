@@ -36,7 +36,7 @@ export const step1Schema = z.object({
     }) as z.ZodType<"excellent" | "good" | "fair">,
   conditionNotes: z.array(z.object({ text: z.string() })).optional(),
   notes: z.array(z.object({ text: z.string() })).optional(),
-  handlingNotes: z.array(z.string()).min(1, "اختر إرشاد واحد على الأقل"),
+  handlingNotes: z.array(z.string()),
   location: z.object({
     street: z.string().min(1, "اسم الشارع مطلوب"),
     buildingNum: z.string().min(1, "رقم المبنى مطلوب"),
