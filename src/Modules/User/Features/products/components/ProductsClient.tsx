@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useCallback, useMemo } from "react";
+import { useState, useTransition, useCallback, useMemo, useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 import ProductCard from "./ProductCard";
@@ -95,6 +95,8 @@ export default function ProductsClient({
     useState<ActionResult<ProductsResponse>>(initialResult);
 
   const [aiProducts, setAiProducts] = useState<Product[]>(AiProducts);
+  console.log(aiProducts, "efef");
+
   // Filter sidebar open on mobile
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -381,7 +383,16 @@ export default function ProductsClient({
       </div>
     </aside>
   );
+  const scrollRef = useRef<HTMLDivElement>(null);
 
+  if (!aiProducts?.length) return null;
+
+  const scroll = (dir: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // RTL: زر اليمين = scroll للخلف (محتوى أحدث)، زر الشمال = scroll للأمام
+    el.scrollBy({ left: dir === "left" ? -280 : 280, behavior: "smooth" });
+  };
   // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
@@ -560,36 +571,49 @@ export default function ProductsClient({
                 </span>
               </div>
             </div>
-            <div>
-              {/* AI recommendations strip */}
-              {aiProducts && (
-                <div className="flex items-center gap-2 bg-accent-light border border-accent-default/20 rounded-xl px-4 py-2.5 mb-5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-4 text-accent-default shrink-0"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"
-                    />
-                  </svg>
-                  <span className="text-body-sm  font-medium">
-                    توصيات ذكية بالذكاء الاصطناعي مختارة لك
-                  </span>
-                  <div className="flex gap-1.5 mr-auto">
-                    <button className="size-6 rounded-full border border-accent-default/30 flex items-center justify-center text-accent-default hover:bg-accent-default/10">
+
+            {aiProducts && (
+              <div className="mb-5">
+                {/* ── Header ─────────────────────────────────────────────────────── */}
+                <div className="flex items-center gap-2 flex-row-reverse mb-3 px-1">
+                  {/* العنوان + أيقونة */}
+                  <div className="flex items-center gap-2 flex-row-reverse flex-1 min-w-0">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="size-4 text-accent-default shrink-0"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"
+                      />
+                    </svg>
+                    <span className="text-body-sm font-semibold text-[var(--text-primary)] truncate">
+                      توصيات ذكية بالذكاء الاصطناعي مختارة لك
+                    </span>
+                  </div>
+
+                  {/* Arrows */}
+                  <div className="flex gap-1.5 shrink-0">
+                    {/* زر يمين — يتحرك للخلف في RTL */}
+                    <button
+                      type="button"
+                      onClick={() => scroll("right")}
+                      className="size-7 rounded-full border border-[var(--border-default)] flex items-center justify-center
+                       text-[var(--text-secondary)] hover:border-accent-default hover:text-accent-default
+                       hover:bg-accent-light transition-colors"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
                         strokeWidth={2}
                         stroke="currentColor"
-                        className="size-3"
+                        className="size-3.5"
                       >
                         <path
                           strokeLinecap="round"
@@ -598,14 +622,21 @@ export default function ProductsClient({
                         />
                       </svg>
                     </button>
-                    <button className="size-6 rounded-full border border-accent-default/30 flex items-center justify-center text-accent-default hover:bg-accent-default/10">
+                    {/* زر شمال */}
+                    <button
+                      type="button"
+                      onClick={() => scroll("left")}
+                      className="size-7 rounded-full border border-[var(--border-default)] flex items-center justify-center
+                       text-[var(--text-secondary)] hover:border-accent-default hover:text-accent-default
+                       hover:bg-accent-light transition-colors"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
                         strokeWidth={2}
                         stroke="currentColor"
-                        className="size-3"
+                        className="size-3.5"
                       >
                         <path
                           strokeLinecap="round"
@@ -616,15 +647,28 @@ export default function ProductsClient({
                     </button>
                   </div>
                 </div>
-              )}
 
-              {aiProducts?.map((product) => (
-                <div key={product._id} className="shrink-0 w-64">
-                  <ProductCard product={product} period={activePeriod} />
+                {/* ── Scrollable Cards Row ─────────────────────────────────────────── */}
+                <div
+                  ref={scrollRef}
+                  className="flex flex-row-reverse gap-3 overflow-x-auto pb-2
+                   scroll-smooth snap-x snap-mandatory
+                   [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                >
+                  {aiProducts.map((item) => (
+                    <div
+                      key={item._id}
+                      className="shrink-0 w-[200px] sm:w-[220px] snap-start"
+                    >
+                      <ProductCard
+                        product={item.product}
+                        period={activePeriod}
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-
+              </div>
+            )}
             {/* Product grid */}
             {hasError ? (
               <div className="text-center py-20">
