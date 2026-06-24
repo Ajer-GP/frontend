@@ -22,7 +22,7 @@ export default async function CompletedPage({ params }: Props) {
   const days = Math.ceil(
     (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
   );
-  console.log(rental);
+  // console.log(rental);
 
   const product = {
     name: rental.product.title,

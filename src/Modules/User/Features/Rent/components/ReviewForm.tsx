@@ -14,7 +14,7 @@ export default function ReviewForm({
   // console.log(rentalId._id);
 
   const handleSubmit = () => {
-    console.log(productId, "sfeeeeeeeeee");
+    // console.log(productId, "sfeeeeeeeeee");
 
     startTransition(async () => {
       const res = await submitReviewAction({ productId, rating, comment });
