@@ -22,6 +22,7 @@ export default async function CompletedPage({ params }: Props) {
   const days = Math.ceil(
     (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
   );
+  console.log(rental);
 
   const product = {
     name: rental.product.title,
@@ -125,7 +126,7 @@ export default async function CompletedPage({ params }: Props) {
         <p className="text-body-sm text-text-secondary">
           رأيك يساعد المستأجرين الآخرين على اتخاذ قرارهم بشكل أفضل.
         </p>
-        <ReviewForm rentalId={id} productId={rental.product.id} />
+        <ReviewForm rentalId={id} productId={rental.productId} />
       </div>
 
       <HowItWorks currentStep={7} />

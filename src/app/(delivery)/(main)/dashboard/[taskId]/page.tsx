@@ -376,7 +376,7 @@ export default async function page({
               <p className="font-black"> {result.delivery.remainingAmount}</p>
             </div>
             <div className="flex flex-wrap justify-between gap-2">
-              <p> نسبة المنصة (7.5%)</p>
+              <p> نسبة المنصة (5%)</p>
               <p className="font-black">{result.delivery.commissionFee}</p>
             </div>
             <div className="flex flex-wrap justify-between gap-2 text-brand-primary bg-gray-50 rounded-xl px-2 py-2 my-1">

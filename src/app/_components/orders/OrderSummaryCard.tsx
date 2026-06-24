@@ -44,7 +44,7 @@ export default function OrderSummaryCard({
               <PricingRow label="سعر التأمين" value={pricing.insurance} />
               <PricingRow label="باقي الحساب" value={pricing.rentalPrice} />
               <PricingRow
-                label="نسبة المنصة (7.5%)"
+                label="نسبة المنصة (5%)"
                 value={pricing.platformFee}
               />
               <div className="flex items-center justify-between bg-[] py-2 px-2 rounded-lg pt-2">
@@ -182,7 +182,7 @@ export default function OrderSummaryCard({
           <Row label="سعر الإيجار" value={pricing.rentalPrice} />
           <Row label="سعر التوصيل" value={pricing.delivery} />
           <Row label="سعر التأمين" value={pricing.insurance} />
-          <Row label="نسبة المنصة (٪7.5)" value={pricing.platformFee} />
+          <Row label="نسبة المنصة (٪5)" value={pricing.platformFee} />
 
           {/* completed → بيظهر "مدفوع بالكامل" badge */}
           {type === "completed" && (

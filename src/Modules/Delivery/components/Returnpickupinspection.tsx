@@ -394,8 +394,14 @@ function ConfirmButton({
       formData.append("deliveryId", deliveryId);
       if (note) formData.append("deliveryRepNotes", note);
 
-      const checkedIds = checkedItems.filter((i) => i.checked).map((i) => i.id);
-      formData.append("checkedItems", JSON.stringify(checkedIds));
+      // const checkedIds = checkedItems.filter((i) => i.checked).map((i) => i.id);
+      // formData.append("checkedItems", JSON.stringify(checkedIds));
+
+      // ✅ بعت الـ labels بدل الـ ids
+      const checkedLabels = checkedItems
+        .filter((i) => i.checked)
+        .map((i) => i.label);
+      formData.append("checkedItems", JSON.stringify(checkedLabels));
 
       for (const file of files) {
         if (file) formData.append("images", file);
@@ -491,8 +497,14 @@ export default function ReturnPickupInspectionPage({
     Array(REQUIRED_PHOTOS).fill(null),
   );
   const [note, setNote] = useState("");
-  const [checklistItems, setChecklistItems] =
-    useState<ChecklistItem[]>(INITIAL_CHECKLIST);
+  // ✅ لو checklist: string[]
+  const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>(
+    taskDeatils.checklist.map((label, i) => ({
+      id: `item-${i}`,
+      label,
+      checked: true,
+    })),
+  );
 
   const isReady = uploadedCount >= REQUIRED_PHOTOS;
 

@@ -180,7 +180,8 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
                     selectedPricing.includes(option.key)
                       ? "border-brand-primary bg-brand-light text-brand-primary"
                       : "border-border-default text-text-secondary"
-                  }`}>
+                  }`}
+              >
                 <Image
                   src={option.icon}
                   alt={option.label}
@@ -245,7 +246,8 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
                           flagMessage
                             ? "bg-yellow-50 text-yellow-700 border-yellow-200"
                             : "bg-green-50 text-green-700 border-green-200"
-                        }`}>
+                        }`}
+                      >
                         {flagMessage ? (
                           <p>{flagMessage}</p>
                         ) : (
@@ -322,7 +324,8 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
           flagMessage
             ? "bg-yellow-50 text-yellow-700 border-yellow-200"
             : "bg-green-50 text-green-700 border-green-200"
-        }`}>
+        }`}
+                >
                   {flagMessage ? (
                     <p>{flagMessage}</p>
                   ) : (
@@ -347,7 +350,8 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            strokeWidth={2}>
+            strokeWidth={2}
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -368,7 +372,8 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="size-6 shrink-0">
+          className="size-6 shrink-0"
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -376,7 +381,7 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
           />
         </svg>
         <p className="text-body-sm">
-          يتم خصم عمولة بنسبة 7.5% من قيمة كل عملية تأجير، وتشمل معالجة المدفوعات،
+          يتم خصم عمولة بنسبة 5% من قيمة كل عملية تأجير، وتشمل معالجة المدفوعات،
           وتغطية الحماية، وخدمة الدعم.
         </p>
       </div>
@@ -399,7 +404,8 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="size-4 rounded-full bg-brand-light text-brand-primary w-9 h-9 px-2 py-2">
+                    className="size-4 rounded-full bg-brand-light text-brand-primary w-9 h-9 px-2 py-2"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -410,14 +416,16 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
                   <button
                     type="button"
                     onClick={() => removeFromChecklist(i)}
-                    className="text-gray-300 hover:text-danger text-sm">
+                    className="text-gray-300 hover:text-danger text-sm"
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke="currentColor"
-                      className="size-6">
+                      className="size-6"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -449,7 +457,8 @@ const Step2Pricing = forwardRef<Step2Ref>((_, ref) => {
             <button
               type="button"
               onClick={addToChecklist}
-              className="bg-brand-primary text-white text-body-sm px-4 py-2 rounded-xl shrink-0">
+              className="bg-brand-primary text-white text-body-sm px-4 py-2 rounded-xl shrink-0"
+            >
               + أضف
             </button>
           </div>
