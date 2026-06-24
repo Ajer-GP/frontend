@@ -194,6 +194,7 @@ export async function submitReviewAction({
 }) {
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value;
+  console.log(rating, comment, "f");
 
   if (!token) {
     return { success: false, error: "غير مصرح" };
@@ -216,7 +217,7 @@ export async function submitReviewAction({
   const data = await res.json();
 
   if (!res.ok) {
-    return { success: false, error: data.message ?? "حدث خطأ" };
+    return { success: false, error: data.error.message ?? "حدث خطأ" };
   }
 
   return { success: true };
