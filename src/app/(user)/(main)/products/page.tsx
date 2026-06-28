@@ -35,7 +35,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       <ProductsClient
         initialResult={result}
         initialParams={params}
-        AiProducts={resultAI.data.recommendations}
+        AiProducts={resultAI?.data?.recommendations}
       />
     </>
   );
